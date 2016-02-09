@@ -1,16 +1,13 @@
 #!/bin/bash
 
-# unmount any partitions on the target
+# unmount any partitions on the target device
 
-sudo umount $19
-sudo umount $18
-sudo umount $17
-sudo umount $16
-sudo umount $15
-sudo umount $14
-sudo umount $13
-sudo umount $12
-sudo umount $11
+a=9
+while [ $a -gt 0 ]
+do
+    sudo umount $1$a
+    a=`expr $a - 1`
+done
 
 # wipe the FAT on the target
 
@@ -18,8 +15,8 @@ sudo dd if=/dev/zero of=$1 bs=512 count=1
 
 # prepare mount points
 
-sudo mkdir /piclonesrc
-sudo mkdir /piclonedst
+src=$(mktemp -d)
+dst=$(mktemp -d)
 
 # find the last partition on the source
 
@@ -60,11 +57,11 @@ sudo parted /dev/mmcblk0 unit s print | tail -n +8 | head -n -1 | while read lin
 
 		# mount and copy
 
-		sudo mount $1$pnum /piclonedst
-		sudo mount /dev/mmcblk0p$pnum /piclonesrc
-		sudo cp -axv /piclonesrc/. /piclonedst/.
-		sudo umount /piclonedst
-		sudo umount /piclonesrc
+		sudo mount $1$pnum $dst
+		sudo mount /dev/mmcblk0p$pnum $src
+		sudo cp -axv $src/. $dst/.
+		sudo umount $dst
+		sudo umount $src
 	fi
 	if [ "$flags" == "lba" ]; then
 		sudo parted $1 set $pnum lba on
@@ -72,4 +69,3 @@ sudo parted /dev/mmcblk0 unit s print | tail -n +8 | head -n -1 | while read lin
 		sudo parted $1 set $pnum lba off
 	fi
 done
-
