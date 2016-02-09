@@ -1,0 +1,75 @@
+#!/bin/bash
+
+# unmount any partitions on the target
+
+sudo umount $19
+sudo umount $18
+sudo umount $17
+sudo umount $16
+sudo umount $15
+sudo umount $14
+sudo umount $13
+sudo umount $12
+sudo umount $11
+
+# wipe the FAT on the target
+
+sudo dd if=/dev/zero of=$1 bs=512 count=1
+
+# prepare mount points
+
+sudo mkdir /piclonesrc
+sudo mkdir /piclonedst
+
+# find the last partition on the source
+
+line=$(sudo parted /dev/mmcblk0 unit s print | tail -n 2 | head -n -1)
+lastpnum=$(echo $line | cut -d ' ' -f 1)
+
+# prepare the new FAT
+
+sudo parted $1 mklabel msdos
+
+# mirror the partitions on mmcblk0
+
+sudo parted /dev/mmcblk0 unit s print | tail -n +8 | head -n -1 | while read line ; do
+	pnum=`echo $line | cut -d ' ' -f 1`
+	start=`echo $line | cut -d ' ' -f 2`
+	end=`echo $line | cut -d ' ' -f 3`
+	type=`echo $line | cut -d ' ' -f 5`
+	fstype=`echo $line | cut -d ' ' -f 6`
+	flags=`echo $line | cut -d ' ' -f 7`
+	if [ "$type" == "extended" ]; then
+		sudo parted $1 -- mkpart extended $start -1s
+	else
+		if [ "$pnum" == "$lastpnum" ]; then
+			sudo parted $1 -- mkpart $type $fstype $start -1s
+		else
+			sudo parted $1 mkpart $type $fstype $start $end
+		fi
+		sudo partprobe
+
+		# create file systems
+
+		if [ "$fstype" == "fat32" ] || [ "$fstype" == "fat16" ]; then
+			sudo mkfs.fat $1$pnum
+		fi
+		if [ "$fstype" == "ext4" ]; then
+			sudo mkfs.ext4 -F $1$pnum
+		fi
+
+		# mount and copy
+
+		sudo mount $1$pnum /piclonedst
+		sudo mount /dev/mmcblk0p$pnum /piclonesrc
+		sudo cp -axv /piclonesrc/. /piclonedst/.
+		sudo umount /piclonedst
+		sudo umount /piclonesrc
+	fi
+	if [ "$flags" == "lba" ]; then
+		sudo parted $1 set $pnum lba on
+	else
+		sudo parted $1 set $pnum lba off
+	fi
+done
+
