@@ -30,12 +30,12 @@ sudo parted $1 mklabel msdos
 # mirror the partitions on mmcblk0
 
 sudo parted /dev/mmcblk0 unit s print | tail -n +8 | head -n -1 | while read line ; do
-	pnum=`echo $line | cut -d ' ' -f 1`
-	start=`echo $line | cut -d ' ' -f 2`
-	end=`echo $line | cut -d ' ' -f 3`
-	type=`echo $line | cut -d ' ' -f 5`
-	fstype=`echo $line | cut -d ' ' -f 6`
-	flags=`echo $line | cut -d ' ' -f 7`
+	pnum=$(echo $line | cut -d ' ' -f 1)
+	start=$(echo $line | cut -d ' ' -f 2)
+	end=$(echo $line | cut -d ' ' -f 3)
+	type=$(echo $line | cut -d ' ' -f 5)
+	fstype=$(echo $line | cut -d ' ' -f 6)
+	flags=$(echo $line | cut -d ' ' -f 7)
 	if [ "$type" == "extended" ]; then
 		sudo parted $1 -- mkpart extended $start -1s
 	else
