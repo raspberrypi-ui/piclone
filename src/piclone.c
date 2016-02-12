@@ -236,7 +236,6 @@ static gpointer backup_thread (gpointer data)
 			prog /= srcsz;
 			gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), prog);
 			//printf ("%ld %ld %f\n", dstsz, srcsz, prog);
-			//if (dstsz >= srcsz) break;
 			sleep (10);
 		}
 			
@@ -299,7 +298,15 @@ static void on_start (void)
     g_thread_new (NULL, backup_thread, NULL);
 }
 
-
+static void on_cb_changed (void)
+{
+    if (gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (to_cb)) == 0 ||
+        gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (from_cb)) == 0 ||
+        !strcmp (gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (to_cb)), gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (from_cb))))
+        gtk_widget_set_sensitive (GTK_WIDGET (start_btn), FALSE);
+    else
+        gtk_widget_set_sensitive (GTK_WIDGET (start_btn), TRUE);
+}
 
 /* The dialog... */
 
@@ -328,6 +335,28 @@ int main (int argc, char *argv[])
 	main_dlg = (GtkWidget *) gtk_builder_get_object (builder, "dialog1");
 
 	GtkWidget *table = (GtkWidget *) gtk_builder_get_object (builder, "table1");
+
+	from_cb = (GtkWidget *)  (GObject *) gtk_combo_box_text_new ();
+	gtk_table_attach (GTK_TABLE (table), GTK_WIDGET (from_cb), 1, 2, 0, 1, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 0);
+	gtk_widget_show_all (GTK_WIDGET (from_cb));
+	gtk_combo_box_append_text (GTK_COMBO_BOX (from_cb), _("Internal SD card"));
+	if (dip = opendir ("/sys/block"))
+	{
+	    while (dit = readdir (dip))
+        {
+            if (!strncmp (dit->d_name, "sd", 2))
+            {
+                // might want to do something with g_drive_get_name here at some point...
+                sprintf (buffer, "/dev/%s",  dit->d_name);
+                gtk_combo_box_append_text (GTK_COMBO_BOX (from_cb), buffer);
+                found = 1;
+            }
+        }
+	    closedir (dip);
+	}
+	gtk_combo_box_set_active (GTK_COMBO_BOX (from_cb), 0);
+	g_signal_connect (from_cb, "changed", G_CALLBACK (on_cb_changed), NULL);
+
 	to_cb = (GtkWidget *)  (GObject *) gtk_combo_box_text_new ();
 	gtk_table_attach (GTK_TABLE (table), GTK_WIDGET (to_cb), 1, 2, 1, 2, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 0);
 	gtk_widget_show_all (GTK_WIDGET (to_cb));
@@ -347,30 +376,11 @@ int main (int argc, char *argv[])
 	    closedir (dip);
 	}
 	if (found) gtk_combo_box_set_active (GTK_COMBO_BOX (to_cb), 0);
-
-	from_cb = (GtkWidget *)  (GObject *) gtk_combo_box_text_new ();
-	gtk_table_attach (GTK_TABLE (table), GTK_WIDGET (from_cb), 1, 2, 0, 1, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 0);
-	gtk_widget_show_all (GTK_WIDGET (from_cb));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (from_cb), _("Internal SD card"));
-    gtk_combo_box_set_active (GTK_COMBO_BOX (from_cb), 0);
-	
-	if (dip = opendir ("/sys/block"))
-	{
-	    while (dit = readdir (dip))
-        {
-            if (!strncmp (dit->d_name, "sd", 2))
-            {
-                // might want to do something with g_drive_get_name here at some point...
-                sprintf (buffer, "/dev/%s",  dit->d_name);
-                gtk_combo_box_append_text (GTK_COMBO_BOX (from_cb), buffer);
-                found = 1;
-            }
-        }	
-	    closedir (dip);
-	}
+	g_signal_connect (to_cb, "changed", G_CALLBACK (on_cb_changed), NULL);
 
 	start_btn = (GtkWidget *) gtk_builder_get_object (builder, "button1");
 	g_signal_connect (start_btn, "clicked", G_CALLBACK (on_start), NULL);
+	on_cb_changed ();
 	
 	g_object_unref (builder);
 
