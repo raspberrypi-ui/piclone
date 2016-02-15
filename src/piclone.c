@@ -11,33 +11,16 @@
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 #include <gtk/gtk.h>
-#include <gdk/gdkx.h>
 
-#include <X11/Xlib.h>
-#include <X11/XKBlib.h>
+/*---------------------------------------------------------------------------*/
+/* Variable and macro definitions */
+/*---------------------------------------------------------------------------*/
 
-/* Global variables for window values */
-
-/* Controls */
-static GtkWidget *main_dlg, *msg_dlg, *status, *progress, *cancel, *to_cb, *from_cb, *start_btn;
-
-/* device names */
-char src_dev[32], dst_dev[32];
-
-/* mount points */
-char src_mnt[32], dst_mnt[32];
-
-/* buffer storing copy command */
-char ctbuffer[256];
-
-/* flag to show that copy thread is running */
-char copying;
-
-/* partition data */
+/* struct to store partition data */
 
 #define MAXPART 9
 
-typedef struct 
+typedef struct
 {
     int pnum;
     long start;
@@ -49,27 +32,71 @@ typedef struct
 
 partition_t parts[MAXPART];
 
+/* control widget globals */
+static GtkWidget *main_dlg, *msg_dlg, *status, *progress, *cancel, *to_cb, *from_cb, *start_btn;
+
+/* device names */
+char src_dev[32], dst_dev[32];
+
+/* mount points */
+char src_mnt[32], dst_mnt[32];
+
+/* buffer storing copy command for subsequent use in grep */
+char ctbuffer[256];
+
+/* flag to show that copy thread is running */
+char copying;
+
+/* flag to show that backup has been cancelled by the user */
+char cancelled;
+#define CANCEL_CHECK if (cancelled) { g_idle_add (close_msg, NULL); return NULL; }
+
+/* debug system function - remove when no longer needed !!!! */
+
 void dsystem (char * cmd)
 {
 	printf ("%s\n", cmd);
 	system (cmd);
 }
+//#define system dsystem
 
+/*---------------------------------------------------------------------------*/
+/* Function definitions */
+/*---------------------------------------------------------------------------*/
 
-#define system dsystem
+/*---------------------------------------------------------------------------*/
+/* System helpers */
 
-static void get_string (char *cmd, char *name)
+/* Call a system command and read the first string returned */
+
+static int get_string (char *cmd, char *name)
 {
-    FILE *fp = popen (cmd, "r");
+    FILE *fp;
     char buf[64];
 
-    if (fp == NULL) return;
-    if (fgets (buf, sizeof (buf) - 1, fp) != NULL)
-    {
-        sscanf (buf, "%s", name);
-        return;
-    }
+    fp = popen (cmd, "r");
+    if (fp == NULL || fgets (buf, sizeof (buf) - 1, fp) == NULL) return 0;
+    return sscanf (buf, "%s", name);
 }
+
+/* System function with printf formatting */
+
+static void sys_printf (const char * format, ...)
+{
+  char buffer[256];
+  va_list args;
+
+  va_start (args, format);
+  vsprintf (buffer, format, args);
+  system (buffer);
+  va_end (args);
+}
+
+
+/*---------------------------------------------------------------------------*/
+/* UI helpers */
+
+/* Close the progress dialog - usually called on idle */
 
 static gboolean close_msg (gpointer data)
 {
@@ -77,166 +104,179 @@ static gboolean close_msg (gpointer data)
 	return FALSE;
 }
 
-static gpointer copy_thread (gpointer data)
-{
-	sprintf (ctbuffer, "sudo cp -ax %s/. %s/.", src_mnt, dst_mnt);
-	system (ctbuffer);
-	copying = 0;
-	return NULL;
-}
 
-static void backup_thread_msg (char *msg)
+/* Update the progress dialog with a message to show that backup has ended */
+
+static void terminate_dialog (char *msg)
 {
     gtk_widget_set_visible (GTK_WIDGET (progress), FALSE);
     gtk_label_set_text (GTK_LABEL (status), msg);
     gtk_button_set_label (GTK_BUTTON (cancel), _("OK"));
 }
 
+
+/*---------------------------------------------------------------------------*/
+/* Threads */
+
+/* Thread which calls the system copy command to do the bulk of the work */
+
+static gpointer copy_thread (gpointer data)
+{
+	sprintf (ctbuffer, "sudo cp -ax %s/. %s/.", src_mnt, dst_mnt);
+	copying = 1;
+	system (ctbuffer);
+	copying = 0;
+	return NULL;
+}
+
+
+/* Thread which sets up all the partitions */
+
 static gpointer backup_thread (gpointer data)
 {
     char buffer[256], res[256];
     int n, p;
-    long srcsz, dstsz;
+    long srcsz, dstsz, stime;
     double prog;
     FILE *fp;
 
-    // check the source has an msdos partition table, or all else is for naught...
+    // check the source has an msdos partition table
     sprintf (buffer, "sudo parted %s unit s print | tail -n +4 | head -n 1", src_dev);  
     fp = popen (buffer, "r");
-    if (fp == NULL)
+    if (fp == NULL || fgets (buffer, sizeof (buffer) - 1, fp) == NULL)
     {
-        backup_thread_msg (_("Unable to read source"));
+        terminate_dialog (_("Unable to read source"));
         return;
     }
-    if (fgets (buffer, sizeof (buffer) - 1, fp) != NULL)
+    if (strncmp (buffer, "Partition Table: msdos", 22))
     {
-        if (strncmp (buffer, "Partition Table: msdos", 22))
-        {
-            backup_thread_msg (_("Non-MSDOS partition table on source"));
-            return;
-        }
+        terminate_dialog (_("Non-MSDOS partition table on source"));
+        return;
     }
     else
-    {
-        backup_thread_msg (_("Unable to read source"));
-        return;
-    }
+    CANCEL_CHECK;
 
+    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 1.0);
     gtk_label_set_text (GTK_LABEL (status), _("Preparing target..."));
+    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 0.0);
 
     // unmount any partitions on the target device
     for (n = 9; n >= 1; n--)
     {
-        sprintf (buffer, "sudo umount %s%d", dst_dev, n);
-        system (buffer);
+        sys_printf ("sudo umount %s%d", dst_dev, n);
+        CANCEL_CHECK;
     }
 
     // wipe the FAT on the target
-    sprintf (buffer, "sudo dd if=/dev/zero of=%s bs=512 count=1", dst_dev);
-    system (buffer);
+    sys_printf ("sudo dd if=/dev/zero of=%s bs=512 count=1", dst_dev);
+    CANCEL_CHECK;
     
     // prepare temp mount points
     get_string ("mktemp -d", src_mnt);
+    CANCEL_CHECK;
     get_string ("mktemp -d", dst_mnt);
-    //printf ("srcmnt = %s dstmnt = %s\n", src_mnt, dst_mnt);
+    CANCEL_CHECK;
     
     // prepare the new FAT
-    sprintf (buffer, "sudo parted -s %s mklabel msdos", dst_dev);
-    system (buffer);
-    
-    // read in the source partition table
+    sys_printf ("sudo parted -s %s mklabel msdos", dst_dev);
+    CANCEL_CHECK;
+
+    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 1.0);
     gtk_label_set_text (GTK_LABEL (status), _("Reading partitions..."));
+    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 0.0);
+
+    // read in the source partition table
     n = 0;
-    while (1)
+    sprintf (buffer, "sudo parted %s unit s print | tail -n +8 | head -n -1", src_dev);
+    fp = popen (buffer, "r");
+    if (fp != NULL)
     {
-        sprintf (buffer, "sudo parted %s unit s print | tail -n +%d | head -n 1", src_dev, n + 8);
-        fp = popen (buffer, "r");
-        if (fp == NULL) break;
-        if (fgets (buffer, sizeof (buffer) - 1, fp) != NULL)
+        while (1)
         {
-            if (buffer[0] == 0x0A) break;
-            //printf ("%s", buffer);
-            sscanf (buffer, "%d %lds %lds %*lds %s %s %s", &(parts[n].pnum), &(parts[n].start), &(parts[n].end), &(parts[n].ptype), &(parts[n].ftype), &(parts[n].flags));
-            //printf ("%d %ld %ld %s %s %s\n", parts[n].pnum, parts[n].start, parts[n].end, parts[n].ptype, parts[n].ftype, parts[n].flags);
+            if (fgets (buffer, sizeof (buffer) - 1, fp) == NULL) break;
+            sscanf (buffer, "%d %lds %lds %*lds %s %s %s", &(parts[n].pnum), &(parts[n].start),
+                &(parts[n].end), &(parts[n].ptype), &(parts[n].ftype), &(parts[n].flags));
+            n++;
         }
-        else break;
-        n++;
     }
-    
-    //printf ("Partition table read - %d partitions found\n", n);
+    CANCEL_CHECK;
+
+    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 1.0);
+    gtk_label_set_text (GTK_LABEL (status), _("Preparing partitions..."));
+    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 0.0);
     
     // recreate the partitions on the target
     for (p = 0; p < n; p++)
     {
-        gtk_label_set_text (GTK_LABEL (status), _("Preparing partitions..."));
-	
 	    // create the partition
 	    if (!strcmp (parts[p].ptype, "extended"))
-	    {
-		    sprintf (buffer, "sudo parted -s %s -- mkpart extended %lds -1s", dst_dev, parts[p].start);
-		}
+		    sys_printf ("sudo parted -s %s -- mkpart extended %lds -1s", dst_dev, parts[p].start);
 	    else
 	    {
 		    if (p == (n - 1))
-			    sprintf (buffer, "sudo parted -s %s -- mkpart %s %s %lds -1s", dst_dev, parts[p].ptype, parts[p].ftype, parts[p].start);
+			    sys_printf ("sudo parted -s %s -- mkpart %s %s %lds -1s", dst_dev,
+			        parts[p].ptype, parts[p].ftype, parts[p].start);
 		    else
-			    sprintf (buffer, "sudo parted -s %s mkpart %s %s %lds %lds", dst_dev, parts[p].ptype, parts[p].ftype, parts[p].start, parts[p].end);
+			    sys_printf ("sudo parted -s %s mkpart %s %s %lds %lds", dst_dev,
+			        parts[p].ptype, parts[p].ftype, parts[p].start, parts[p].end);
 		}
-		system (buffer);
-		
+        CANCEL_CHECK;
+
 		// refresh the kernel partion table
 		system ("sudo partprobe");
+        CANCEL_CHECK;
 
 		// create file systems
         if (!strncmp (parts[p].ftype, "fat", 3))
-        {
-            sprintf (buffer, "sudo mkfs.fat %s%d", dst_dev, parts[p].pnum);
-            system (buffer);
-        } 
+            sys_printf ("sudo mkfs.fat %s%d", dst_dev, parts[p].pnum);
+        CANCEL_CHECK;
+
         if (!strcmp (parts[p].ftype, "ext4"))
-        {
-            sprintf (buffer, "sudo mkfs.ext4 -F %s%d", dst_dev, parts[p].pnum);
-            system (buffer);
-        } 
+            sys_printf ("sudo mkfs.ext4 -F %s%d", dst_dev, parts[p].pnum);
+        CANCEL_CHECK;
 
         // set the flags        
         if (!strcmp (parts[p].flags, "lba"))
-            sprintf (buffer, "sudo parted -s %s set %d lba on", dst_dev, parts[p].pnum);
+            sys_printf ("sudo parted -s %s set %d lba on", dst_dev, parts[p].pnum);
         else
-            sprintf (buffer, "sudo parted -s %s set %d lba off", dst_dev, parts[p].pnum);
-        system (buffer);
+            sys_printf ("sudo parted -s %s set %d lba off", dst_dev, parts[p].pnum);
+        CANCEL_CHECK;
         
         prog = p + 1;
         prog /= n;
         gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), prog);
     }
-    
+
     // do the copy for each partition
     for (p = 0; p < n; p++)
     {
         sprintf (buffer, _("Copying partition %d of %d..."), p + 1, n);
- 		gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 0.0);
 		gtk_label_set_text (GTK_LABEL (status), buffer);
+ 		gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 0.0);
 	
 		// mount partitions
-		sprintf (buffer, "sudo mount %s%d %s", dst_dev, parts[p].pnum, dst_mnt);
-		system (buffer);
+		sys_printf ("sudo mount %s%d %s", dst_dev, parts[p].pnum, dst_mnt);
+        CANCEL_CHECK;
 		if (!strcmp (src_dev, "/dev/mmcblk0"))
-		    sprintf (buffer, "sudo mount %sp%d %s", src_dev, parts[p].pnum, src_mnt);
+		    sys_printf ("sudo mount %sp%d %s", src_dev, parts[p].pnum, src_mnt);
 		else
-		    sprintf (buffer, "sudo mount %s%d %s", src_dev, parts[p].pnum, src_mnt);
-		system (buffer);
+		    sys_printf ("sudo mount %s%d %s", src_dev, parts[p].pnum, src_mnt);
+        CANCEL_CHECK;
  		
 		// start the copy itself in a new thread
-		copying = 1;
 		g_thread_new (NULL, copy_thread, NULL);
 
-		// wait for the copy to complete, while updating the progress bar...
+        // get the size to be copied
 		sprintf (buffer, "sudo du -s %s", src_mnt);
 		get_string (buffer, res);
 		sscanf (res, "%ld", &srcsz);
+		if (srcsz < 50000) stime = 1;
+		else if (srcsz < 500000) stime = 5;
+		else stime = 10;
+
+		// wait for the copy to complete, while updating the progress bar...
 		sprintf (buffer, "sudo du -s %s", dst_mnt);
-		while (copying) //!!! check the cancel button in here somehow?
+		while (copying)
 		{
 			get_string (buffer, res);
 			sscanf (res, "%ld", &dstsz);
@@ -244,19 +284,27 @@ static gpointer backup_thread (gpointer data)
 			prog /= srcsz;
 			gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), prog);
 			//printf ("%ld %ld %f\n", dstsz, srcsz, prog);
-			sleep (10);
+			sleep (stime);
 		}
+
+		gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 1.0);
 			
 		// unmount partitions
-		sprintf (buffer, "sudo umount %s", dst_mnt);
-		system (buffer);
-		sprintf (buffer, "sudo umount %s", src_mnt);
-		system (buffer);
+		sys_printf ("sudo umount %s", dst_mnt);
+        CANCEL_CHECK;
+		sys_printf ("sudo umount %s", src_mnt);
+        CANCEL_CHECK;
     }
 
-    backup_thread_msg (_("Copy complete"));
+    terminate_dialog (_("Copy complete"));
     return NULL;
 }
+
+
+/*---------------------------------------------------------------------------*/
+/* Progress dialog UI handlers */
+
+/* Handler for cancel button */
 
 static void on_cancel (void)
 {
@@ -264,6 +312,12 @@ static void on_cancel (void)
 	char buffer[256];
 	int pid;
 
+    // hide the progress bar and disable the cancel button
+    gtk_widget_set_visible (GTK_WIDGET (progress), FALSE);
+    gtk_label_set_text (GTK_LABEL (status), "Cancelling...");
+    gtk_widget_set_sensitive (GTK_WIDGET (cancel), FALSE);
+
+    // kill copy processes if running
 	if (copying)
 	{
 		sprintf (buffer, "ps ax | grep \"%s\" | grep -v \"grep\"", ctbuffer);
@@ -272,24 +326,25 @@ static void on_cancel (void)
 		{
             while (1)
             {
-                if (fgets (buffer, sizeof (buffer) - 1, fp) != NULL)
-                {
-                    if (buffer[0] == 0x0A) break;
-                    sscanf (buffer, "%d", &pid);
-                    sprintf (buffer, "sudo kill %d", pid);
-                    system (buffer);
-                }
-            else break;
+                if (fgets (buffer, sizeof (buffer) - 1, fp) == NULL) break;
+                if (sscanf (buffer, "%d", &pid) == 1) sys_printf ("sudo kill %d", pid);
             }
 		}
         copying = 0;
+        g_idle_add (close_msg, NULL);
     }
-    g_idle_add (close_msg, NULL);
+    else cancelled = 1;
 }
+
+
+/*---------------------------------------------------------------------------*/
+/* Main dialog UI handlers */
+
+/* Handler for start button */
 
 static void on_start (void)
 {
-    // set up source and target devices
+    // set up source and target devices from combobox values
     strcpy (dst_dev, gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (to_cb)));
 
     if (!strcmp (_("Internal SD card"), gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (from_cb))))
@@ -297,10 +352,10 @@ static void on_start (void)
     else
         strcpy (src_dev, gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (from_cb)));  
 
-    // don't do anything if src == dest
+    // basic sanity check - don't do anything if src == dest
     if (!strcmp (src_dev, dst_dev)) return;
 
-    // show the progress dialog
+    // create the progress dialog
     msg_dlg = (GtkWidget *) gtk_dialog_new ();
     gtk_window_set_title (GTK_WINDOW (msg_dlg), "");
     gtk_window_set_modal (GTK_WINDOW (msg_dlg), TRUE);
@@ -308,39 +363,55 @@ static void on_start (void)
     gtk_window_set_destroy_with_parent (GTK_WINDOW (msg_dlg), TRUE);
     gtk_window_set_skip_taskbar_hint (GTK_WINDOW (msg_dlg), TRUE);
     gtk_window_set_transient_for (GTK_WINDOW (msg_dlg), GTK_WINDOW (main_dlg));
+
+    // add border
     GtkWidget *frame = gtk_frame_new (NULL);
-    gtk_container_add (GTK_CONTAINER (gtk_dialog_get_content_area (GTK_DIALOG (msg_dlg))), frame);
-        
+    gtk_container_add (GTK_CONTAINER (gtk_dialog_get_action_area (GTK_DIALOG (msg_dlg))), frame);
+
+    // add container
     GtkWidget *box = (GtkWidget *) gtk_vbox_new (TRUE, 5);
     gtk_container_set_border_width (GTK_CONTAINER (box), 10);
     gtk_container_add (GTK_CONTAINER (frame), box);
-        
+
+    // add message
     status = (GtkWidget *) gtk_label_new (_("Checking source..."));
     gtk_box_pack_start (GTK_BOX (box), status, FALSE, FALSE, 5);
+
+    // add progress bar
     progress = (GtkWidget *) gtk_progress_bar_new ();
     gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 0.0);
     gtk_box_pack_start (GTK_BOX (box), progress, FALSE, FALSE, 5);
+
+    // add cancel button
     cancel = (GtkWidget *) gtk_button_new_with_label (_("Cancel"));
     gtk_box_pack_start (GTK_BOX (box), cancel, FALSE, FALSE, 5);
     g_signal_connect (cancel, "clicked", G_CALLBACK (on_cancel), NULL);
-    
+
     gtk_widget_show_all (GTK_WIDGET (msg_dlg));
 
     // launch a thread with the system call to run the backup
+    cancelled = 0;
     g_thread_new (NULL, backup_thread, NULL);
 }
 
+
+/* Handler for "changed" signal from comboboxes */
+
 static void on_cb_changed (void)
 {
+    // set the start button to active only if boxes contain different strings
     if (gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (to_cb)) == 0 ||
         gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (from_cb)) == 0 ||
-        !strcmp (gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (to_cb)), gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (from_cb))))
+        !strcmp (gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (to_cb)),
+            gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (from_cb))))
         gtk_widget_set_sensitive (GTK_WIDGET (start_btn), FALSE);
     else
         gtk_widget_set_sensitive (GTK_WIDGET (start_btn), TRUE);
 }
 
-/* The dialog... */
+
+/*---------------------------------------------------------------------------*/
+/* Main function - main dialog */
 
 int main (int argc, char *argv[])
 {
@@ -366,12 +437,28 @@ int main (int argc, char *argv[])
 	gtk_builder_add_from_file (builder, PACKAGE_DATA_DIR "/piclone.ui", NULL);
 	main_dlg = (GtkWidget *) gtk_builder_get_object (builder, "dialog1");
 
+    // set up the start button
+	start_btn = (GtkWidget *) gtk_builder_get_object (builder, "button1");
+	g_signal_connect (start_btn, "clicked", G_CALLBACK (on_start), NULL);
+
+    // get the table which holds the other elements
 	GtkWidget *table = (GtkWidget *) gtk_builder_get_object (builder, "table1");
 
+    // create and add the source combobox
 	from_cb = (GtkWidget *)  (GObject *) gtk_combo_box_text_new ();
 	gtk_table_attach (GTK_TABLE (table), GTK_WIDGET (from_cb), 1, 2, 0, 1, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 0);
 	gtk_widget_show_all (GTK_WIDGET (from_cb));
+	g_signal_connect (from_cb, "changed", G_CALLBACK (on_cb_changed), NULL);
+
+    // create and add the destination combobox
+	to_cb = (GtkWidget *)  (GObject *) gtk_combo_box_text_new ();
+	gtk_table_attach (GTK_TABLE (table), GTK_WIDGET (to_cb), 1, 2, 1, 2, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 0);
+	gtk_widget_show_all (GTK_WIDGET (to_cb));
+	g_signal_connect (to_cb, "changed", G_CALLBACK (on_cb_changed), NULL);
+
+	// populate the comboboxes
 	gtk_combo_box_append_text (GTK_COMBO_BOX (from_cb), _("Internal SD card"));
+	gtk_combo_box_set_active (GTK_COMBO_BOX (from_cb), 0);
 	if (dip = opendir ("/sys/block"))
 	{
 	    while (dit = readdir (dip))
@@ -381,26 +468,6 @@ int main (int argc, char *argv[])
                 // might want to do something with g_drive_get_name here at some point...
                 sprintf (buffer, "/dev/%s",  dit->d_name);
                 gtk_combo_box_append_text (GTK_COMBO_BOX (from_cb), buffer);
-                found = 1;
-            }
-        }
-	    closedir (dip);
-	}
-	gtk_combo_box_set_active (GTK_COMBO_BOX (from_cb), 0);
-	g_signal_connect (from_cb, "changed", G_CALLBACK (on_cb_changed), NULL);
-
-	to_cb = (GtkWidget *)  (GObject *) gtk_combo_box_text_new ();
-	gtk_table_attach (GTK_TABLE (table), GTK_WIDGET (to_cb), 1, 2, 1, 2, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 0);
-	gtk_widget_show_all (GTK_WIDGET (to_cb));
-
-	if (dip = opendir ("/sys/block"))
-	{
-	    while (dit = readdir (dip))
-        {
-            if (!strncmp (dit->d_name, "sd", 2))
-            {
-                // might want to do something with g_drive_get_name here at some point...
-                sprintf (buffer, "/dev/%s",  dit->d_name);
                 gtk_combo_box_append_text (GTK_COMBO_BOX (to_cb), buffer);
                 found = 1;
             }
@@ -408,16 +475,13 @@ int main (int argc, char *argv[])
 	    closedir (dip);
 	}
 	if (found) gtk_combo_box_set_active (GTK_COMBO_BOX (to_cb), 0);
-	g_signal_connect (to_cb, "changed", G_CALLBACK (on_cb_changed), NULL);
-
-	start_btn = (GtkWidget *) gtk_builder_get_object (builder, "button1");
-	g_signal_connect (start_btn, "clicked", G_CALLBACK (on_start), NULL);
-	on_cb_changed ();
 	
 	g_object_unref (builder);
-
 	gtk_dialog_run (GTK_DIALOG (main_dlg));
 	gtk_widget_destroy (main_dlg);
 
 	return 0;
 }
+
+/* End of file */
+/*===========================================================================*/
