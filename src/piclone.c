@@ -27,6 +27,9 @@ char src_dev[32], dst_dev[32];
 /* mount points */
 char src_mnt[32], dst_mnt[32];
 
+/* buffer storing copy command */
+char ctbuffer[256];
+
 /* flag to show that copy thread is running */
 char copying;
 
@@ -46,7 +49,14 @@ typedef struct
 
 partition_t parts[MAXPART];
 
+void dsystem (char * cmd)
+{
+	printf ("%s\n", cmd);
+	system (cmd);
+}
 
+
+#define system dsystem
 
 static void get_string (char *cmd, char *name)
 {
@@ -69,7 +79,6 @@ static gboolean close_msg (gpointer data)
 
 static gpointer copy_thread (gpointer data)
 {
-	char ctbuffer[256];
 	sprintf (ctbuffer, "sudo cp -ax %s/. %s/.", src_mnt, dst_mnt);
 	system (ctbuffer);
 	copying = 0;
@@ -82,7 +91,6 @@ static void backup_thread_msg (char *msg)
     gtk_label_set_text (GTK_LABEL (status), msg);
     gtk_button_set_label (GTK_BUTTON (cancel), _("OK"));
 }
-
 
 static gpointer backup_thread (gpointer data)
 {
@@ -133,7 +141,7 @@ static gpointer backup_thread (gpointer data)
     //printf ("srcmnt = %s dstmnt = %s\n", src_mnt, dst_mnt);
     
     // prepare the new FAT
-    sprintf (buffer, "sudo parted %s mklabel msdos", dst_dev);
+    sprintf (buffer, "sudo parted -s %s mklabel msdos", dst_dev);
     system (buffer);
     
     // read in the source partition table
@@ -193,9 +201,9 @@ static gpointer backup_thread (gpointer data)
 
         // set the flags        
         if (!strcmp (parts[p].flags, "lba"))
-            sprintf (buffer, "sudo parted %s set %d lba on", dst_dev, parts[p].pnum);
+            sprintf (buffer, "sudo parted -s %s set %d lba on", dst_dev, parts[p].pnum);
         else
-            sprintf (buffer, "sudo parted %s set %d lba off", dst_dev, parts[p].pnum);
+            sprintf (buffer, "sudo parted -s %s set %d lba off", dst_dev, parts[p].pnum);
         system (buffer);
         
         prog = p + 1;
@@ -221,8 +229,8 @@ static gpointer backup_thread (gpointer data)
  		
 		// start the copy itself in a new thread
 		copying = 1;
-		g_thread_new (NULL, copy_thread, NULL);	
-		
+		g_thread_new (NULL, copy_thread, NULL);
+
 		// wait for the copy to complete, while updating the progress bar...
 		sprintf (buffer, "sudo du -s %s", src_mnt);
 		get_string (buffer, res);
@@ -252,6 +260,30 @@ static gpointer backup_thread (gpointer data)
 
 static void on_cancel (void)
 {
+	FILE *fp;
+	char buffer[256];
+	int pid;
+
+	if (copying)
+	{
+		sprintf (buffer, "ps ax | grep \"%s\" | grep -v \"grep\"", ctbuffer);
+        fp = popen (buffer, "r");
+        if (fp != NULL)
+		{
+            while (1)
+            {
+                if (fgets (buffer, sizeof (buffer) - 1, fp) != NULL)
+                {
+                    if (buffer[0] == 0x0A) break;
+                    sscanf (buffer, "%d", &pid);
+                    sprintf (buffer, "sudo kill %d", pid);
+                    system (buffer);
+                }
+            else break;
+            }
+		}
+        copying = 0;
+    }
     g_idle_add (close_msg, NULL);
 }
 
