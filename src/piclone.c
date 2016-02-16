@@ -112,6 +112,22 @@ static void terminate_dialog (char *msg)
 }
 
 
+/* Parse the partition table to get a device name */
+
+static int get_dev_name (char *dev, char *name)
+{
+    char buffer[256];
+    FILE *fp;
+
+    sprintf (buffer, "sudo parted -l | grep -B 1 \"/dev/%s\" | head -n 1 | cut -d \":\" -f 2 | cut -d \"(\" -f 1", dev);
+    fp = popen (buffer, "r");
+    if (fp == NULL || fgets (buffer, sizeof (buffer) - 1, fp) == NULL) return 0;
+    buffer[strlen (buffer) - 2] = 0;
+    strcpy (name, buffer + 1);
+    return 1;
+}
+
+
 /*---------------------------------------------------------------------------*/
 /* Threads */
 
@@ -340,13 +356,16 @@ static void on_cancel (void)
 
 static void on_start (void)
 {
-    // set up source and target devices from combobox values
-    strcpy (dst_dev, gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (to_cb)));
+    char *ptr;
 
-    if (!strcmp (_("Internal SD card"), gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (from_cb))))
-        sprintf (src_dev, "/dev/mmcblk0");
-    else
-        strcpy (src_dev, gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (from_cb)));  
+    // set up source and target devices from combobox values
+    ptr = strrchr (gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (to_cb)), '(');
+    strcpy (dst_dev, ptr + 1);
+    dst_dev[strlen (dst_dev) - 1] = 0;
+
+    ptr = strrchr (gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (from_cb)), '(');
+    strcpy (src_dev, ptr + 1);
+    src_dev[strlen (src_dev) - 1] = 0;
 
     // basic sanity check - don't do anything if src == dest
     if (!strcmp (src_dev, dst_dev)) return;
@@ -414,8 +433,7 @@ int main (int argc, char *argv[])
 	GtkBuilder *builder;
 	DIR *dip;
 	struct dirent *dit;
-	int found = 0;
-	char buffer[32];
+	char buffer[256];
 
 #ifdef ENABLE_NLS
     setlocale (LC_ALL, "");
@@ -453,7 +471,7 @@ int main (int argc, char *argv[])
 	g_signal_connect (to_cb, "changed", G_CALLBACK (on_cb_changed), NULL);
 
 	// populate the comboboxes
-	gtk_combo_box_append_text (GTK_COMBO_BOX (from_cb), _("Internal SD card"));
+	gtk_combo_box_append_text (GTK_COMBO_BOX (from_cb), _("Internal SD card  (/dev/mmcblk0)"));
 	gtk_combo_box_set_active (GTK_COMBO_BOX (from_cb), 0);
 	if (dip = opendir ("/sys/block"))
 	{
@@ -461,16 +479,14 @@ int main (int argc, char *argv[])
         {
             if (!strncmp (dit->d_name, "sd", 2))
             {
-                // might want to do something with g_drive_get_name here at some point...
-                sprintf (buffer, "/dev/%s",  dit->d_name);
+                get_dev_name (dit->d_name, buffer);
+                sprintf (buffer, "%s  (/dev/%s)", buffer, dit->d_name);
                 gtk_combo_box_append_text (GTK_COMBO_BOX (from_cb), buffer);
                 gtk_combo_box_append_text (GTK_COMBO_BOX (to_cb), buffer);
-                found = 1;
             }
         }
 	    closedir (dip);
 	}
-	if (found) gtk_combo_box_set_active (GTK_COMBO_BOX (to_cb), 0);
 	
 	g_object_unref (builder);
 	gtk_dialog_run (GTK_DIALOG (main_dlg));
