@@ -41,9 +41,6 @@ char src_dev[32], dst_dev[32];
 /* mount points */
 char src_mnt[32], dst_mnt[32];
 
-/* buffer storing copy command for subsequent use in grep */
-char ctbuffer[256];
-
 /* flag to show that copy thread is running */
 char copying;
 
@@ -122,9 +119,8 @@ static void terminate_dialog (char *msg)
 
 static gpointer copy_thread (gpointer data)
 {
-	sprintf (ctbuffer, "sudo cp -ax %s/. %s/.", src_mnt, dst_mnt);
 	copying = 1;
-	system (ctbuffer);
+	sys_printf ("sudo cp -ax %s/. %s/.", src_mnt, dst_mnt);
 	copying = 0;
 	return NULL;
 }
@@ -320,7 +316,7 @@ static void on_cancel (void)
     // kill copy processes if running
 	if (copying)
 	{
-		sprintf (buffer, "ps ax | grep \"%s\" | grep -v \"grep\"", ctbuffer);
+		sprintf (buffer, "ps ax | grep \"sudo cp -ax %s/. %s/.\" | grep -v \"grep\"", src_mnt, dst_mnt);
         fp = popen (buffer, "r");
         if (fp != NULL)
 		{
