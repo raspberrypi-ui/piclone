@@ -360,13 +360,16 @@ static void on_cancel (void)
 
 
 /*---------------------------------------------------------------------------*/
-/* Main dialog UI handlers */
+/* Confirm dialog UI handlers */
 
-/* Handler for start button */
+/* Handler for Yes button */
 
 static void on_start (void)
 {
     char *ptr;
+
+    // close the confirm dialog
+	gtk_widget_destroy (msg_dlg);
 
     // set up source and target devices from combobox values
     ptr = strrchr (gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (to_cb)), '(');
@@ -422,6 +425,62 @@ static void on_start (void)
 }
 
 
+/* Handler for No button */
+
+static void on_close (void)
+{
+	gtk_widget_destroy (msg_dlg);
+}
+
+/*---------------------------------------------------------------------------*/
+/* Main dialog UI handlers */
+
+/* Handler for Start button */
+
+static void on_confirm (void)
+{
+    char buffer[256], res[256];
+
+    // create the confirm dialog
+    msg_dlg = (GtkWidget *) gtk_dialog_new ();
+    gtk_window_set_title (GTK_WINDOW (msg_dlg), "");
+    gtk_window_set_modal (GTK_WINDOW (msg_dlg), TRUE);
+    gtk_window_set_decorated (GTK_WINDOW (msg_dlg), FALSE);
+    gtk_window_set_destroy_with_parent (GTK_WINDOW (msg_dlg), TRUE);
+    gtk_window_set_skip_taskbar_hint (GTK_WINDOW (msg_dlg), TRUE);
+    gtk_window_set_transient_for (GTK_WINDOW (msg_dlg), GTK_WINDOW (main_dlg));
+
+    // add border
+    GtkWidget *frame = gtk_frame_new (NULL);
+    gtk_container_add (GTK_CONTAINER (gtk_dialog_get_action_area (GTK_DIALOG (msg_dlg))), frame);
+
+    // add container
+    GtkWidget *box = (GtkWidget *) gtk_vbox_new (TRUE, 5);
+    gtk_container_set_border_width (GTK_CONTAINER (box), 10);
+    gtk_container_add (GTK_CONTAINER (frame), box);
+
+    // add message
+    get_dev_name (dst_dev, res);
+    sprintf (buffer, _("This will erase all content on the device '%s'. Are you sure?"), res);
+    GtkWidget* status = (GtkWidget *) gtk_label_new (buffer);
+    gtk_box_pack_start (GTK_BOX (box), status, FALSE, FALSE, 5);
+
+    GtkWidget *hbox = gtk_hbox_new (TRUE, 10);
+    gtk_box_pack_start (GTK_BOX (box), hbox, FALSE, FALSE, 5);
+
+    // add buttons
+    GtkWidget *no = (GtkWidget *) gtk_button_new_with_label (_("No"));
+    gtk_box_pack_start (GTK_BOX (hbox), no, FALSE, TRUE, 40);
+    g_signal_connect (no, "clicked", G_CALLBACK (on_close), NULL);
+
+    GtkWidget *yes = (GtkWidget *) gtk_button_new_with_label (_("Yes"));
+    gtk_box_pack_start (GTK_BOX (hbox), yes, FALSE, TRUE, 40);
+    g_signal_connect (yes, "clicked", G_CALLBACK (on_start), NULL);
+
+    gtk_widget_show_all (GTK_WIDGET (msg_dlg));
+ }
+
+
 /* Handler for "changed" signal from comboboxes */
 
 static void on_cb_changed (void)
@@ -465,7 +524,7 @@ int main (int argc, char *argv[])
 
     // set up the start button
 	start_btn = (GtkWidget *) gtk_builder_get_object (builder, "button1");
-	g_signal_connect (start_btn, "clicked", G_CALLBACK (on_start), NULL);
+	g_signal_connect (start_btn, "clicked", G_CALLBACK (on_confirm), NULL);
 
     // get the table which holds the other elements
 	GtkWidget *table = (GtkWidget *) gtk_builder_get_object (builder, "table1");
