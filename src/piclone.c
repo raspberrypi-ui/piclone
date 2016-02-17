@@ -44,6 +44,9 @@ char src_mnt[32], dst_mnt[32];
 /* flag to show that copy thread is running */
 char copying;
 
+/* flag to show that copy has been interrupted */
+char ended;
+
 /* flag to show that backup has been cancelled by the user */
 char cancelled;
 #define CANCEL_CHECK if (cancelled) { g_idle_add (close_msg, NULL); return NULL; }
@@ -109,6 +112,7 @@ static void terminate_dialog (char *msg)
     gtk_widget_set_visible (GTK_WIDGET (progress), FALSE);
     gtk_label_set_text (GTK_LABEL (status), msg);
     gtk_button_set_label (GTK_BUTTON (cancel), _("OK"));
+    ended = 1;
 }
 
 
@@ -324,6 +328,12 @@ static void on_cancel (void)
 	char buffer[256];
 	int pid;
 
+	if (ended)
+	{
+        g_idle_add (close_msg, NULL);
+        return;
+    }
+
     // hide the progress bar and disable the cancel button
     gtk_widget_set_visible (GTK_WIDGET (progress), FALSE);
     gtk_label_set_text (GTK_LABEL (status), "Cancelling...");
@@ -406,6 +416,7 @@ static void on_start (void)
 
     // launch a thread with the system call to run the backup
     cancelled = 0;
+    ended = 0;
     g_thread_new (NULL, backup_thread, NULL);
 }
 
