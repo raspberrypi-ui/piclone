@@ -109,7 +109,7 @@ static gboolean close_msg (gpointer data)
 
 static void terminate_dialog (char *msg)
 {
-    gtk_widget_set_visible (GTK_WIDGET (progress), FALSE);
+    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 1.0);
     gtk_label_set_text (GTK_LABEL (status), msg);
     gtk_button_set_label (GTK_BUTTON (cancel), _("OK"));
     ended = 1;
@@ -335,7 +335,7 @@ static void on_cancel (void)
     }
 
     // hide the progress bar and disable the cancel button
-    gtk_widget_set_visible (GTK_WIDGET (progress), FALSE);
+    gtk_progress_bar_pulse (GTK_PROGRESS_BAR (progress));
     gtk_label_set_text (GTK_LABEL (status), "Cancelling...");
     gtk_widget_set_sensitive (GTK_WIDGET (cancel), FALSE);
 
@@ -400,6 +400,7 @@ static void on_start (void)
 
     // add message
     status = (GtkWidget *) gtk_label_new (_("Checking source..."));
+    gtk_label_set_width_chars (GTK_LABEL (status), 25);
     gtk_box_pack_start (GTK_BOX (box), status, FALSE, FALSE, 5);
 
     // add progress bar
