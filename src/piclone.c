@@ -278,7 +278,24 @@ static gpointer backup_thread (gpointer data)
 		else
 		    sys_printf ("sudo mount %s%d %s", src_dev, parts[p].pnum, src_mnt);
         CANCEL_CHECK;
- 		
+
+		// check there is enough space...
+		sprintf (buffer, "df %s | tail -n 1 | tr -s \" \" \" \" | cut -d ' ' -f 3", src_mnt);
+		get_string (buffer, res);
+		sscanf (res, "%ld", &srcsz);
+
+		sprintf (buffer, "df %s | tail -n 1 | tr -s \" \" \" \" | cut -d ' ' -f 4", dst_mnt);
+		get_string (buffer, res);
+		sscanf (res, "%ld", &dstsz);
+
+		if (srcsz >= dstsz)
+		{
+			sys_printf ("sudo umount %s", dst_mnt);
+			sys_printf ("sudo umount %s", src_mnt);
+			terminate_dialog (_("Insufficient space. Backup aborted."));
+			return NULL;
+		}
+
 		// start the copy itself in a new thread
 		g_thread_new (NULL, copy_thread, NULL);
 
@@ -389,7 +406,7 @@ static void on_start (void)
 
     // add message
     status = (GtkWidget *) gtk_label_new (_("Checking source..."));
-    gtk_label_set_width_chars (GTK_LABEL (status), 25);
+    gtk_label_set_width_chars (GTK_LABEL (status), 30);
     gtk_box_pack_start (GTK_BOX (box), status, FALSE, FALSE, 5);
 
     // add progress bar
@@ -529,13 +546,15 @@ int main (int argc, char *argv[])
 
     // create and add the source combobox
 	from_cb = (GtkWidget *)  (GObject *) gtk_combo_box_text_new ();
-	gtk_table_attach (GTK_TABLE (table), GTK_WIDGET (from_cb), 1, 2, 0, 1, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 0);
+	gtk_widget_set_tooltip_text (from_cb, _("Select the device to copy from"));
+	gtk_table_attach (GTK_TABLE (table), GTK_WIDGET (from_cb), 1, 2, 0, 1, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 5);
 	gtk_widget_show_all (GTK_WIDGET (from_cb));
 	g_signal_connect (from_cb, "changed", G_CALLBACK (on_cb_changed), NULL);
 
     // create and add the destination combobox
 	to_cb = (GtkWidget *)  (GObject *) gtk_combo_box_text_new ();
-	gtk_table_attach (GTK_TABLE (table), GTK_WIDGET (to_cb), 1, 2, 1, 2, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 0);
+	gtk_widget_set_tooltip_text (to_cb, _("Select the device to copy to"));
+	gtk_table_attach (GTK_TABLE (table), GTK_WIDGET (to_cb), 1, 2, 1, 2, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 5);
 	gtk_widget_show_all (GTK_WIDGET (to_cb));
 	g_signal_connect (to_cb, "changed", G_CALLBACK (on_cb_changed), NULL);
 
