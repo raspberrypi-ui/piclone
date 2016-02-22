@@ -33,7 +33,7 @@ typedef struct
 partition_t parts[MAXPART];
 
 /* control widget globals */
-static GtkWidget *main_dlg, *msg_dlg, *status, *progress, *cancel, *to_cb, *from_cb, *start_btn;
+static GtkWidget *main_dlg, *msg_dlg, *status, *progress, *cancel, *to_cb, *from_cb, *start_btn, *help_btn;
 
 /* device names */
 char src_dev[32], dst_dev[32];
@@ -497,6 +497,21 @@ static void on_confirm (void)
  }
 
 
+/* Handler for Help button */
+
+static void on_help (void)
+{
+	GtkBuilder *builder;
+    GtkWidget *dlg;
+
+	builder = gtk_builder_new ();
+	gtk_builder_add_from_file (builder, PACKAGE_DATA_DIR "/piclone.ui", NULL);
+	dlg = (GtkWidget *) gtk_builder_get_object (builder, "dialog2");
+	gtk_dialog_run (GTK_DIALOG (dlg));
+	gtk_widget_destroy (dlg);
+}
+
+
 /* Handler for "changed" signal from comboboxes */
 
 static void on_cb_changed (void)
@@ -540,6 +555,10 @@ int main (int argc, char *argv[])
     // set up the start button
 	start_btn = (GtkWidget *) gtk_builder_get_object (builder, "button1");
 	g_signal_connect (start_btn, "clicked", G_CALLBACK (on_confirm), NULL);
+
+    // set up the help button
+	help_btn = (GtkWidget *) gtk_builder_get_object (builder, "button4");
+	g_signal_connect (help_btn, "clicked", G_CALLBACK (on_help), NULL);
 
     // get the table which holds the other elements
 	GtkWidget *table = (GtkWidget *) gtk_builder_get_object (builder, "table1");
