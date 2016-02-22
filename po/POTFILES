@@ -1,0 +1,3 @@
+	../src/piclone.c \
+	../data/piclone.ui \
+	../data/piclone.desktop.in

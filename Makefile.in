@@ -347,9 +347,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I m4
-
-#SUBDIRS = src data po
-SUBDIRS = src data
+SUBDIRS = src data po
 EXTRA_DIST = \
         autogen.sh \
         piclone.pc.in
