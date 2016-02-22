@@ -164,12 +164,12 @@ static gpointer backup_thread (gpointer data)
     fp = popen (buffer, "r");
     if (fp == NULL || fgets (buffer, sizeof (buffer) - 1, fp) == NULL)
     {
-        terminate_dialog (_("Unable to read source"));
+        terminate_dialog (_("Unable to read source."));
         return;
     }
     if (strncmp (buffer, "Partition Table: msdos", 22))
     {
-        terminate_dialog (_("Non-MSDOS partition table on source"));
+        terminate_dialog (_("Non-MSDOS partition table on source."));
         return;
     }
     else
@@ -319,7 +319,6 @@ static gpointer backup_thread (gpointer data)
 			prog = dstsz;
 			prog /= srcsz;
 			gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), prog);
-			//printf ("%ld %ld %f\n", dstsz, srcsz, prog);
 			sleep (stime);
 		}
 
@@ -332,7 +331,7 @@ static gpointer backup_thread (gpointer data)
         CANCEL_CHECK;
     }
 
-    terminate_dialog (_("Copy complete"));
+    terminate_dialog (_("Copy complete."));
     return NULL;
 }
 
@@ -510,6 +509,7 @@ static void on_help (void)
 	builder = gtk_builder_new ();
 	gtk_builder_add_from_file (builder, PACKAGE_DATA_DIR "/piclone.ui", NULL);
 	dlg = (GtkWidget *) gtk_builder_get_object (builder, "dialog2");
+	g_object_unref (builder);
 	gtk_dialog_run (GTK_DIALOG (dlg));
 	gtk_widget_destroy (dlg);
 }
@@ -592,8 +592,6 @@ int main (int argc, char *argv[])
 {
 	GtkBuilder *builder;
     GVolumeMonitor *monitor;
-	char buffer[256], device[32];
-	FILE *fp;
 
 #ifdef ENABLE_NLS
     setlocale (LC_ALL, "");

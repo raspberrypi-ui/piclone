@@ -62,7 +62,7 @@
             </child>
             <child>
               <object class="GtkButton" id="button1">
-                <property name="label">Start</property>
+                <property name="label" translatable="yes">Start</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -131,11 +131,11 @@
     </action-widgets>
   </object>
   <object class="GtkTextBuffer" id="textbuffer1">
-    <property name="text" translatable="yes">PiClone v1.0
+    <property name="text" translatable="yes">SD Card Copier v1.0
 
 This is an application to copy and back up SD cards. To use it, you will need a USB SD card writer.
 
-To back up your Raspberry Pi's internal SD card, insert a blank SD card into a USB card writer and connect it to your Pi. Then start the PiClone application, choose your card writer from the “Copy To Device” drop-down box and press “Start”. The copy process will take 10-15 minutes depending on the size of your card.
+To back up your Raspberry Pi's internal SD card, insert a blank SD card into a USB card writer and connect it to your Pi. Then start the application, choose your card writer from the “Copy To Device” drop-down box and press “Start”. The copy process will take 10-15 minutes depending on the size of your card.
 
 The resulting card should be a bootable copy of your existing card; to restore, simply place the backup card into the onboard SD card slot, put the card to restore onto into the USB writer and repeat the copy process above.
 
