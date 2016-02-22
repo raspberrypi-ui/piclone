@@ -1,0 +1,3 @@
+This is an application which allows the SD card inserted into the Pi to be copied to one in a connected USB reader.
+
+To build, run autogen.sh, then ./configure and make.
