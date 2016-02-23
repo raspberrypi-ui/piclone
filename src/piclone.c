@@ -323,6 +323,7 @@ static gpointer backup_thread (gpointer data)
 			prog /= srcsz;
 			gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), prog);
 			sleep (stime);
+			CANCEL_CHECK;
 		}
 
 		gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 1.0);
@@ -375,9 +376,8 @@ static void on_cancel (void)
             }
 		}
         copying = 0;
-        g_idle_add (close_msg, NULL);
     }
-    else cancelled = 1;
+    cancelled = 1;
 }
 
 
