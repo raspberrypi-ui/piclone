@@ -27,8 +27,6 @@ LT_INIT
 # Checks for libraries.
 pkg_modules="$pkg_modules gtk+-2.0 >= 2.18.0"
 
-pkg_modules="$pkg_modules \
-             libxml-2.0"
 PKG_CHECK_MODULES(PACKAGE, [$pkg_modules])
 AC_SUBST(PACKAGE_CFLAGS)
 AC_SUBST(PACKAGE_LIBS)
