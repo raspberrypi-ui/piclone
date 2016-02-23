@@ -269,6 +269,9 @@ static gpointer backup_thread (gpointer data)
     // do the copy for each partition
     for (p = 0; p < n; p++)
     {
+		// don't try to copy extended partitions
+		if (!strcmp (parts[p].ptype, "extended")) continue;
+
         sprintf (buffer, _("Copying partition %d of %d..."), p + 1, n);
 		gtk_label_set_text (GTK_LABEL (status), buffer);
  		gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 0.0);
