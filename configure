@@ -12343,8 +12343,6 @@ CC="$lt_save_CC"
 # Checks for libraries.
 pkg_modules="$pkg_modules gtk+-2.0 >= 2.18.0"
 
-pkg_modules="$pkg_modules \
-             libxml-2.0"
 
 
 
