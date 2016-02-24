@@ -1,0 +1,2 @@
+shlibs:Depends=libc6 (>= 2.7), libglib2.0-0 (>= 2.31.8), libgtk2.0-0 (>= 2.24.0)
+misc:Depends=

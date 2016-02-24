@@ -1,0 +1,16 @@
+Package: piclone
+Version: 0.1-1
+Architecture: armhf
+Maintainer: Simon Long <simon@raspberrypi.org>
+Installed-Size: 36
+Depends: libc6 (>= 2.7), libglib2.0-0 (>= 2.31.8), libgtk2.0-0 (>= 2.24.0)
+Section: utils
+Priority: optional
+Homepage: <insert the upstream URL, if relevant>
+Description: SD Card backup program for Raspberry Pi
+ This is a GTK application to copy the contents of SD cards and other USB
+ drives. It mirrors the partition layout of the source device onto the
+ target device, with the exception of the last partition, which is created
+ to be the largest which will fit onto the target device.
+ Files are then copied between all partitions - the result should be a
+ bootable card with an image of the source device.
