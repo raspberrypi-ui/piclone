@@ -537,7 +537,7 @@ static void on_cb_changed (void)
 
 static void on_drives_changed (void)
 {
-	char buffer[256], device[32];
+	char buffer[256], name[128], device[32];
 	FILE *fp;
 
 	// empty the comboboxes
@@ -567,8 +567,8 @@ static void on_drives_changed (void)
 	        if (!strncmp (device + 5, "sd", 2))
 	        {
 	            device[strlen (device) - 1] = 0;
-	            get_dev_name (device, buffer);
-	            sprintf (buffer, "%s  (%s)", buffer, device);
+	            get_dev_name (device, name);
+	            sprintf (buffer, "%s  (%s)", name, device);
 	            gtk_combo_box_append_text (GTK_COMBO_BOX (from_cb), buffer);
 	            gtk_combo_box_append_text (GTK_COMBO_BOX (to_cb), buffer);
 	            src_count++;
