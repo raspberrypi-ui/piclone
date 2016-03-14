@@ -349,8 +349,7 @@ top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = src data po
 EXTRA_DIST = \
-        autogen.sh \
-        piclone.pc.in
+        autogen.sh
 
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive

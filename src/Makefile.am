@@ -25,4 +25,5 @@ piclone_LDADD = \
 		$(X11_LIBS) \
 		$(INTLLIBS)
 
-EXTRA_DIST =
+EXTRA_DIST = \
+		backup

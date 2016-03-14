@@ -5,8 +5,7 @@ ACLOCAL_AMFLAGS= -I m4
 SUBDIRS = src data po
 
 EXTRA_DIST = \
-        autogen.sh \
-        piclone.pc.in
+        autogen.sh
 
 install-data-local:
 	@$(NORMAL_INSTALL)
