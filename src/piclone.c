@@ -182,7 +182,7 @@ static gpointer backup_thread (gpointer data)
     // unmount any partitions on the target device
     for (n = 9; n >= 1; n--)
     {
-        sys_printf ("sudo umount %s%d", dst_dev, n);
+        sys_printf ("sudo umount %s%s%d", dst_dev, !strcmp(dst_dev, "/dev/mmcblk1")?"p":"", n);
         CANCEL_CHECK;
     }
 
@@ -247,11 +247,11 @@ static gpointer backup_thread (gpointer data)
 
 		// create file systems
         if (!strncmp (parts[p].ftype, "fat", 3))
-            sys_printf ("sudo mkfs.fat %s%d", dst_dev, parts[p].pnum);
+            sys_printf ("sudo mkfs.fat %s%s%d", dst_dev, !strcmp(dst_dev, "/dev/mmcblk1")?"p":"", parts[p].pnum);
         CANCEL_CHECK;
 
         if (!strcmp (parts[p].ftype, "ext4"))
-            sys_printf ("sudo mkfs.ext4 -F %s%d", dst_dev, parts[p].pnum);
+            sys_printf ("sudo mkfs.ext4 -F %s%s%d", dst_dev, !strcmp(dst_dev, "/dev/mmcblk1")?"p":"", parts[p].pnum);
         CANCEL_CHECK;
 
         // set the flags        
@@ -277,7 +277,7 @@ static gpointer backup_thread (gpointer data)
  		gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 0.0);
 	
 		// mount partitions
-		sys_printf ("sudo mount %s%d %s", dst_dev, parts[p].pnum, dst_mnt);
+		sys_printf ("sudo mount %s%s%d %s", dst_dev, !strcmp(dst_dev, "/dev/mmcblk1")?"p":"", parts[p].pnum, dst_mnt);
         CANCEL_CHECK;
 		if (!strcmp (src_dev, "/dev/mmcblk0"))
 		    sys_printf ("sudo mount %sp%d %s", src_dev, parts[p].pnum, src_mnt);
@@ -564,7 +564,7 @@ static void on_drives_changed (void)
 	    {
 	        if (fgets (device, sizeof (device) - 1, fp) == NULL) break;
 
-	        if (!strncmp (device + 5, "sd", 2))
+	        if (!strncmp (device + 5, "sd", 2) || !strncmp (device + 5, "mmcblk1", 7) )
 	        {
 	            device[strlen (device) - 1] = 0;
 	            get_dev_name (device, name);
