@@ -135,6 +135,16 @@ static int get_dev_name (char *dev, char *name)
 }
 
 
+static char *partition_name (char *device, char *buffer)
+{
+    if (!strncmp (device, "/dev/mmcblk", 11))
+        sprintf (buffer, "%sp", device);
+    else
+        sprintf (buffer, "%s", device);
+    return buffer;
+}
+
+
 /*---------------------------------------------------------------------------*/
 /* Threads */
 
@@ -153,7 +163,7 @@ static gpointer copy_thread (gpointer data)
 
 static gpointer backup_thread (gpointer data)
 {
-    char buffer[256], res[256];
+    char buffer[256], res[256], dev[16];
     int n, p;
     long srcsz, dstsz, stime;
     double prog;
@@ -182,7 +192,7 @@ static gpointer backup_thread (gpointer data)
     // unmount any partitions on the target device
     for (n = 9; n >= 1; n--)
     {
-        sys_printf ("sudo umount %s%s%d", dst_dev, !strcmp(dst_dev, "/dev/mmcblk1")?"p":"", n);
+        sys_printf ("sudo umount %s%d", partition_name (dst_dev, dev), n);
         CANCEL_CHECK;
     }
 
@@ -247,11 +257,11 @@ static gpointer backup_thread (gpointer data)
 
 		// create file systems
         if (!strncmp (parts[p].ftype, "fat", 3))
-            sys_printf ("sudo mkfs.fat %s%s%d", dst_dev, !strcmp(dst_dev, "/dev/mmcblk1")?"p":"", parts[p].pnum);
+            sys_printf ("sudo mkfs.fat %s%d", partition_name (dst_dev, dev), parts[p].pnum);
         CANCEL_CHECK;
 
         if (!strcmp (parts[p].ftype, "ext4"))
-            sys_printf ("sudo mkfs.ext4 -F %s%s%d", dst_dev, !strcmp(dst_dev, "/dev/mmcblk1")?"p":"", parts[p].pnum);
+            sys_printf ("sudo mkfs.ext4 -F %s%d", partition_name (dst_dev, dev), parts[p].pnum);
         CANCEL_CHECK;
 
         // set the flags        
@@ -277,13 +287,10 @@ static gpointer backup_thread (gpointer data)
  		gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 0.0);
 	
 		// mount partitions
-		sys_printf ("sudo mount %s%s%d %s", dst_dev, !strcmp(dst_dev, "/dev/mmcblk1")?"p":"", parts[p].pnum, dst_mnt);
+		sys_printf ("sudo mount %s%d %s", partition_name (dst_dev, dev), parts[p].pnum, dst_mnt);
         CANCEL_CHECK;
-		if (!strcmp (src_dev, "/dev/mmcblk0"))
-		    sys_printf ("sudo mount %sp%d %s", src_dev, parts[p].pnum, src_mnt);
-		else
-		    sys_printf ("sudo mount %s%d %s", src_dev, parts[p].pnum, src_mnt);
-        CANCEL_CHECK;
+		sys_printf ("sudo mount %s%d %s", partition_name (src_dev, dev), parts[p].pnum, src_mnt);
+		CANCEL_CHECK;
 
 		// check there is enough space...
 		sprintf (buffer, "df %s | tail -n 1 | tr -s \" \" \" \" | cut -d ' ' -f 3", src_mnt);
