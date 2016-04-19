@@ -7,7 +7,7 @@
     <property name="border_width">5</property>
     <property name="title" translatable="yes">SD Card Copier</property>
     <property name="resizable">False</property>
-    <property name="icon_name">media-flash</property>
+    <property name="icon_name">media-removable</property>
     <property name="type_hint">dialog</property>
     <child internal-child="vbox">
       <object class="GtkVBox" id="dialog-vbox1">
