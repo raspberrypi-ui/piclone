@@ -150,7 +150,7 @@ Note also that the destination card doesn’t need to be the same size as the so
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
     <property name="title" translatable="yes">SD Card Copier Help</property>
-    <property name="icon_name">media-flash</property>
+    <property name="icon_name">media-removable</property>
     <property name="type_hint">dialog</property>
     <child internal-child="vbox">
       <object class="GtkVBox" id="dialog-vbox2">
