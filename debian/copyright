@@ -1,6 +1,6 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: piclone
-Source: <url://example.com>
+Source: http://github.com/raspberrypi/piclone
 
 Files: *
 Copyright: 2016 Simon Long simon@raspberrypi.org
