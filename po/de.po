@@ -1,0 +1,189 @@
+# German translations for piclone package.
+# Copyright (C) 2016 THE piclone'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the piclone package.
+# Simon Long <simon@raspberrypi.org>, 2016.
+# Benjamin Weis <benjamin.weis@gmx.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: piclone 0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-02-22 16:07+0000\n"
+"PO-Revision-Date: 2016-05-14 16:20+0200\n"
+"Last-Translator: Benjamin Weis <benjamin.weis@gmx.com>\n"
+"Language-Team: \n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 1.8.7\n"
+
+#: ../src/piclone.c:117
+msgid "OK"
+msgstr "OK"
+
+#: ../src/piclone.c:167
+msgid "Unable to read source."
+msgstr "Quelle kann nicht gelesen werden."
+
+#: ../src/piclone.c:172
+msgid "Non-MSDOS partition table on source."
+msgstr "Nicht-MSDOS-Partitionstabelle auf Quelle."
+
+#: ../src/piclone.c:179
+msgid "Preparing target..."
+msgstr "Ziel wird vorbereitet..."
+
+#: ../src/piclone.c:204
+msgid "Reading partitions..."
+msgstr "Partitionen werden gelesen..."
+
+#: ../src/piclone.c:224
+msgid "Preparing partitions..."
+msgstr "Partitionen werden vorbereitet..."
+
+#: ../src/piclone.c:272
+#, c-format
+msgid "Copying partition %d of %d..."
+msgstr "Partition %d von %d wird kopiert..."
+
+#: ../src/piclone.c:298
+msgid "Insufficient space. Backup aborted."
+msgstr "Nicht genügend Speicherplatz . Sicherung abgebrochen."
+
+#: ../src/piclone.c:334
+msgid "Copy complete."
+msgstr "Kopieren abgeschlossen."
+
+#. add message
+#: ../src/piclone.c:410
+msgid "Checking source..."
+msgstr "Quelle wird überprüft..."
+
+#. add cancel button
+#: ../src/piclone.c:420
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: ../src/piclone.c:482
+#, c-format
+msgid "This will erase all content on the device '%s'. Are you sure?"
+msgstr "Dies wird alle Inhalte auf dem Gerät '%s' löschen. Sind Sie sicher?"
+
+#. add buttons
+#: ../src/piclone.c:490
+msgid "No"
+msgstr "Nein"
+
+#: ../src/piclone.c:494
+msgid "Yes"
+msgstr "Ja"
+
+#. populate the comboboxes
+#: ../src/piclone.c:553
+msgid "Internal SD card  (/dev/mmcblk0)"
+msgstr "Interne  SD-Karte  (/dev/mmcblk0)"
+
+#: ../src/piclone.c:579
+msgid "No devices available"
+msgstr "Keine Geräte verfügbar"
+
+#: ../src/piclone.c:626
+msgid "Select the device to copy from"
+msgstr "Wählen Sie das Gerät aus, von dem kopiert werden soll"
+
+#: ../src/piclone.c:634
+msgid "Select the device to copy to"
+msgstr "Wählen Sie das Gerät aus, zu dem kopiert werden soll"
+
+#. End of file
+#. ===========================================================================
+#: ../data/piclone.ui.h:1 ../data/piclone.desktop.in.h:1
+msgid "SD Card Copier"
+msgstr "SD Card Copier"
+
+#: ../data/piclone.ui.h:2
+msgid "Help"
+msgstr "Hilfe"
+
+#: ../data/piclone.ui.h:3
+msgid "Start"
+msgstr "Start"
+
+#: ../data/piclone.ui.h:4
+msgid "Copy From Device:"
+msgstr "Von Gerät kopieren:"
+
+#: ../data/piclone.ui.h:5
+msgid "Copy To Device:"
+msgstr "Auf Gerät kopieren:"
+
+#: ../data/piclone.ui.h:6
+msgid ""
+"SD Card Copier v1.0\n"
+"\n"
+"This is an application to copy and back up SD cards. To use it, you will "
+"need a USB SD card writer.\n"
+"\n"
+"To back up your Raspberry Pi's internal SD card, insert a blank SD card into "
+"a USB card writer and connect it to your Pi. Then start the application, "
+"choose your card writer from the “Copy To Device” drop-down box and press "
+"“Start”. The copy process will take 10-15 minutes depending on the size of "
+"your card.\n"
+"\n"
+"The resulting card should be a bootable copy of your existing card; to "
+"restore, simply place the backup card into the onboard SD card slot, put the "
+"card to restore onto into the USB writer and repeat the copy process above.\n"
+"\n"
+"You can also back up to a standard USB stick, and then restore from the USB "
+"stick to an SD card by setting the “Copy From Device” drop-down to the USB "
+"stick and the “Copy To Device” to a USB card writer containing the card to "
+"restore onto.\n"
+"\n"
+"Note that you cannot copy onto the SD card from which your Pi is currently "
+"booted, which is why it does not appear in the “Copy To Device” dropdown.\n"
+"\n"
+"Note also that the destination card doesn’t need to be the same size as the "
+"source card, but it must have enough space to hold all the data that is on "
+"it. The application will warn you if there is insufficient space on the "
+"destination.\n"
+msgstr ""
+"SD Card Copier v1.0\n"
+"\n"
+"Dies ist eine Anwendung zum Kopieren und Sichern von SD-Karten. Sie "
+"benötigen einen USB-SD-Kartenschreiber, um sie verwenden zu können.\n"
+"\n"
+"Um die interne SD-Karte Ihres Raspberry Pis zu sichern, legen Sie eine leere "
+"SD-Karte in einen USB-Kartenschreiber ein und verbinden Sie ihn mit Ihrem "
+"Pi. Anschließend starten Sie die Anwendung, wählen Sie Ihren Kartenschreiber "
+"aus der Dropdown-Liste “Auf Gerät kopieren” aus und drücken Sie auf “Start”. "
+"Der Kopiervorgang wird 10-15 Minuten dauern, je nach Größe Ihrer Karte.\n"
+"\n"
+"Die hierdurch entstandene Karte sollte eine bootbare Kopie Ihrer vorhandenen "
+"Karte sein; zum Wiederherstellen legen Sie einfach die Sicherungskarte in "
+"den sich auf der Platine befindlichen SD-Kartensteckplatz ein, legen Sie zum "
+"Wiederherstellen der Karte diese in den USB-Kartenschreiber ein und "
+"wiederholen sie den obigen Kopiervorgang.\n"
+"\n"
+"Sie können auch auf einen Standard-USB-Stick sichern und anschließend von "
+"dem USB-Stick auf eine SD-Karte durch die Auswahl “Von Gerät kopieren” in "
+"der Dropdown-Liste wiederherstellen und zu einem USB-Kartenschreiber, der "
+"die Karte enthält, mit “Auf Gerät kopieren” wiederherstellen.\n"
+"\n"
+"Beachten Sie, dass Sie nicht auf die SD-Karte kopieren können, von denen Ihr "
+"Pi gebootet wurde, welche deshalb auch nicht in der Dropdown-Liste “Auf "
+"Gerät kopieren” erscheint.\n"
+"\n"
+"Beachten Sie auch, dass die Zielkarte nicht die gleiche Größe wie die "
+"Quellkarte haben muss, aber sie muss genügend Speicherplatz für alle Daten "
+"haben. Die Anwendung wird Sie warnen, wenn nicht genügend Speicherplatz auf "
+"dem Ziel vorhanden ist.\n"
+
+#: ../data/piclone.ui.h:20
+msgid "SD Card Copier Help"
+msgstr "SD Card Copier Hilfe"
+
+#: ../data/piclone.desktop.in.h:2
+msgid "Make a copy of the Raspbian SD card"
+msgstr "Erstellen Sie eine Kopie der Raspbian SD-Karte"
