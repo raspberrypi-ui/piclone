@@ -233,6 +233,11 @@ static gpointer backup_thread (gpointer data)
         while (1)
         {
             if (fgets (buffer, sizeof (buffer) - 1, fp) == NULL) break;
+            if (n == MAXPART)
+            {
+                terminate_dialog (_("Too many partitions on source."));
+                return;
+            }
             sscanf (buffer, "%d %lds %lds %*lds %s %s %s", &(parts[n].pnum), &(parts[n].start),
                 &(parts[n].end), &(parts[n].ptype), &(parts[n].ftype), &(parts[n].flags));
             n++;
