@@ -58,8 +58,8 @@ char cancelled;
 
 void dsystem (char * cmd)
 {
-	printf ("%s\n", cmd);
-	system (cmd);
+    printf ("%s\n", cmd);
+    system (cmd);
 }
 //#define system dsystem
 
@@ -84,15 +84,17 @@ static int get_string (char *cmd, char *name)
 
 /* System function with printf formatting */
 
-static void sys_printf (const char * format, ...)
+static int sys_printf (const char * format, ...)
 {
-  char buffer[256];
-  va_list args;
+    char buffer[256];
+    va_list args;
+    FILE *fp;
 
-  va_start (args, format);
-  vsprintf (buffer, format, args);
-  system (buffer);
-  va_end (args);
+    va_start (args, format);
+    vsprintf (buffer, format, args);
+    fp = popen (buffer, "r");
+    va_end (args);
+    return pclose (fp);
 }
 
 
@@ -103,8 +105,8 @@ static void sys_printf (const char * format, ...)
 
 static gboolean close_msg (gpointer data)
 {
-	gtk_widget_destroy (GTK_WIDGET (msg_dlg));
-	return FALSE;
+    gtk_widget_destroy (GTK_WIDGET (msg_dlg));
+    return FALSE;
 }
 
 
@@ -152,10 +154,10 @@ static char *partition_name (char *device, char *buffer)
 
 static gpointer copy_thread (gpointer data)
 {
-	copying = 1;
-	sys_printf ("sudo cp -ax %s/. %s/.", src_mnt, dst_mnt);
-	copying = 0;
-	return NULL;
+    copying = 1;
+    sys_printf ("sudo cp -ax %s/. %s/.", src_mnt, dst_mnt);
+    copying = 0;
+    return NULL;
 }
 
 
@@ -197,7 +199,11 @@ static gpointer backup_thread (gpointer data)
     }
 
     // wipe the FAT on the target
-    sys_printf ("sudo dd if=/dev/zero of=%s bs=512 count=1", dst_dev);
+    if (sys_printf ("sudo dd if=/dev/zero of=%s bs=512 count=1", dst_dev))
+    {
+        terminate_dialog (_("Could not write to destination."));
+        return;
+    }
     CANCEL_CHECK;
     
     // prepare temp mount points
@@ -207,7 +213,11 @@ static gpointer backup_thread (gpointer data)
     CANCEL_CHECK;
     
     // prepare the new FAT
-    sys_printf ("sudo parted -s %s mklabel msdos", dst_dev);
+    if (sys_printf ("sudo parted -s %s mklabel msdos", dst_dev))
+    {
+        terminate_dialog (_("Could not create FAT."));
+        return;
+    }
     CANCEL_CHECK;
 
     gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 1.0);
@@ -237,38 +247,80 @@ static gpointer backup_thread (gpointer data)
     // recreate the partitions on the target
     for (p = 0; p < n; p++)
     {
-	    // create the partition
-	    if (!strcmp (parts[p].ptype, "extended"))
-		    sys_printf ("sudo parted -s %s -- mkpart extended %lds -1s", dst_dev, parts[p].start);
-	    else
-	    {
-		    if (p == (n - 1))
-			    sys_printf ("sudo parted -s %s -- mkpart %s %s %lds -1s", dst_dev,
-			        parts[p].ptype, parts[p].ftype, parts[p].start);
-		    else
-			    sys_printf ("sudo parted -s %s mkpart %s %s %lds %lds", dst_dev,
-			        parts[p].ptype, parts[p].ftype, parts[p].start, parts[p].end);
-		}
+        // create the partition
+        if (!strcmp (parts[p].ptype, "extended"))
+        {
+            if (sys_printf ("sudo parted -s %s -- mkpart extended %lds -1s", dst_dev, parts[p].start))
+            {
+                terminate_dialog (_("Could not create partition."));
+                return;
+            }
+        }
+        else
+        {
+            if (p == (n - 1))
+            {
+                if (sys_printf ("sudo parted -s %s -- mkpart %s %s %lds -1s", dst_dev,
+                    parts[p].ptype, parts[p].ftype, parts[p].start))
+                {
+                    terminate_dialog (_("Could not create partition."));
+                    return;
+                }
+            }
+            else
+            {
+                if (sys_printf ("sudo parted -s %s mkpart %s %s %lds %lds", dst_dev,
+                    parts[p].ptype, parts[p].ftype, parts[p].start, parts[p].end))
+                {
+                    terminate_dialog (_("Could not create partition."));
+                    return;
+                }
+            }
+        }
         CANCEL_CHECK;
 
-		// refresh the kernel partion table
-		system ("sudo partprobe");
+        // refresh the kernel partion table
+        system ("sudo partprobe");
         CANCEL_CHECK;
 
-		// create file systems
+        // create file systems
         if (!strncmp (parts[p].ftype, "fat", 3))
-            sys_printf ("sudo mkfs.fat %s%d", partition_name (dst_dev, dev), parts[p].pnum);
+        {
+            if (sys_printf ("sudo mkfs.fat %s%d", partition_name (dst_dev, dev), parts[p].pnum))
+            {
+                terminate_dialog (_("Could not create file system."));
+                return;
+            }
+        }
         CANCEL_CHECK;
 
         if (!strcmp (parts[p].ftype, "ext4"))
-            sys_printf ("sudo mkfs.ext4 -F %s%d", partition_name (dst_dev, dev), parts[p].pnum);
+        {
+            if (sys_printf ("sudo mkfs.ext4 -F %s%d", partition_name (dst_dev, dev), parts[p].pnum))
+            {
+                terminate_dialog (_("Could not create file system."));
+                return;
+            }
+        }
         CANCEL_CHECK;
 
         // set the flags        
         if (!strcmp (parts[p].flags, "lba"))
-            sys_printf ("sudo parted -s %s set %d lba on", dst_dev, parts[p].pnum);
+        {
+            if (sys_printf ("sudo parted -s %s set %d lba on", dst_dev, parts[p].pnum))
+            {
+                terminate_dialog (_("Could not set flags."));
+                return;
+            }
+        }
         else
-            sys_printf ("sudo parted -s %s set %d lba off", dst_dev, parts[p].pnum);
+        {
+            if (sys_printf ("sudo parted -s %s set %d lba off", dst_dev, parts[p].pnum))
+            {
+                terminate_dialog (_("Could not set flags."));
+                return;
+            }
+        }
         CANCEL_CHECK;
         
         prog = p + 1;
@@ -279,66 +331,82 @@ static gpointer backup_thread (gpointer data)
     // do the copy for each partition
     for (p = 0; p < n; p++)
     {
-		// don't try to copy extended partitions
-		if (!strcmp (parts[p].ptype, "extended")) continue;
+        // don't try to copy extended partitions
+        if (!strcmp (parts[p].ptype, "extended")) continue;
 
         sprintf (buffer, _("Copying partition %d of %d..."), p + 1, n);
-		gtk_label_set_text (GTK_LABEL (status), buffer);
- 		gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 0.0);
-	
-		// mount partitions
-		sys_printf ("sudo mount %s%d %s", partition_name (dst_dev, dev), parts[p].pnum, dst_mnt);
+        gtk_label_set_text (GTK_LABEL (status), buffer);
+        gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 0.0);
+
+        // mount partitions
+        if (sys_printf ("sudo mount %s%d %s", partition_name (dst_dev, dev), parts[p].pnum, dst_mnt))
+        {
+            terminate_dialog (_("Could not mount partition."));
+            return;
+        }
         CANCEL_CHECK;
-		sys_printf ("sudo mount %s%d %s", partition_name (src_dev, dev), parts[p].pnum, src_mnt);
-		CANCEL_CHECK;
+        if (sys_printf ("sudo mount %s%d %s", partition_name (src_dev, dev), parts[p].pnum, src_mnt))
+        {
+            terminate_dialog (_("Could not mount partition."));
+            return;
+        }
+        CANCEL_CHECK;
 
-		// check there is enough space...
-		sprintf (buffer, "df %s | tail -n 1 | tr -s \" \" \" \" | cut -d ' ' -f 3", src_mnt);
-		get_string (buffer, res);
-		sscanf (res, "%ld", &srcsz);
+        // check there is enough space...
+        sprintf (buffer, "df %s | tail -n 1 | tr -s \" \" \" \" | cut -d ' ' -f 3", src_mnt);
+        get_string (buffer, res);
+        sscanf (res, "%ld", &srcsz);
 
-		sprintf (buffer, "df %s | tail -n 1 | tr -s \" \" \" \" | cut -d ' ' -f 4", dst_mnt);
-		get_string (buffer, res);
-		sscanf (res, "%ld", &dstsz);
+        sprintf (buffer, "df %s | tail -n 1 | tr -s \" \" \" \" | cut -d ' ' -f 4", dst_mnt);
+        get_string (buffer, res);
+        sscanf (res, "%ld", &dstsz);
 
-		if (srcsz >= dstsz)
-		{
-			sys_printf ("sudo umount %s", dst_mnt);
-			sys_printf ("sudo umount %s", src_mnt);
-			terminate_dialog (_("Insufficient space. Backup aborted."));
-			return NULL;
-		}
+        if (srcsz >= dstsz)
+        {
+            sys_printf ("sudo umount %s", dst_mnt);
+            sys_printf ("sudo umount %s", src_mnt);
+            terminate_dialog (_("Insufficient space. Backup aborted."));
+            return NULL;
+        }
 
-		// start the copy itself in a new thread
-		g_thread_new (NULL, copy_thread, NULL);
+        // start the copy itself in a new thread
+        g_thread_new (NULL, copy_thread, NULL);
 
         // get the size to be copied
-		sprintf (buffer, "sudo du -s %s", src_mnt);
-		get_string (buffer, res);
-		sscanf (res, "%ld", &srcsz);
-		if (srcsz < 50000) stime = 1;
-		else if (srcsz < 500000) stime = 5;
-		else stime = 10;
+        sprintf (buffer, "sudo du -s %s", src_mnt);
+        get_string (buffer, res);
+        sscanf (res, "%ld", &srcsz);
+        if (srcsz < 50000) stime = 1;
+        else if (srcsz < 500000) stime = 5;
+        else stime = 10;
 
-		// wait for the copy to complete, while updating the progress bar...
-		sprintf (buffer, "sudo du -s %s", dst_mnt);
-		while (copying)
-		{
-			get_string (buffer, res);
-			sscanf (res, "%ld", &dstsz);
-			prog = dstsz;
-			prog /= srcsz;
-			gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), prog);
-			sleep (stime);
-			CANCEL_CHECK;
-		}
+        // wait for the copy to complete, while updating the progress bar...
+        sprintf (buffer, "sudo du -s %s", dst_mnt);
+        while (copying)
+        {
+            get_string (buffer, res);
+            sscanf (res, "%ld", &dstsz);
+            prog = dstsz;
+            prog /= srcsz;
+            gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), prog);
+            sleep (stime);
+            CANCEL_CHECK;
+        }
 
-		gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 1.0);
-			
-		// unmount partitions
-		sys_printf ("sudo umount %s", dst_mnt);
+        gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 1.0);
+
+        // unmount partitions
+        if (sys_printf ("sudo umount %s", dst_mnt))
+        {
+            terminate_dialog (_("Could not unmount partition."));
+            return;
+        }
         CANCEL_CHECK;
-		sys_printf ("sudo umount %s", src_mnt);
+        if (sys_printf ("sudo umount %s", src_mnt))
+        {
+            terminate_dialog (_("Could not unmount partition."));
+            return;
+        }
         CANCEL_CHECK;
     }
 
@@ -354,12 +422,12 @@ static gpointer backup_thread (gpointer data)
 
 static void on_cancel (void)
 {
-	FILE *fp;
-	char buffer[256];
-	int pid;
+    FILE *fp;
+    char buffer[256];
+    int pid;
 
-	if (ended)
-	{
+    if (ended)
+    {
         g_idle_add (close_msg, NULL);
         return;
     }
@@ -370,18 +438,18 @@ static void on_cancel (void)
     gtk_widget_set_sensitive (GTK_WIDGET (cancel), FALSE);
 
     // kill copy processes if running
-	if (copying)
-	{
-		sprintf (buffer, "ps ax | grep \"sudo cp -ax %s/. %s/.\" | grep -v \"grep\"", src_mnt, dst_mnt);
+    if (copying)
+    {
+        sprintf (buffer, "ps ax | grep \"sudo cp -ax %s/. %s/.\" | grep -v \"grep\"", src_mnt, dst_mnt);
         fp = popen (buffer, "r");
         if (fp != NULL)
-		{
+        {
             while (1)
             {
                 if (fgets (buffer, sizeof (buffer) - 1, fp) == NULL) break;
                 if (sscanf (buffer, "%d", &pid) == 1) sys_printf ("sudo kill %d", pid);
             }
-		}
+        }
         copying = 0;
     }
     cancelled = 1;
@@ -396,7 +464,7 @@ static void on_cancel (void)
 static void on_start (void)
 {
     // close the confirm dialog
-	gtk_widget_destroy (msg_dlg);
+    gtk_widget_destroy (msg_dlg);
 
     // create the progress dialog
     msg_dlg = (GtkWidget *) gtk_dialog_new ();
@@ -444,7 +512,7 @@ static void on_start (void)
 
 static void on_close (void)
 {
-	gtk_widget_destroy (msg_dlg);
+    gtk_widget_destroy (msg_dlg);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -513,15 +581,15 @@ static void on_confirm (void)
 
 static void on_help (void)
 {
-	GtkBuilder *builder;
+    GtkBuilder *builder;
     GtkWidget *dlg;
 
-	builder = gtk_builder_new ();
-	gtk_builder_add_from_file (builder, PACKAGE_DATA_DIR "/piclone.ui", NULL);
-	dlg = (GtkWidget *) gtk_builder_get_object (builder, "dialog2");
-	g_object_unref (builder);
-	gtk_dialog_run (GTK_DIALOG (dlg));
-	gtk_widget_destroy (dlg);
+    builder = gtk_builder_new ();
+    gtk_builder_add_from_file (builder, PACKAGE_DATA_DIR "/piclone.ui", NULL);
+    dlg = (GtkWidget *) gtk_builder_get_object (builder, "dialog2");
+    g_object_unref (builder);
+    gtk_dialog_run (GTK_DIALOG (dlg));
+    gtk_widget_destroy (dlg);
 }
 
 
@@ -544,54 +612,54 @@ static void on_cb_changed (void)
 
 static void on_drives_changed (void)
 {
-	char buffer[256], name[128], device[32];
-	FILE *fp;
+    char buffer[256], name[128], device[32];
+    FILE *fp;
 
-	// empty the comboboxes
-	while (src_count)
-	{
-	    gtk_combo_box_remove_text (GTK_COMBO_BOX (from_cb), 0);
-	    src_count--;
-	}
-	while (dst_count)
-	{
-	    gtk_combo_box_remove_text (GTK_COMBO_BOX (to_cb), 0);
-	    dst_count--;
-	}
+    // empty the comboboxes
+    while (src_count)
+    {
+        gtk_combo_box_remove_text (GTK_COMBO_BOX (from_cb), 0);
+        src_count--;
+    }
+    while (dst_count)
+    {
+        gtk_combo_box_remove_text (GTK_COMBO_BOX (to_cb), 0);
+        dst_count--;
+    }
 
-	// populate the comboboxes
-	gtk_combo_box_append_text (GTK_COMBO_BOX (from_cb), _("Internal SD card  (/dev/mmcblk0)"));
-	gtk_combo_box_set_active (GTK_COMBO_BOX (from_cb), 0);
-	src_count++;
+    // populate the comboboxes
+    gtk_combo_box_append_text (GTK_COMBO_BOX (from_cb), _("Internal SD card  (/dev/mmcblk0)"));
+    gtk_combo_box_set_active (GTK_COMBO_BOX (from_cb), 0);
+    src_count++;
 
     fp = popen ("sudo parted -l | grep \"^Disk /dev/\" | cut -d ' ' -f 2 | cut -d ':' -f 1", "r");
     if (fp != NULL)
     {
-	    while (1)
-	    {
-	        if (fgets (device, sizeof (device) - 1, fp) == NULL) break;
+        while (1)
+        {
+            if (fgets (device, sizeof (device) - 1, fp) == NULL) break;
 
-	        if (!strncmp (device + 5, "sd", 2) || !strncmp (device + 5, "mmcblk1", 7) )
-	        {
-	            device[strlen (device) - 1] = 0;
-	            get_dev_name (device, name);
-	            sprintf (buffer, "%s  (%s)", name, device);
-	            gtk_combo_box_append_text (GTK_COMBO_BOX (from_cb), buffer);
-	            gtk_combo_box_append_text (GTK_COMBO_BOX (to_cb), buffer);
-	            src_count++;
-	            dst_count++;
-	        }
-	    }
-	}
+            if (!strncmp (device + 5, "sd", 2) || !strncmp (device + 5, "mmcblk1", 7) )
+            {
+                device[strlen (device) - 1] = 0;
+                get_dev_name (device, name);
+                sprintf (buffer, "%s  (%s)", name, device);
+                gtk_combo_box_append_text (GTK_COMBO_BOX (from_cb), buffer);
+                gtk_combo_box_append_text (GTK_COMBO_BOX (to_cb), buffer);
+                src_count++;
+                dst_count++;
+            }
+        }
+    }
 
-	if (dst_count == 0)
-	{
-	    gtk_combo_box_append_text (GTK_COMBO_BOX (to_cb), _("No devices available"));
-	    gtk_combo_box_set_active (GTK_COMBO_BOX (to_cb), 0);
-	    gtk_widget_set_sensitive (GTK_WIDGET (to_cb), FALSE);
-	    dst_count++;
-	}
-	else gtk_widget_set_sensitive (GTK_WIDGET (to_cb), TRUE);
+    if (dst_count == 0)
+    {
+        gtk_combo_box_append_text (GTK_COMBO_BOX (to_cb), _("No devices available"));
+        gtk_combo_box_set_active (GTK_COMBO_BOX (to_cb), 0);
+        gtk_widget_set_sensitive (GTK_WIDGET (to_cb), FALSE);
+        dst_count++;
+    }
+    else gtk_widget_set_sensitive (GTK_WIDGET (to_cb), TRUE);
 }
 
 
@@ -600,7 +668,7 @@ static void on_drives_changed (void)
 
 int main (int argc, char *argv[])
 {
-	GtkBuilder *builder;
+    GtkBuilder *builder;
     GVolumeMonitor *monitor;
 
 #ifdef ENABLE_NLS
@@ -610,56 +678,56 @@ int main (int argc, char *argv[])
     textdomain ( GETTEXT_PACKAGE );
 #endif
 
-	// GTK setup
-	gtk_init (&argc, &argv);
-	gtk_icon_theme_prepend_search_path (gtk_icon_theme_get_default(), PACKAGE_DATA_DIR);
+    // GTK setup
+    gtk_init (&argc, &argv);
+    gtk_icon_theme_prepend_search_path (gtk_icon_theme_get_default(), PACKAGE_DATA_DIR);
 
-	// build the UI
-	builder = gtk_builder_new ();
-	gtk_builder_add_from_file (builder, PACKAGE_DATA_DIR "/piclone.ui", NULL);
-	main_dlg = (GtkWidget *) gtk_builder_get_object (builder, "dialog1");
+    // build the UI
+    builder = gtk_builder_new ();
+    gtk_builder_add_from_file (builder, PACKAGE_DATA_DIR "/piclone.ui", NULL);
+    main_dlg = (GtkWidget *) gtk_builder_get_object (builder, "dialog1");
 
     // set up the start button
-	start_btn = (GtkWidget *) gtk_builder_get_object (builder, "button1");
-	g_signal_connect (start_btn, "clicked", G_CALLBACK (on_confirm), NULL);
+    start_btn = (GtkWidget *) gtk_builder_get_object (builder, "button1");
+    g_signal_connect (start_btn, "clicked", G_CALLBACK (on_confirm), NULL);
 
     // set up the help button
-	help_btn = (GtkWidget *) gtk_builder_get_object (builder, "button4");
-	g_signal_connect (help_btn, "clicked", G_CALLBACK (on_help), NULL);
+    help_btn = (GtkWidget *) gtk_builder_get_object (builder, "button4");
+    g_signal_connect (help_btn, "clicked", G_CALLBACK (on_help), NULL);
 
     // get the table which holds the other elements
-	GtkWidget *table = (GtkWidget *) gtk_builder_get_object (builder, "table1");
+    GtkWidget *table = (GtkWidget *) gtk_builder_get_object (builder, "table1");
 
     // create and add the source combobox
     src_count = 0;
-	from_cb = (GtkWidget *)  (GObject *) gtk_combo_box_text_new ();
-	gtk_widget_set_tooltip_text (from_cb, _("Select the device to copy from"));
-	gtk_table_attach (GTK_TABLE (table), GTK_WIDGET (from_cb), 1, 2, 0, 1, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 5);
-	gtk_widget_show_all (GTK_WIDGET (from_cb));
-	g_signal_connect (from_cb, "changed", G_CALLBACK (on_cb_changed), NULL);
+    from_cb = (GtkWidget *)  (GObject *) gtk_combo_box_text_new ();
+    gtk_widget_set_tooltip_text (from_cb, _("Select the device to copy from"));
+    gtk_table_attach (GTK_TABLE (table), GTK_WIDGET (from_cb), 1, 2, 0, 1, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 5);
+    gtk_widget_show_all (GTK_WIDGET (from_cb));
+    g_signal_connect (from_cb, "changed", G_CALLBACK (on_cb_changed), NULL);
 
     // create and add the destination combobox
     dst_count = 0;
-	to_cb = (GtkWidget *)  (GObject *) gtk_combo_box_text_new ();
-	gtk_widget_set_tooltip_text (to_cb, _("Select the device to copy to"));
-	gtk_table_attach (GTK_TABLE (table), GTK_WIDGET (to_cb), 1, 2, 1, 2, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 5);
-	gtk_widget_show_all (GTK_WIDGET (to_cb));
-	g_signal_connect (to_cb, "changed", G_CALLBACK (on_cb_changed), NULL);
+    to_cb = (GtkWidget *)  (GObject *) gtk_combo_box_text_new ();
+    gtk_widget_set_tooltip_text (to_cb, _("Select the device to copy to"));
+    gtk_table_attach (GTK_TABLE (table), GTK_WIDGET (to_cb), 1, 2, 1, 2, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 5);
+    gtk_widget_show_all (GTK_WIDGET (to_cb));
+    g_signal_connect (to_cb, "changed", G_CALLBACK (on_cb_changed), NULL);
 
-	// populate the comboboxes
-	on_drives_changed ();
+    // populate the comboboxes
+    on_drives_changed ();
 
-	// configure monitoring for drives being connected or disconnected
+    // configure monitoring for drives being connected or disconnected
     monitor = g_volume_monitor_get ();
     g_signal_connect (monitor, "drive_changed", G_CALLBACK (on_drives_changed), NULL);
     g_signal_connect (monitor, "drive_connected", G_CALLBACK (on_drives_changed), NULL);
     g_signal_connect (monitor, "drive_disconnected", G_CALLBACK (on_drives_changed), NULL);
 
-	g_object_unref (builder);
-	gtk_dialog_run (GTK_DIALOG (main_dlg));
-	gtk_widget_destroy (main_dlg);
+    g_object_unref (builder);
+    gtk_dialog_run (GTK_DIALOG (main_dlg));
+    gtk_widget_destroy (main_dlg);
 
-	return 0;
+    return 0;
 }
 
 /* End of file */
