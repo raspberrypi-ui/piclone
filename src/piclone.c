@@ -233,7 +233,7 @@ static gpointer backup_thread (gpointer data)
         while (1)
         {
             if (fgets (buffer, sizeof (buffer) - 1, fp) == NULL) break;
-            if (n == MAXPART)
+            if (n >= MAXPART)
             {
                 terminate_dialog (_("Too many partitions on source."));
                 return;

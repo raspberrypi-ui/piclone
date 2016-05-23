@@ -1,32 +1,22 @@
-# Object files
 *.o
-*.ko
-*.obj
-*.elf
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
-
-# Shared objects (inc. Windows DLLs)
-*.dll
 *.so
-*.so.*
-*.dylib
-
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
-
-# Debug files
-*.dSYM/
+*.la
+*.a
+*.gmo
+*.lo
+.dirstamp
+.DS_Store
+Makefile
+piclone
+config.status
+config.log
+config.h
+.deps/
+.libs/
+libtool
+autom4te.cache/*
+po/Makefile.in
+po/POTFILES
+po/stamp-it
+po/.intltool-merge-cache
+stamp-h1
