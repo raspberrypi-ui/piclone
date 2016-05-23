@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-20 14:17+0100\n"
+"POT-Creation-Date: 2016-05-23 09:25+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,81 +45,85 @@ msgstr ""
 msgid "Reading partitions..."
 msgstr ""
 
-#: ../src/piclone.c:244
+#: ../src/piclone.c:238
+msgid "Too many partitions on source."
+msgstr ""
+
+#: ../src/piclone.c:249
 msgid "Preparing partitions..."
 msgstr ""
 
-#: ../src/piclone.c:255 ../src/piclone.c:266 ../src/piclone.c:275
+#: ../src/piclone.c:260 ../src/piclone.c:271 ../src/piclone.c:280
 msgid "Could not create partition."
 msgstr ""
 
-#: ../src/piclone.c:291 ../src/piclone.c:301
+#: ../src/piclone.c:296 ../src/piclone.c:306
 msgid "Could not create file system."
 msgstr ""
 
-#: ../src/piclone.c:312 ../src/piclone.c:320
+#: ../src/piclone.c:317 ../src/piclone.c:325
 msgid "Could not set flags."
 msgstr ""
 
-#: ../src/piclone.c:337
+#: ../src/piclone.c:342
 #, c-format
 msgid "Copying partition %d of %d..."
 msgstr ""
 
-#: ../src/piclone.c:344 ../src/piclone.c:350
+#: ../src/piclone.c:349 ../src/piclone.c:355
 msgid "Could not mount partition."
 msgstr ""
 
-#: ../src/piclone.c:368
+#: ../src/piclone.c:373
 msgid "Insufficient space. Backup aborted."
 msgstr ""
 
-#: ../src/piclone.c:401 ../src/piclone.c:407
+#: ../src/piclone.c:406 ../src/piclone.c:412
 msgid "Could not unmount partition."
 msgstr ""
 
-#: ../src/piclone.c:413
+#: ../src/piclone.c:418
 msgid "Copy complete."
 msgstr ""
 
 #. add message
-#: ../src/piclone.c:488
+#: ../src/piclone.c:493
 msgid "Checking source..."
 msgstr ""
 
 #. add cancel button
-#: ../src/piclone.c:498
+#: ../src/piclone.c:503
 msgid "Cancel"
 msgstr ""
 
-#: ../src/piclone.c:560
+#: ../src/piclone.c:565
 #, c-format
 msgid "This will erase all content on the device '%s'. Are you sure?"
 msgstr ""
 
 #. add buttons
-#: ../src/piclone.c:568
+#: ../src/piclone.c:573
 msgid "No"
 msgstr ""
 
-#: ../src/piclone.c:572
+#: ../src/piclone.c:577
 msgid "Yes"
 msgstr ""
 
 #. populate the comboboxes
-#: ../src/piclone.c:631
+#: ../src/piclone.c:636
 msgid "Internal SD card  (/dev/mmcblk0)"
 msgstr ""
 
-#: ../src/piclone.c:657
+#: ../src/piclone.c:662
 msgid "No devices available"
 msgstr ""
 
-#: ../src/piclone.c:704
+#: ../src/piclone.c:709
 msgid "Select the device to copy from"
 msgstr ""
 
-#: ../src/piclone.c:712
+#: ../src/piclone.c:717
 msgid "Select the device to copy to"
 msgstr ""
 
