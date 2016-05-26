@@ -76,7 +76,9 @@ static int get_string (char *cmd, char *name)
 {
     FILE *fp;
     char buf[64];
+    int res;
 
+    name[0] = 0;
     fp = popen (cmd, "r");
     if (fp == NULL) return 0;
     if (fgets (buf, sizeof (buf) - 1, fp) == NULL)
@@ -87,7 +89,9 @@ static int get_string (char *cmd, char *name)
     else
     {
         pclose (fp);
-        return sscanf (buf, "%s", name);
+        res = sscanf (buf, "%s", name);
+        if (res != 1) return 0;
+        return 1;
     }
 }
 
