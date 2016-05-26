@@ -78,8 +78,17 @@ static int get_string (char *cmd, char *name)
     char buf[64];
 
     fp = popen (cmd, "r");
-    if (fp == NULL || fgets (buf, sizeof (buf) - 1, fp) == NULL) return 0;
-    return sscanf (buf, "%s", name);
+    if (fp == NULL) return 0;
+    if (fgets (buf, sizeof (buf) - 1, fp) == NULL)
+    {
+        pclose (fp);
+        return 0;
+    }
+    else
+    {
+        pclose (fp);
+        return sscanf (buf, "%s", name);
+    }
 }
 
 /* System function with printf formatting */
@@ -130,7 +139,13 @@ static int get_dev_name (char *dev, char *name)
 
     sprintf (buffer, "sudo parted -l | grep -B 1 \"%s\" | head -n 1 | cut -d \":\" -f 2 | cut -d \"(\" -f 1", dev);
     fp = popen (buffer, "r");
-    if (fp == NULL || fgets (buffer, sizeof (buffer) - 1, fp) == NULL) return 0;
+    if (fp == NULL) return 0;
+    if (fgets (buffer, sizeof (buffer) - 1, fp) == NULL)
+    {
+        pclose (fp);
+        return 0;
+    }
+    pclose (fp);
     buffer[strlen (buffer) - 2] = 0;
     strcpy (name, buffer + 1);
     return 1;
@@ -165,8 +180,8 @@ static gpointer copy_thread (gpointer data)
 
 static gpointer backup_thread (gpointer data)
 {
-    char buffer[256], res[256], dev[16];
-    int n, p;
+    char buffer[256], res[256], dev[16], uuid[64];
+    int n, p, lbl, uid;
     long srcsz, dstsz, stime;
     double prog;
     FILE *fp;
@@ -174,11 +189,14 @@ static gpointer backup_thread (gpointer data)
     // check the source has an msdos partition table
     sprintf (buffer, "sudo parted %s unit s print | tail -n +4 | head -n 1", src_dev);  
     fp = popen (buffer, "r");
-    if (fp == NULL || fgets (buffer, sizeof (buffer) - 1, fp) == NULL)
+    if (fp == NULL) return;
+    if (fgets (buffer, sizeof (buffer) - 1, fp) == NULL)
     {
+        pclose (fp);
         terminate_dialog (_("Unable to read source."));
         return;
     }
+    pclose (fp);
     if (strncmp (buffer, "Partition Table: msdos", 22))
     {
         terminate_dialog (_("Non-MSDOS partition table on source."));
@@ -235,6 +253,7 @@ static gpointer backup_thread (gpointer data)
             if (fgets (buffer, sizeof (buffer) - 1, fp) == NULL) break;
             if (n >= MAXPART)
             {
+                pclose (fp);
                 terminate_dialog (_("Too many partitions on source."));
                 return;
             }
@@ -242,6 +261,7 @@ static gpointer backup_thread (gpointer data)
                 &(parts[n].end), &(parts[n].ptype), &(parts[n].ftype), &(parts[n].flags));
             n++;
         }
+        pclose (fp);
     }
     CANCEL_CHECK;
 
@@ -288,24 +308,69 @@ static gpointer backup_thread (gpointer data)
         system ("sudo partprobe");
         CANCEL_CHECK;
 
+        // get the UUID
+        sprintf (buffer, "sudo lsblk -o name,uuid %s | grep %s%d | tr -s \" \" | cut -d \" \" -f 2", src_dev, partition_name (src_dev, dev) + 5, parts[p].pnum);
+        uid = get_string (buffer, uuid);
+        if (uid)
+        {
+            // sanity check the ID
+            if (strlen (uuid) == 9)
+            {
+                if (uuid[4] = '-')
+                {
+                    // remove the hyphen from the middle of a FAT volume ID
+                    uuid[4] = uuid[5];
+                    uuid[5] = uuid[6];
+                    uuid[6] = uuid[7];
+                    uuid[7] = uuid[8];
+                    uuid[8] = 0;
+                }
+                else uid = 0;
+            }
+            else if (strlen (uuid) == 36)
+            {
+                // check there are hyphens in the right places in a UUID
+                if (uuid[8] != '-') uid = 0;
+                if (uuid[13] != '-') uid = 0;
+                if (uuid[18] != '-') uid = 0;
+                if (uuid[23] != '-') uid = 0;
+            }
+            else uid = 0;
+        }
+
+        // get the label
+        sprintf (buffer, "sudo lsblk -o name,label %s | grep %s%d | tr -s \" \" | cut -d \" \" -f 2", src_dev, partition_name (src_dev, dev) + 5, parts[p].pnum);
+        lbl = get_string (buffer, res);
+        if (!strlen (res)) lbl = 0;
+
         // create file systems
         if (!strncmp (parts[p].ftype, "fat", 3))
         {
-            if (sys_printf ("sudo mkfs.fat %s%d", partition_name (dst_dev, dev), parts[p].pnum))
+            if (uid) sprintf (buffer, "sudo mkfs.fat -i %s %s%d", uuid, partition_name (dst_dev, dev), parts[p].pnum);
+            else sprintf (buffer, "sudo mkfs.fat %s%d", partition_name (dst_dev, dev), parts[p].pnum);
+
+            if (sys_printf (buffer))
             {
                 terminate_dialog (_("Could not create file system."));
                 return;
             }
+
+            if (lbl) sys_printf ("sudo fatlabel %s%d %s", partition_name (dst_dev, dev), parts[p].pnum, res);
         }
         CANCEL_CHECK;
 
         if (!strcmp (parts[p].ftype, "ext4"))
         {
-            if (sys_printf ("sudo mkfs.ext4 -F %s%d", partition_name (dst_dev, dev), parts[p].pnum))
+            if (uid) sprintf (buffer, "sudo mkfs.ext4 -F -U %s %s%d", uuid, partition_name (dst_dev, dev), parts[p].pnum);
+            else sprintf (buffer, "sudo mkfs.ext4 -F %s%d", partition_name (dst_dev, dev), parts[p].pnum);
+
+            if (sys_printf (buffer))
             {
                 terminate_dialog (_("Could not create file system."));
                 return;
             }
+
+            if (lbl) sys_printf ("sudo e2label %s%d %s", partition_name (dst_dev, dev), parts[p].pnum, res);
         }
         CANCEL_CHECK;
 
@@ -454,6 +519,7 @@ static void on_cancel (void)
                 if (fgets (buffer, sizeof (buffer) - 1, fp) == NULL) break;
                 if (sscanf (buffer, "%d", &pid) == 1) sys_printf ("sudo kill %d", pid);
             }
+            pclose (fp);
         }
         copying = 0;
     }
@@ -655,6 +721,7 @@ static void on_drives_changed (void)
                 dst_count++;
             }
         }
+        pclose (fp);
     }
 
     if (dst_count == 0)
