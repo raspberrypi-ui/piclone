@@ -248,7 +248,7 @@ static gpointer backup_thread (gpointer data)
 
     // read in the source partition table
     n = 0;
-    sprintf (buffer, "sudo parted %s unit s print | tail -n +8 | head -n -1", src_dev);
+    sprintf (buffer, "sudo parted %s unit s print | sed '/^ /!d'", src_dev);
     fp = popen (buffer, "r");
     if (fp != NULL)
     {
