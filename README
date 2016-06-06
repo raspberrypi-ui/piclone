@@ -1,3 +1,8 @@
 This is an application which allows the SD card inserted into the Pi to be copied to one in a connected USB reader.
 
 To build, run autogen.sh, then ./configure and make.
+
+To generate a Debian package for piclone:
+1/ run autogen.sh
+2/ run dpkg-buildpackage -us -uc
+3/ install the deb package with sudo dpkg -i piclone_0.?_armhf.deb 
