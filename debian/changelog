@@ -1,3 +1,22 @@
+piclone (0.3) Jessie; urgency=low
+
+  * Retry file system creation if it fails due to inability to write UUID
+  * Improve portability of parted output
+
+ -- Simon Long <simon@raspberrypi.org>  Wed, 10 Aug 2016 09:15:00 +0100
+
+piclone (0.2) jessie; urgency=medium
+
+  * Added some more error checking to prevent null strings making it into commands
+  * Copying of volume labels and IDs added
+  * Integrate effects of language changes
+  * Translations updated
+  * Check for more than 9 partitions
+  * A lot of error checking for failures such as write-protected target
+  * German translation added
+
+ -- Serge Schneider <serge@raspberrypi.org>  Fri, 27 May 2016 10:58:28 +0100
+
 piclone (0.1) unstable; urgency=low
 
   * Initial release
