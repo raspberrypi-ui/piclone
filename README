@@ -3,6 +3,28 @@ This is an application which allows the SD card inserted into the Pi to be copie
 To build, run autogen.sh, then ./configure and make.
 
 To generate a Debian package for piclone:
-1/ run autogen.sh
-2/ run dpkg-buildpackage -us -uc
-3/ install the deb package with sudo dpkg -i piclone_0.?_armhf.deb 
+1/ run dpkg-buildpackage -us -uc
+2/ install the deb package with sudo dpkg -i piclone_0.?_armhf.deb 
+
+
+You can also create a dump image of a SDcard on a USB hard drive for archive
+
+1/ create an empty file on your harddrive about the size of your SD card (for example 32GB)
+
+	cd /mnt/myharddrive
+	dd if=/dev/zero of=PicloneSAVE_YYYY_MM_DD.bin bs=100M count=320
+
+2/ attach the file to a loopback device (example "/dev/loop0")
+
+	sudo losetup /dev/loop0 PicloneSAVE_YYYY_MM_DD.bin
+
+3/ use piclone with /dev/loop0 as target
+
+4/ detach loop device 
+
+	sudo losetup -d /dev/loop0
+
+5/ you can use md5sum / sha1sum / sha256sum on the file PicloneSAVE_YYYY_MM_DD.bin as usual
+
+6/ you can zip the image using 7zip or another compression tool
+ 

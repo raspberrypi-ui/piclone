@@ -141,25 +141,41 @@ static int get_dev_name (char *dev, char *name)
     char buffer[256];
     FILE *fp;
 
-    sprintf (buffer, "sudo parted -l | grep -B 1 \"%s\" | head -n 1 | cut -d \":\" -f 2 | cut -d \"(\" -f 1", dev);
-    fp = popen (buffer, "r");
-    if (fp == NULL) return 0;
-    if (fgets (buffer, sizeof (buffer) - 1, fp) == NULL)
-    {
-        pclose (fp);
-        return 0;
-    }
-    pclose (fp);
-    buffer[strlen (buffer) - 2] = 0;
-    strcpy (name, buffer + 1);
-    return 1;
+	if (!strncmp (dev, "/dev/loop", 9))
+	{
+		sprintf (buffer, "sudo losetup -a | grep -B 1 \"%s\" | head -n 1 | cut -d \"(\" -f 2 | cut -d \")\" -f 1", dev);
+		fp = popen (buffer, "r");
+		if (fp == NULL) return 0;
+		if (fgets (buffer, sizeof (buffer) - 1, fp) == NULL)
+		{
+			pclose (fp);
+			return 0;
+		}
+		pclose (fp);
+		buffer[strlen (buffer) - 1] = 0;
+		strcpy (name, buffer);
+	}
+	else
+	{
+		sprintf (buffer, "sudo parted -l | grep -B 1 \"%s\" | head -n 1 | cut -d \":\" -f 2 | cut -d \"(\" -f 1", dev);
+		fp = popen (buffer, "r");
+		if (fp == NULL) return 0;
+		if (fgets (buffer, sizeof (buffer) - 1, fp) == NULL)
+		{
+			pclose (fp);
+			return 0;
+		}
+		pclose (fp);
+		buffer[strlen (buffer) - 2] = 0;
+		strcpy (name, buffer + 1);
+		return 1;
+	}
 }
-
 
 static char *partition_name (char *device, char *buffer)
 {
-    if (!strncmp (device, "/dev/mmcblk", 11))
-        sprintf (buffer, "%sp", device);
+    if (!strncmp (device, "/dev/mmcblk", 11) || !strncmp (device, "/dev/loop", 9))
+        sprintf (buffer, "%sp", device);    
     else
         sprintf (buffer, "%s", device);
     return buffer;
@@ -733,6 +749,7 @@ static void on_drives_changed (void)
     gtk_combo_box_set_active (GTK_COMBO_BOX (from_cb), 0);
     src_count++;
 
+	// add existing physical disk as source or target (excepted boot device mmcblk0)
     fp = popen ("sudo parted -l | grep \"^Disk /dev/\" | cut -d ' ' -f 2 | cut -d ':' -f 1", "r");
     if (fp != NULL)
     {
@@ -748,6 +765,26 @@ static void on_drives_changed (void)
                 gtk_combo_box_append_text (GTK_COMBO_BOX (from_cb), buffer);
                 gtk_combo_box_append_text (GTK_COMBO_BOX (to_cb), buffer);
                 src_count++;
+                dst_count++;
+            }
+        }
+        pclose (fp);
+    }
+    
+    // add existing loopback devices as target
+    fp = popen ("sudo losetup -a | cut -d ' ' -f 1 | cut -d ':' -f 1", "r");
+    if (fp != NULL)
+    {
+        while (1)
+        {
+            if (fgets (device, sizeof (device) - 1, fp) == NULL) break;
+
+            if (!strncmp (device + 5, "loop", 4) )
+            {
+                device[strlen (device) - 1] = 0;
+                get_dev_name (device, name);
+                sprintf (buffer, "%s  (%s)", name, device);                
+                gtk_combo_box_append_text (GTK_COMBO_BOX (to_cb), buffer);
                 dst_count++;
             }
         }
