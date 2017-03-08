@@ -32,6 +32,9 @@ typedef struct
 
 partition_t parts[MAXPART];
 
+/* global volume monitor object */
+GVolumeMonitor *monitor;
+
 /* control widget globals */
 static GtkWidget *main_dlg, *msg_dlg, *status, *progress, *cancel, *to_cb, *from_cb, *start_btn, *help_btn;
 
@@ -136,25 +139,24 @@ static void terminate_dialog (char *msg)
 
 /* Parse the partition table to get a device name */
 
-static int get_dev_name (char *dev, char *name)
+static void get_dev_name (char *dev, char *name)
 {
-    char buffer[256];
-    FILE *fp;
-
-    sprintf (buffer, "sudo parted -l | grep -B 1 \"%s\" | head -n 1 | cut -d \":\" -f 2 | cut -d \"(\" -f 1", dev);
-    fp = popen (buffer, "r");
-    if (fp == NULL) return 0;
-    if (fgets (buffer, sizeof (buffer) - 1, fp) == NULL)
+    GList *iter, *drives = g_volume_monitor_get_connected_drives (monitor);
+    name[0] = 0;
+    for (iter = drives; iter != NULL; iter = g_list_next (iter))
     {
-        pclose (fp);
-        return 0;
+        GDrive *d = iter->data;
+        char *id = g_drive_get_identifier (d, "unix-device");
+        if (!strcmp (id + 5, dev))
+        {
+            char *n = g_drive_get_name (d);
+            strcpy (name, n);
+            g_free (n);
+        }
+        g_free (id);
     }
-    pclose (fp);
-    buffer[strlen (buffer) - 2] = 0;
-    strcpy (name, buffer + 1);
-    return 1;
+    g_list_free_full (drives, g_object_unref);
 }
-
 
 static char *partition_name (char *device, char *buffer)
 {
@@ -710,7 +712,9 @@ static void on_cb_changed (void)
     if (gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (to_cb)) == 0 ||
         gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (from_cb)) == 0 ||
         !strcmp (gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (to_cb)),
-            gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (from_cb))))
+            gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (from_cb))) ||
+         !strcmp (gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (to_cb)),
+           _("No devices available")))
         gtk_widget_set_sensitive (GTK_WIDGET (start_btn), FALSE);
     else
         gtk_widget_set_sensitive (GTK_WIDGET (start_btn), TRUE);
@@ -723,6 +727,7 @@ static void on_drives_changed (void)
 {
     char buffer[256], name[128], device[32], test[128];
     FILE *fp, *fp1;
+    int devlen;
 
     // empty the comboboxes
     while (src_count)
@@ -737,23 +742,24 @@ static void on_drives_changed (void)
     }
 
     // populate the comboboxes
-    fp = popen ("sudo parted -l | grep \"^Disk /dev/\" | cut -d ' ' -f 2 | cut -d ':' -f 1", "r");
+    fp = popen ("lsblk -n | grep ^[ms] | cut -f 1 -d ' '", "r");
     if (fp != NULL)
     {
         while (1)
         {
             if (fgets (device, sizeof (device) - 1, fp) == NULL) break;
 
-            if (!strncmp (device + 5, "sd", 2) || !strncmp (device + 5, "mmcblk", 6))
+            if (!strncmp (device, "sd", 2) || !strncmp (device, "mmcblk", 6))
             {
-                device[strlen (device) - 1] = 0;
+                devlen = strlen (device) - 1;
+                device[devlen] = 0;
                 get_dev_name (device, name);
-                sprintf (buffer, "%s  (%s)", name, device);
+                sprintf (buffer, "%s  (/dev/%s)", name, device);
                 gtk_combo_box_append_text (GTK_COMBO_BOX (from_cb), buffer);
                 src_count++;
 
                 // do not allow the current root and boot devices as targets
-                sprintf (test, "lsblk %s | grep -Eq \"part /(boot)?$\"", device);
+                sprintf (test, "lsblk /dev/%s | grep -Eq \"part /(boot)?$\"", device);
                 fp1 = popen (test, "r");
                 if (fp1 && pclose (fp1))
                 {
@@ -782,7 +788,6 @@ static void on_drives_changed (void)
 int main (int argc, char *argv[])
 {
     GtkBuilder *builder;
-    GVolumeMonitor *monitor;
 
 #ifdef ENABLE_NLS
     setlocale (LC_ALL, "");
@@ -827,14 +832,18 @@ int main (int argc, char *argv[])
     gtk_widget_show_all (GTK_WIDGET (to_cb));
     g_signal_connect (to_cb, "changed", G_CALLBACK (on_cb_changed), NULL);
 
+    // configure monitoring for drives being connected or disconnected
+    monitor = g_volume_monitor_get ();
+
     // populate the comboboxes
     on_drives_changed ();
 
-    // configure monitoring for drives being connected or disconnected
-    monitor = g_volume_monitor_get ();
     g_signal_connect (monitor, "drive_changed", G_CALLBACK (on_drives_changed), NULL);
     g_signal_connect (monitor, "drive_connected", G_CALLBACK (on_drives_changed), NULL);
     g_signal_connect (monitor, "drive_disconnected", G_CALLBACK (on_drives_changed), NULL);
+    g_signal_connect (monitor, "mount_changed", G_CALLBACK (on_drives_changed), NULL);
+    g_signal_connect (monitor, "mount_added", G_CALLBACK (on_drives_changed), NULL);
+    g_signal_connect (monitor, "mount_removed", G_CALLBACK (on_drives_changed), NULL);
 
     g_object_unref (builder);
     gtk_dialog_run (GTK_DIALOG (main_dlg));
