@@ -410,7 +410,7 @@ static gpointer backup_thread (gpointer data)
         CANCEL_CHECK;
 
         // write the partition UUID
-        if (puid) sys_printf (buffer, "echo -e \"x\ni\n0x%s\nr\nw\n\" | sudo fdisk %s", puuid, dst_dev);
+        if (puid) sys_printf ("echo \"x\ni\n0x%s\nr\nw\n\" | sudo fdisk %s", puuid, dst_dev);
 
         // set the flags        
         if (!strcmp (parts[p].flags, "lba"))
