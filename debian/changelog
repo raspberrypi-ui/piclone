@@ -1,3 +1,11 @@
+piclone (0.4) UNRELEASED; urgency=medium
+
+  * Clone PARTUUID when copying
+  * Allow all /dev/sd? and /dev/mmcblk? devices as sources and targets
+  * Detect root and boot devices and prevent use as target
+
+ -- Simon Long <simon@raspberrypi.org>  Wed, 08 Mar 2017 14:33:07 +0000
+
 piclone (0.3) Jessie; urgency=low
 
   * Retry file system creation if it fails due to inability to write UUID
