@@ -713,8 +713,8 @@ static void on_cb_changed (void)
 
 static void on_drives_changed (void)
 {
-    char buffer[256], name[128], device[32], root[128], boot[128];
-    FILE *fp;
+    char buffer[256], name[128], device[32], test[128];
+    FILE *fp, *fp1;
 
     // empty the comboboxes
     while (src_count)
@@ -727,10 +727,6 @@ static void on_drives_changed (void)
         gtk_combo_box_remove_text (GTK_COMBO_BOX (to_cb), 0);
         dst_count--;
     }
-
-    // get the device names which hold the boot partition and the root fs
-    get_string ("ls -l /dev | grep $(printf \"[[:space:]]%d,[[:space:]]*0\" 0x$(stat -c %D / | rev | cut -c 3- | rev)) | rev | cut -f 1 -d ' ' | rev", root);
-    get_string ("ls -l /dev | grep $(printf \"[[:space:]]%d,[[:space:]]*0\" 0x$(stat -c %D /boot | rev | cut -c 3- | rev)) | rev | cut -f 1 -d ' ' | rev", boot);
 
     // populate the comboboxes
     fp = popen ("sudo parted -l | grep \"^Disk /dev/\" | cut -d ' ' -f 2 | cut -d ':' -f 1", "r");
@@ -749,7 +745,9 @@ static void on_drives_changed (void)
                 src_count++;
 
                 // do not allow the current root and boot devices as targets
-                if (!((boot && !strcmp (device + 5, boot)) || (root && !strcmp (device + 5, root))))
+                sprintf (test, "lsblk %s | grep -Eq \"part /(boot)?$\"", device);
+                fp1 = popen (test, "r");
+                if (fp1 && pclose (fp1))
                 {
 					gtk_combo_box_append_text (GTK_COMBO_BOX (to_cb), buffer);
 					dst_count++;
