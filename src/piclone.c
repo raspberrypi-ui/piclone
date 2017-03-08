@@ -713,7 +713,7 @@ static void on_cb_changed (void)
 
 static void on_drives_changed (void)
 {
-    char buffer[256], name[128], device[32];
+    char buffer[256], name[128], device[32], root[128], boot[128];
     FILE *fp;
 
     // empty the comboboxes
@@ -728,11 +728,11 @@ static void on_drives_changed (void)
         dst_count--;
     }
 
-    // populate the comboboxes
-    gtk_combo_box_append_text (GTK_COMBO_BOX (from_cb), _("Internal SD card  (/dev/mmcblk0)"));
-    gtk_combo_box_set_active (GTK_COMBO_BOX (from_cb), 0);
-    src_count++;
+    // get the device names which hold the boot partition and the root fs
+    get_string ("ls -l /dev | grep $(printf \"[[:space:]]%d,[[:space:]]*0\" 0x$(stat -c %D / | rev | cut -c 3- | rev)) | rev | cut -f 1 -d ' ' | rev", root);
+    get_string ("ls -l /dev | grep $(printf \"[[:space:]]%d,[[:space:]]*0\" 0x$(stat -c %D /boot | rev | cut -c 3- | rev)) | rev | cut -f 1 -d ' ' | rev", boot);
 
+    // populate the comboboxes
     fp = popen ("sudo parted -l | grep \"^Disk /dev/\" | cut -d ' ' -f 2 | cut -d ':' -f 1", "r");
     if (fp != NULL)
     {
@@ -740,15 +740,20 @@ static void on_drives_changed (void)
         {
             if (fgets (device, sizeof (device) - 1, fp) == NULL) break;
 
-            if (!strncmp (device + 5, "sd", 2) || !strncmp (device + 5, "mmcblk1", 7) )
+            if (!strncmp (device + 5, "sd", 2) || !strncmp (device + 5, "mmcblk", 6))
             {
                 device[strlen (device) - 1] = 0;
                 get_dev_name (device, name);
                 sprintf (buffer, "%s  (%s)", name, device);
                 gtk_combo_box_append_text (GTK_COMBO_BOX (from_cb), buffer);
-                gtk_combo_box_append_text (GTK_COMBO_BOX (to_cb), buffer);
                 src_count++;
-                dst_count++;
+
+                // do not allow the current root and boot devices as targets
+                if (!((boot && !strcmp (device + 5, boot)) || (root && !strcmp (device + 5, root))))
+                {
+					gtk_combo_box_append_text (GTK_COMBO_BOX (to_cb), buffer);
+					dst_count++;
+				}
             }
         }
         pclose (fp);
