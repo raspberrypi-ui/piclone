@@ -184,8 +184,8 @@ static gpointer copy_thread (gpointer data)
 
 static gpointer backup_thread (gpointer data)
 {
-    char buffer[256], res[256], dev[16], uuid[64];
-    int n, p, lbl, uid;
+    char buffer[256], res[256], dev[16], uuid[64], puuid[64];
+    int n, p, lbl, uid, puid;
     long srcsz, dstsz, stime;
     double prog;
     FILE *fp;
@@ -347,6 +347,11 @@ static gpointer backup_thread (gpointer data)
         lbl = get_string (buffer, res);
         if (!strlen (res)) lbl = 0;
 
+        // get the partition UUID
+		sprintf (buffer, "sudo blkid %s | rev | cut -f 2 -d ' ' | rev | cut -f 2 -d \\\"", src_dev);
+		puid = get_string (buffer, puuid);
+        if (!strlen (puuid)) puid = 0;
+
         // create file systems
         if (!strncmp (parts[p].ftype, "fat", 3))
         {
@@ -403,6 +408,9 @@ static gpointer backup_thread (gpointer data)
             if (lbl) sys_printf ("sudo e2label %s%d %s", partition_name (dst_dev, dev), parts[p].pnum, res);
         }
         CANCEL_CHECK;
+
+        // write the partition UUID
+        if (puid) sys_printf (buffer, "echo -e \"x\ni\n0x%s\nr\nw\n\" | sudo fdisk %s", puuid, dst_dev);
 
         // set the flags        
         if (!strcmp (parts[p].flags, "lba"))
