@@ -137,26 +137,7 @@ static void terminate_dialog (char *msg)
 }
 
 
-/* Parse the partition table to get a device name */
-
-static void get_dev_name (char *dev, char *name)
-{
-    GList *iter, *drives = g_volume_monitor_get_connected_drives (monitor);
-    name[0] = 0;
-    for (iter = drives; iter != NULL; iter = g_list_next (iter))
-    {
-        GDrive *d = iter->data;
-        char *id = g_drive_get_identifier (d, "unix-device");
-        if (!strcmp (id + 5, dev))
-        {
-            char *n = g_drive_get_name (d);
-            strcpy (name, n);
-            g_free (n);
-        }
-        g_free (id);
-    }
-    g_list_free_full (drives, g_object_unref);
-}
+/* Get a partition name - format is different on mmcblk from sd */
 
 static char *partition_name (char *device, char *buffer)
 {
@@ -634,16 +615,17 @@ static void on_close (void)
 static void on_confirm (void)
 {
     char buffer[256], res[256];
-    char *ptr;
+    char *src, *dst;
+    int len;
 
     // set up source and target devices from combobox values
-    ptr = strrchr (gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (to_cb)), '(');
-    strcpy (dst_dev, ptr + 1);
-    dst_dev[strlen (dst_dev) - 1] = 0;
+    dst = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (to_cb));
+    strtok (dst, "(");
+    strcpy (dst_dev, strtok (NULL, ")"));
 
-    ptr = strrchr (gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (from_cb)), '(');
-    strcpy (src_dev, ptr + 1);
-    src_dev[strlen (src_dev) - 1] = 0;
+    src = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (from_cb));
+    strtok (src, "(");
+    strcpy (src_dev, strtok (NULL, ")"));
 
     // basic sanity check - don't do anything if src == dest
     if (!strcmp (src_dev, dst_dev)) return;
@@ -667,8 +649,9 @@ static void on_confirm (void)
     gtk_container_add (GTK_CONTAINER (frame), box);
 
     // add message
-    get_dev_name (dst_dev, res);
-    sprintf (buffer, _("This will erase all content on the device '%s'. Are you sure?"), res);
+    len = strlen (dst);
+    if (len >= 2) dst[len - 2] = 0;
+    sprintf (buffer, _("This will erase all content on the device '%s'. Are you sure?"), dst);
     GtkWidget* status = (GtkWidget *) gtk_label_new (buffer);
     gtk_box_pack_start (GTK_BOX (box), status, FALSE, FALSE, 5);
 
@@ -683,6 +666,9 @@ static void on_confirm (void)
     GtkWidget *yes = (GtkWidget *) gtk_button_new_with_label (_("Yes"));
     gtk_box_pack_start (GTK_BOX (hbox), yes, FALSE, TRUE, 40);
     g_signal_connect (yes, "clicked", G_CALLBACK (on_start), NULL);
+
+    g_free (src);
+    g_free (dst);
 
     gtk_widget_show_all (GTK_WIDGET (msg_dlg));
  }
@@ -725,8 +711,8 @@ static void on_cb_changed (void)
 
 static void on_drives_changed (void)
 {
-    char buffer[256], name[128], device[32], test[128];
-    FILE *fp, *fp1;
+    char buffer[256], test[128];
+    FILE *fp;
     int devlen;
 
     // empty the comboboxes
@@ -742,34 +728,28 @@ static void on_drives_changed (void)
     }
 
     // populate the comboboxes
-    fp = popen ("lsblk -n | grep ^[ms] | cut -f 1 -d ' '", "r");
-    if (fp != NULL)
+    GList *iter, *drives = g_volume_monitor_get_connected_drives (monitor);
+    for (iter = drives; iter != NULL; iter = g_list_next (iter))
     {
-        while (1)
+        GDrive *d = iter->data;
+        char *id = g_drive_get_identifier (d, "unix-device");
+        char *n = g_drive_get_name (d);
+        sprintf (buffer, "%s  (%s)", n, id);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (from_cb), buffer);
+        src_count++;
+
+        // do not allow the current root and boot devices as targets
+        sprintf (test, "lsblk %s | grep -Eq \"part /(boot)?$\"", id);
+        fp = popen (test, "r");
+        if (fp && pclose (fp))
         {
-            if (fgets (device, sizeof (device) - 1, fp) == NULL) break;
-
-            if (!strncmp (device, "sd", 2) || !strncmp (device, "mmcblk", 6))
-            {
-                devlen = strlen (device) - 1;
-                device[devlen] = 0;
-                get_dev_name (device, name);
-                sprintf (buffer, "%s  (/dev/%s)", name, device);
-                gtk_combo_box_append_text (GTK_COMBO_BOX (from_cb), buffer);
-                src_count++;
-
-                // do not allow the current root and boot devices as targets
-                sprintf (test, "lsblk /dev/%s | grep -Eq \"part /(boot)?$\"", device);
-                fp1 = popen (test, "r");
-                if (fp1 && pclose (fp1))
-                {
-					gtk_combo_box_append_text (GTK_COMBO_BOX (to_cb), buffer);
-					dst_count++;
-				}
-            }
+            gtk_combo_box_append_text (GTK_COMBO_BOX (to_cb), buffer);
+            dst_count++;
         }
-        pclose (fp);
+        g_free (id);
+        g_free (n);
     }
+    g_list_free_full (drives, g_object_unref);
 
     if (dst_count == 0)
     {
