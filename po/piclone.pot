@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-23 09:25+0100\n"
+"POT-Creation-Date: 2017-07-06 13:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,113 +17,109 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/piclone.c:119
+#: ../src/piclone.c:136
 msgid "OK"
 msgstr ""
 
-#: ../src/piclone.c:179
+#: ../src/piclone.c:184
 msgid "Unable to read source."
 msgstr ""
 
-#: ../src/piclone.c:184
+#: ../src/piclone.c:190
 msgid "Non-MSDOS partition table on source."
 msgstr ""
 
-#: ../src/piclone.c:191
+#: ../src/piclone.c:197
 msgid "Preparing target..."
 msgstr ""
 
-#: ../src/piclone.c:204
+#: ../src/piclone.c:210
 msgid "Could not write to destination."
 msgstr ""
 
-#: ../src/piclone.c:218
+#: ../src/piclone.c:224
 msgid "Could not create FAT."
 msgstr ""
 
-#: ../src/piclone.c:224
+#: ../src/piclone.c:230
 msgid "Reading partitions..."
 msgstr ""
 
-#: ../src/piclone.c:238
+#: ../src/piclone.c:245
 msgid "Too many partitions on source."
 msgstr ""
 
-#: ../src/piclone.c:249
+#: ../src/piclone.c:257
 msgid "Preparing partitions..."
 msgstr ""
 
-#: ../src/piclone.c:260 ../src/piclone.c:271 ../src/piclone.c:280
+#: ../src/piclone.c:268 ../src/piclone.c:279 ../src/piclone.c:288
 msgid "Could not create partition."
 msgstr ""
 
-#: ../src/piclone.c:296 ../src/piclone.c:306
+#: ../src/piclone.c:353 ../src/piclone.c:359 ../src/piclone.c:381
+#: ../src/piclone.c:387
 msgid "Could not create file system."
 msgstr ""
 
-#: ../src/piclone.c:317 ../src/piclone.c:325
+#: ../src/piclone.c:404 ../src/piclone.c:412
 msgid "Could not set flags."
 msgstr ""
 
-#: ../src/piclone.c:342
+#: ../src/piclone.c:429
 #, c-format
 msgid "Copying partition %d of %d..."
 msgstr ""
 
-#: ../src/piclone.c:349 ../src/piclone.c:355
+#: ../src/piclone.c:436 ../src/piclone.c:442
 msgid "Could not mount partition."
 msgstr ""
 
-#: ../src/piclone.c:373
+#: ../src/piclone.c:460
 msgid "Insufficient space. Backup aborted."
 msgstr ""
 
-#: ../src/piclone.c:406 ../src/piclone.c:412
+#: ../src/piclone.c:493 ../src/piclone.c:499
 msgid "Could not unmount partition."
 msgstr ""
 
-#: ../src/piclone.c:418
+#: ../src/piclone.c:505
 msgid "Copy complete."
 msgstr ""
 
 #. add message
-#: ../src/piclone.c:493
+#: ../src/piclone.c:581
 msgid "Checking source..."
 msgstr ""
 
 #. add cancel button
-#: ../src/piclone.c:503
+#: ../src/piclone.c:591
 msgid "Cancel"
 msgstr ""
 
-#: ../src/piclone.c:565
+#: ../src/piclone.c:655
 #, c-format
 msgid "This will erase all content on the device '%s'. Are you sure?"
 msgstr ""
 
 #. add buttons
-#: ../src/piclone.c:573
+#: ../src/piclone.c:663
 msgid "No"
 msgstr ""
 
-#: ../src/piclone.c:577
+#: ../src/piclone.c:667
 msgid "Yes"
 msgstr ""
 
-#. populate the comboboxes
-#: ../src/piclone.c:636
-msgid "Internal SD card  (/dev/mmcblk0)"
-msgstr ""
-
-#: ../src/piclone.c:662
+#: ../src/piclone.c:704 ../src/piclone.c:757
 msgid "No devices available"
 msgstr ""
 
-#: ../src/piclone.c:709
+#: ../src/piclone.c:803
 msgid "Select the device to copy from"
 msgstr ""
 
-#: ../src/piclone.c:717
+#: ../src/piclone.c:811
 msgid "Select the device to copy to"
 msgstr ""
 
@@ -186,4 +182,8 @@ msgstr ""
 
 #: ../data/piclone.desktop.in.h:2
 msgid "Make a copy of the Raspbian SD card"
+msgstr ""
+
+#: ../data/pwdpic.sh:6
+msgid "Password Required"
 msgstr ""

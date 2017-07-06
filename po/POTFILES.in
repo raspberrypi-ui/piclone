@@ -3,3 +3,4 @@ src/piclone.c
 [type: gettext/glade] data/piclone.ui
 # files added by intltool-prepare
 data/piclone.desktop.in
+data/pwdpic.sh

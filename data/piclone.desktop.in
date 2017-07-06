@@ -4,7 +4,7 @@ _Name=SD Card Copier
 _GenericName=SD Card Copier
 _Comment=Make a copy of the Raspbian SD card
 Icon=media-removable
-Exec=piclone
+Exec=env SUDO_ASKPASS=/usr/bin/pwdpic.sh piclone
 NotShowIn=GNOME;XFCE;
 StartupNotify=true
 Categories=Utility;

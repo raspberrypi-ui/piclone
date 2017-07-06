@@ -1,4 +1,10 @@
-piclone (0.4) UNRELEASED; urgency=medium
+piclone (0.5) stretch; urgency=medium
+
+  * Use sudo -A option with zenity helper script to prompt for password when needed
+
+ -- Simon Long <simon@raspberrypi.org>  Tue, 04 Jul 2017 15:26:56 +0100
+
+piclone (0.4) jessie; urgency=medium
 
   * Clone PARTUUID when copying
   * Allow all /dev/sd? and /dev/mmcblk? devices as sources and targets

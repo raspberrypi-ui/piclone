@@ -1,14 +1,14 @@
 # English translations for piclone package.
-# Copyright (C) 2016 THE piclone'S COPYRIGHT HOLDER
+# Copyright (C) 2017 Raspberry PI
 # This file is distributed under the same license as the piclone package.
-# Simon Long <simon@raspberrypi.org>, 2016.
+# Simon Long <simon@raspberrypi.org>, 2017.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: piclone 0.1\n"
+"Project-Id-Version: piclone 0.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-23 09:25+0100\n"
-"PO-Revision-Date: 2016-05-23 09:59+0100\n"
+"POT-Creation-Date: 2017-07-06 12:04+0100\n"
+"PO-Revision-Date: 2017-07-06 12:05+0100\n"
 "Last-Translator: Simon Long <simon@raspberrypi.org>\n"
 "Language-Team: English (British)\n"
 "Language: en_GB\n"
@@ -17,113 +17,109 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../src/piclone.c:119
+#: ../src/piclone.c:136
 msgid "OK"
 msgstr "OK"
 
-#: ../src/piclone.c:179
+#: ../src/piclone.c:184
 msgid "Unable to read source."
 msgstr "Unable to read source."
 
-#: ../src/piclone.c:184
+#: ../src/piclone.c:190
 msgid "Non-MSDOS partition table on source."
 msgstr "Non-MSDOS partition table on source."
 
-#: ../src/piclone.c:191
+#: ../src/piclone.c:197
 msgid "Preparing target..."
 msgstr "Preparing target..."
 
-#: ../src/piclone.c:204
+#: ../src/piclone.c:210
 msgid "Could not write to destination."
 msgstr "Could not write to destination."
 
-#: ../src/piclone.c:218
+#: ../src/piclone.c:224
 msgid "Could not create FAT."
 msgstr "Could not create FAT."
 
-#: ../src/piclone.c:224
+#: ../src/piclone.c:230
 msgid "Reading partitions..."
 msgstr "Reading partitions..."
 
-#: ../src/piclone.c:238
+#: ../src/piclone.c:245
 msgid "Too many partitions on source."
 msgstr "Too many partitions on source."
 
-#: ../src/piclone.c:249
+#: ../src/piclone.c:257
 msgid "Preparing partitions..."
 msgstr "Preparing partitions..."
 
-#: ../src/piclone.c:260 ../src/piclone.c:271 ../src/piclone.c:280
+#: ../src/piclone.c:268 ../src/piclone.c:279 ../src/piclone.c:288
 msgid "Could not create partition."
 msgstr "Could not create partition."
 
-#: ../src/piclone.c:296 ../src/piclone.c:306
+#: ../src/piclone.c:353 ../src/piclone.c:359 ../src/piclone.c:381
+#: ../src/piclone.c:387
 msgid "Could not create file system."
 msgstr "Could not create file system."
 
-#: ../src/piclone.c:317 ../src/piclone.c:325
+#: ../src/piclone.c:404 ../src/piclone.c:412
 msgid "Could not set flags."
 msgstr "Could not set flags."
 
-#: ../src/piclone.c:342
+#: ../src/piclone.c:429
 #, c-format
 msgid "Copying partition %d of %d..."
 msgstr "Copying partition %d of %d..."
 
-#: ../src/piclone.c:349 ../src/piclone.c:355
+#: ../src/piclone.c:436 ../src/piclone.c:442
 msgid "Could not mount partition."
 msgstr "Could not mount partition."
 
-#: ../src/piclone.c:373
+#: ../src/piclone.c:460
 msgid "Insufficient space. Backup aborted."
 msgstr "Insufficient space. Backup aborted."
 
-#: ../src/piclone.c:406 ../src/piclone.c:412
+#: ../src/piclone.c:493 ../src/piclone.c:499
 msgid "Could not unmount partition."
 msgstr "Could not unmount partition."
 
-#: ../src/piclone.c:418
+#: ../src/piclone.c:505
 msgid "Copy complete."
 msgstr "Copy complete."
 
 #. add message
-#: ../src/piclone.c:493
+#: ../src/piclone.c:581
 msgid "Checking source..."
 msgstr "Checking source..."
 
 #. add cancel button
-#: ../src/piclone.c:503
+#: ../src/piclone.c:591
 msgid "Cancel"
 msgstr "Cancel"
 
-#: ../src/piclone.c:565
+#: ../src/piclone.c:655
 #, c-format
 msgid "This will erase all content on the device '%s'. Are you sure?"
 msgstr "This will erase all content on the device '%s'. Are you sure?"
 
 #. add buttons
-#: ../src/piclone.c:573
+#: ../src/piclone.c:663
 msgid "No"
 msgstr "No"
 
-#: ../src/piclone.c:577
+#: ../src/piclone.c:667
 msgid "Yes"
 msgstr "Yes"
 
-#. populate the comboboxes
-#: ../src/piclone.c:636
-msgid "Internal SD card  (/dev/mmcblk0)"
-msgstr "Internal SD card  (/dev/mmcblk0)"
-
-#: ../src/piclone.c:662
+#: ../src/piclone.c:704 ../src/piclone.c:757
 msgid "No devices available"
 msgstr "No devices available"
 
-#: ../src/piclone.c:709
+#: ../src/piclone.c:803
 msgid "Select the device to copy from"
 msgstr "Select the device to copy from"
 
-#: ../src/piclone.c:717
+#: ../src/piclone.c:811
 msgid "Select the device to copy to"
 msgstr "Select the device to copy to"
 
@@ -214,3 +210,7 @@ msgstr "SD Card Copier Help"
 #: ../data/piclone.desktop.in.h:2
 msgid "Make a copy of the Raspbian SD card"
 msgstr "Make a copy of the Raspbian SD card"
+
+#: ../data/pwdpic.sh:6
+msgid "Password Required"
+msgstr "Password Required"
