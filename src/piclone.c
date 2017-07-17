@@ -158,7 +158,7 @@ static char *partition_name (char *device, char *buffer)
 static gpointer copy_thread (gpointer data)
 {
     copying = 1;
-    sys_printf ("sudo -A cp -ax %s/. %s/.", src_mnt, dst_mnt);
+    sys_printf ("cp -ax %s/. %s/.", src_mnt, dst_mnt);
     copying = 0;
     return NULL;
 }
@@ -175,7 +175,7 @@ static gpointer backup_thread (gpointer data)
     FILE *fp;
 
     // check the source has an msdos partition table
-    sprintf (buffer, "sudo -A parted %s unit s print | tail -n +4 | head -n 1", src_dev);
+    sprintf (buffer, "parted %s unit s print | tail -n +4 | head -n 1", src_dev);
     fp = popen (buffer, "r");
     if (fp == NULL) return NULL;
     if (fgets (buffer, sizeof (buffer) - 1, fp) == NULL)
@@ -200,12 +200,12 @@ static gpointer backup_thread (gpointer data)
     // unmount any partitions on the target device
     for (n = 9; n >= 1; n--)
     {
-        sys_printf ("sudo -A umount %s%d", partition_name (dst_dev, dev), n);
+        sys_printf ("umount %s%d", partition_name (dst_dev, dev), n);
         CANCEL_CHECK;
     }
 
     // wipe the FAT on the target
-    if (sys_printf ("sudo -A dd if=/dev/zero of=%s bs=512 count=1", dst_dev))
+    if (sys_printf ("dd if=/dev/zero of=%s bs=512 count=1", dst_dev))
     {
         terminate_dialog (_("Could not write to destination."));
         return NULL;
@@ -219,7 +219,7 @@ static gpointer backup_thread (gpointer data)
     CANCEL_CHECK;
     
     // prepare the new FAT
-    if (sys_printf ("sudo -A parted -s %s mklabel msdos", dst_dev))
+    if (sys_printf ("parted -s %s mklabel msdos", dst_dev))
     {
         terminate_dialog (_("Could not create FAT."));
         return NULL;
@@ -232,7 +232,7 @@ static gpointer backup_thread (gpointer data)
 
     // read in the source partition table
     n = 0;
-    sprintf (buffer, "sudo -A parted %s unit s print | sed '/^ /!d'", src_dev);
+    sprintf (buffer, "parted %s unit s print | sed '/^ /!d'", src_dev);
     fp = popen (buffer, "r");
     if (fp != NULL)
     {
@@ -263,7 +263,7 @@ static gpointer backup_thread (gpointer data)
         // create the partition
         if (!strcmp (parts[p].ptype, "extended"))
         {
-            if (sys_printf ("sudo -A parted -s %s -- mkpart extended %lds -1s", dst_dev, parts[p].start))
+            if (sys_printf ("parted -s %s -- mkpart extended %lds -1s", dst_dev, parts[p].start))
             {
                 terminate_dialog (_("Could not create partition."));
                 return NULL;
@@ -273,7 +273,7 @@ static gpointer backup_thread (gpointer data)
         {
             if (p == (n - 1))
             {
-                if (sys_printf ("sudo -A parted -s %s -- mkpart %s %s %lds -1s", dst_dev,
+                if (sys_printf ("parted -s %s -- mkpart %s %s %lds -1s", dst_dev,
                     parts[p].ptype, parts[p].ftype, parts[p].start))
                 {
                     terminate_dialog (_("Could not create partition."));
@@ -282,7 +282,7 @@ static gpointer backup_thread (gpointer data)
             }
             else
             {
-                if (sys_printf ("sudo -A parted -s %s mkpart %s %s %lds %lds", dst_dev,
+                if (sys_printf ("parted -s %s mkpart %s %s %lds %lds", dst_dev,
                     parts[p].ptype, parts[p].ftype, parts[p].start, parts[p].end))
                 {
                     terminate_dialog (_("Could not create partition."));
@@ -293,11 +293,11 @@ static gpointer backup_thread (gpointer data)
         CANCEL_CHECK;
 
         // refresh the kernel partion table
-        system ("sudo -A partprobe");
+        system ("partprobe");
         CANCEL_CHECK;
 
         // get the UUID
-        sprintf (buffer, "sudo -A lsblk -o name,uuid %s | grep %s%d | tr -s \" \" | cut -d \" \" -f 2", src_dev, partition_name (src_dev, dev) + 5, parts[p].pnum);
+        sprintf (buffer, "lsblk -o name,uuid %s | grep %s%d | tr -s \" \" | cut -d \" \" -f 2", src_dev, partition_name (src_dev, dev) + 5, parts[p].pnum);
         uid = get_string (buffer, uuid);
         if (uid)
         {
@@ -327,27 +327,27 @@ static gpointer backup_thread (gpointer data)
         }
 
         // get the label
-        sprintf (buffer, "sudo -A lsblk -o name,label %s | grep %s%d | tr -s \" \" | cut -d \" \" -f 2", src_dev, partition_name (src_dev, dev) + 5, parts[p].pnum);
+        sprintf (buffer, "lsblk -o name,label %s | grep %s%d | tr -s \" \" | cut -d \" \" -f 2", src_dev, partition_name (src_dev, dev) + 5, parts[p].pnum);
         lbl = get_string (buffer, res);
         if (!strlen (res)) lbl = 0;
 
         // get the partition UUID
-		sprintf (buffer, "sudo -A blkid %s | rev | cut -f 2 -d ' ' | rev | cut -f 2 -d \\\"", src_dev);
+		sprintf (buffer, "blkid %s | rev | cut -f 2 -d ' ' | rev | cut -f 2 -d \\\"", src_dev);
 		puid = get_string (buffer, puuid);
         if (!strlen (puuid)) puid = 0;
 
         // create file systems
         if (!strncmp (parts[p].ftype, "fat", 3))
         {
-            if (uid) sprintf (buffer, "sudo -A mkfs.fat -i %s %s%d", uuid, partition_name (dst_dev, dev), parts[p].pnum);
-            else sprintf (buffer, "sudo -A mkfs.fat %s%d", partition_name (dst_dev, dev), parts[p].pnum);
+            if (uid) sprintf (buffer, "mkfs.fat -i %s %s%d", uuid, partition_name (dst_dev, dev), parts[p].pnum);
+            else sprintf (buffer, "mkfs.fat %s%d", partition_name (dst_dev, dev), parts[p].pnum);
 
             if (sys_printf (buffer))
             {
                 if (uid)
                 {
                     // second try just in case the only problem was a corrupt UUID
-                    sprintf (buffer, "sudo -A mkfs.fat %s%d", partition_name (dst_dev, dev), parts[p].pnum);
+                    sprintf (buffer, "mkfs.fat %s%d", partition_name (dst_dev, dev), parts[p].pnum);
                     if (sys_printf (buffer))
                     {
                         terminate_dialog (_("Could not create file system."));
@@ -361,21 +361,21 @@ static gpointer backup_thread (gpointer data)
                 }
             }
 
-            if (lbl) sys_printf ("sudo -A fatlabel %s%d %s", partition_name (dst_dev, dev), parts[p].pnum, res);
+            if (lbl) sys_printf ("fatlabel %s%d %s", partition_name (dst_dev, dev), parts[p].pnum, res);
         }
         CANCEL_CHECK;
 
         if (!strcmp (parts[p].ftype, "ext4"))
         {
-            if (uid) sprintf (buffer, "sudo -A mkfs.ext4 -F -U %s %s%d", uuid, partition_name (dst_dev, dev), parts[p].pnum);
-            else sprintf (buffer, "sudo -A mkfs.ext4 -F %s%d", partition_name (dst_dev, dev), parts[p].pnum);
+            if (uid) sprintf (buffer, "mkfs.ext4 -F -U %s %s%d", uuid, partition_name (dst_dev, dev), parts[p].pnum);
+            else sprintf (buffer, "mkfs.ext4 -F %s%d", partition_name (dst_dev, dev), parts[p].pnum);
 
             if (sys_printf (buffer))
             {
                 if (uid)
                 {
                     // second try just in case the only problem was a corrupt UUID
-                    sprintf (buffer, "sudo -A mkfs.ext4 -F %s%d", partition_name (dst_dev, dev), parts[p].pnum);
+                    sprintf (buffer, "mkfs.ext4 -F %s%d", partition_name (dst_dev, dev), parts[p].pnum);
                     if (sys_printf (buffer))
                     {
                         terminate_dialog (_("Could not create file system."));
@@ -389,17 +389,17 @@ static gpointer backup_thread (gpointer data)
                 }
             }
 
-            if (lbl) sys_printf ("sudo -A e2label %s%d %s", partition_name (dst_dev, dev), parts[p].pnum, res);
+            if (lbl) sys_printf ("e2label %s%d %s", partition_name (dst_dev, dev), parts[p].pnum, res);
         }
         CANCEL_CHECK;
 
         // write the partition UUID
-        if (puid) sys_printf ("echo \"x\ni\n0x%s\nr\nw\n\" | sudo -A fdisk %s", puuid, dst_dev);
+        if (puid) sys_printf ("echo \"x\ni\n0x%s\nr\nw\n\" | fdisk %s", puuid, dst_dev);
 
         // set the flags        
         if (!strcmp (parts[p].flags, "lba"))
         {
-            if (sys_printf ("sudo -A parted -s %s set %d lba on", dst_dev, parts[p].pnum))
+            if (sys_printf ("parted -s %s set %d lba on", dst_dev, parts[p].pnum))
             {
                 terminate_dialog (_("Could not set flags."));
                 return NULL;
@@ -407,7 +407,7 @@ static gpointer backup_thread (gpointer data)
         }
         else
         {
-            if (sys_printf ("sudo -A parted -s %s set %d lba off", dst_dev, parts[p].pnum))
+            if (sys_printf ("parted -s %s set %d lba off", dst_dev, parts[p].pnum))
             {
                 terminate_dialog (_("Could not set flags."));
                 return NULL;
@@ -431,13 +431,13 @@ static gpointer backup_thread (gpointer data)
         gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 0.0);
 
         // mount partitions
-        if (sys_printf ("sudo -A mount %s%d %s", partition_name (dst_dev, dev), parts[p].pnum, dst_mnt))
+        if (sys_printf ("mount %s%d %s", partition_name (dst_dev, dev), parts[p].pnum, dst_mnt))
         {
             terminate_dialog (_("Could not mount partition."));
             return NULL;
         }
         CANCEL_CHECK;
-        if (sys_printf ("sudo -A mount %s%d %s", partition_name (src_dev, dev), parts[p].pnum, src_mnt))
+        if (sys_printf ("mount %s%d %s", partition_name (src_dev, dev), parts[p].pnum, src_mnt))
         {
             terminate_dialog (_("Could not mount partition."));
             return NULL;
@@ -455,8 +455,8 @@ static gpointer backup_thread (gpointer data)
 
         if (srcsz >= dstsz)
         {
-            sys_printf ("sudo -A umount %s", dst_mnt);
-            sys_printf ("sudo -A umount %s", src_mnt);
+            sys_printf ("umount %s", dst_mnt);
+            sys_printf ("umount %s", src_mnt);
             terminate_dialog (_("Insufficient space. Backup aborted."));
             return NULL;
         }
@@ -465,7 +465,7 @@ static gpointer backup_thread (gpointer data)
         g_thread_new (NULL, copy_thread, NULL);
 
         // get the size to be copied
-        sprintf (buffer, "sudo -A du -s %s", src_mnt);
+        sprintf (buffer, "du -s %s", src_mnt);
         get_string (buffer, res);
         sscanf (res, "%ld", &srcsz);
         if (srcsz < 50000) stime = 1;
@@ -473,7 +473,7 @@ static gpointer backup_thread (gpointer data)
         else stime = 10;
 
         // wait for the copy to complete, while updating the progress bar...
-        sprintf (buffer, "sudo -A du -s %s", dst_mnt);
+        sprintf (buffer, "du -s %s", dst_mnt);
         while (copying)
         {
             get_string (buffer, res);
@@ -488,13 +488,13 @@ static gpointer backup_thread (gpointer data)
         gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 1.0);
 
         // unmount partitions
-        if (sys_printf ("sudo -A umount %s", dst_mnt))
+        if (sys_printf ("umount %s", dst_mnt))
         {
             terminate_dialog (_("Could not unmount partition."));
             return NULL;
         }
         CANCEL_CHECK;
-        if (sys_printf ("sudo -A umount %s", src_mnt))
+        if (sys_printf ("umount %s", src_mnt))
         {
             terminate_dialog (_("Could not unmount partition."));
             return NULL;
@@ -532,14 +532,14 @@ static void on_cancel (void)
     // kill copy processes if running
     if (copying)
     {
-        sprintf (buffer, "ps ax | grep \"sudo -A cp -ax %s/. %s/.\" | grep -v \"grep\"", src_mnt, dst_mnt);
+        sprintf (buffer, "ps ax | grep \"cp -ax %s/. %s/.\" | grep -v \"grep\"", src_mnt, dst_mnt);
         fp = popen (buffer, "r");
         if (fp != NULL)
         {
             while (1)
             {
                 if (fgets (buffer, sizeof (buffer) - 1, fp) == NULL) break;
-                if (sscanf (buffer, "%d", &pid) == 1) sys_printf ("sudo -A kill %d", pid);
+                if (sscanf (buffer, "%d", &pid) == 1) sys_printf ("kill %d", pid);
             }
             pclose (fp);
         }

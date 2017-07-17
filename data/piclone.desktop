@@ -10,7 +10,7 @@ Comment=Make a copy of the Raspbian SD card
 Comment[de]=Erstellen Sie eine Kopie der Raspbian SD-Karte
 Comment[en_GB]=Make a copy of the Raspbian SD card
 Icon=media-removable
-Exec=env SUDO_ASKPASS=/usr/bin/pwdpic.sh piclone
+Exec=env SUDO_ASKPASS=/usr/bin/pwdpic.sh sudo -A dbus-launch piclone
 NotShowIn=GNOME;XFCE;
 StartupNotify=true
 Categories=Utility;
