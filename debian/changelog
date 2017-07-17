@@ -1,3 +1,9 @@
+piclone (0.6) stretch; urgency=medium
+
+  * Enable access to session DBus from desktop command line
+
+ -- Simon Long <simon@raspberrypi.org>  Mon, 17 Jul 2017 15:18:41 +0100
+
 piclone (0.5) stretch; urgency=medium
 
   * Use sudo -A option with zenity helper script to prompt for password when needed
