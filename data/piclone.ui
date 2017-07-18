@@ -86,13 +86,14 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="n_rows">3</property>
-            <property name="n_columns">3</property>
+            <property name="n_columns">2</property>
             <child>
               <object class="GtkLabel" id="label1">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="xalign">0</property>
                 <property name="label" translatable="yes">Copy From Device:</property>
+                <property name="tooltip_text" translatable="yes">Select the device from which to copy</property>
               </object>
               <packing>
                 <property name="top_attach">0</property>
@@ -108,6 +109,7 @@
                 <property name="can_focus">False</property>
                 <property name="xalign">0</property>
                 <property name="label" translatable="yes">Copy To Device:</property>
+                <property name="tooltip_text" translatable="yes">Select the device to which to copy</property>
               </object>
               <packing>
                 <property name="top_attach">1</property>
@@ -115,6 +117,22 @@
                 <property name="left_attach">0</property>
                 <property name="right_attach">1</property>
                 <property name="x_padding">5</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkCheckButton" id="cpcheck">
+                <property name="label" translatable="yes">Clone Partition UUIDs</property>
+                <property name="tooltip_text" translatable="yes">Uncheck this box to create new partition UUIDs on the copy</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">False</property>
+                <property name="draw_indicator">True</property>
+              </object>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="right_attach">2</property>
+                <property name="top_attach">2</property>
+                <property name="bottom_attach">3</property>
               </packing>
             </child>
           </object>
@@ -144,6 +162,8 @@ You can also back up to a standard USB stick, and then restore from the USB stic
 Note that you cannot copy onto the SD card from which your Pi is currently booted, which is why it does not appear in the “Copy To Device” dropdown.
 
 Note also that the destination card doesn’t need to be the same size as the source card, but it must have enough space to hold all the data that is on it. The application will warn you if there is insufficient space on the destination.
+
+Under Raspbian Stretch and later versions, you cannot mount two partitions with the same UUID, so you will not be able to mount a cloned SD card when booted from the disk from which it was cloned. If you need to do this, uncheck the "Clone Partition UUIDs" box before copying.
 </property>
   </object>
   <object class="GtkDialog" id="dialog2">

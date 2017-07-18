@@ -37,7 +37,7 @@ partition_t parts[MAXPART];
 GVolumeMonitor *monitor;
 
 /* control widget globals */
-static GtkWidget *main_dlg, *msg_dlg, *status, *progress, *cancel, *to_cb, *from_cb, *start_btn, *help_btn;
+static GtkWidget *main_dlg, *msg_dlg, *status, *progress, *cancel, *to_cb, *from_cb, *start_btn, *help_btn, *cpuidcheck;
 
 /* combo box counters */
 int src_count, dst_count;
@@ -47,6 +47,9 @@ char src_dev[32], dst_dev[32];
 
 /* mount points */
 char src_mnt[32], dst_mnt[32];
+
+/* flag to show that partition UUIDs should be copied */
+char copy_uuid;
 
 /* flag to show that copy thread is running */
 char copying;
@@ -394,7 +397,7 @@ static gpointer backup_thread (gpointer data)
         CANCEL_CHECK;
 
         // write the partition UUID
-        if (puid) sys_printf ("echo \"x\ni\n0x%s\nr\nw\n\" | fdisk %s", puuid, dst_dev);
+        if (copy_uuid && puid) sys_printf ("echo \"x\ni\n0x%s\nr\nw\n\" | fdisk %s", puuid, dst_dev);
 
         // set the flags        
         if (!strcmp (parts[p].flags, "lba"))
@@ -628,6 +631,9 @@ static void on_confirm (void)
     strtok (src, "(");
     strcpy (src_dev, strtok (NULL, ")"));
 
+    // read the UUID clone setting
+    copy_uuid = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (cpuidcheck));
+
     // basic sanity check - don't do anything if src == dest
     if (!strcmp (src_dev, dst_dev)) return;
 
@@ -796,6 +802,10 @@ int main (int argc, char *argv[])
 
     // get the table which holds the other elements
     GtkWidget *table = (GtkWidget *) gtk_builder_get_object (builder, "table1");
+
+    // get the clone UUID checkbox - check it by default
+    cpuidcheck = (GtkWidget *) gtk_builder_get_object (builder, "cpcheck");
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (cpuidcheck), TRUE);
 
     // create and add the source combobox
     src_count = 0;

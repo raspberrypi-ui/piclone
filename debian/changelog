@@ -1,3 +1,9 @@
+piclone (0.7) stretch; urgency=medium
+
+  * Add option to not clone partition UUIDs
+
+ -- Simon Long <simon@raspberrypi.org>  Tue, 18 Jul 2017 08:21:15 +0100
+
 piclone (0.6) stretch; urgency=medium
 
   * Enable access to session DBus from desktop command line
