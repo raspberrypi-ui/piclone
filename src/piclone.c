@@ -248,8 +248,8 @@ static gpointer backup_thread (gpointer data)
                 terminate_dialog (_("Too many partitions on source."));
                 return NULL;
             }
-            sscanf (buffer, "%d %lds %lds %*lds %s %s %s", &(parts[n].pnum), &(parts[n].start),
-                &(parts[n].end), &(parts[n].ptype), &(parts[n].ftype), &(parts[n].flags));
+            sscanf (buffer, "%d %lds %lds %*ds %s %s %s", &(parts[n].pnum), &(parts[n].start),
+                &(parts[n].end), (char *) &(parts[n].ptype), (char *) &(parts[n].ftype), (char *) &(parts[n].flags));
             n++;
         }
         pclose (fp);
