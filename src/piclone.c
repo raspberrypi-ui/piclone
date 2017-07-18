@@ -48,8 +48,8 @@ char src_dev[32], dst_dev[32];
 /* mount points */
 char src_mnt[32], dst_mnt[32];
 
-/* flag to show that partition UUIDs should be copied */
-char copy_uuid;
+/* flag to show that new partition UUIDs should be created */
+char new_uuid;
 
 /* flag to show that copy thread is running */
 char copying;
@@ -176,6 +176,9 @@ static gpointer backup_thread (gpointer data)
     long srcsz, dstsz, stime;
     double prog;
     FILE *fp;
+
+    // get a new partition UUID
+    get_string ("uuid | cut -f1 -d-", npuuid);
 
     // check the source has an msdos partition table
     sprintf (buffer, "parted %s unit s print | tail -n +4 | head -n 1", src_dev);
@@ -397,20 +400,7 @@ static gpointer backup_thread (gpointer data)
         CANCEL_CHECK;
 
         // write the partition UUID
-        if (puid)
-        {
-            if (copy_uuid)
-                sys_printf ("echo \"x\ni\n0x%s\nr\nw\n\" | fdisk %s", puuid, dst_dev);
-            else
-            {
-                // increment the partition UUID by 1 before writing it
-                int ipu;
-                sscanf (puuid, "%x", &ipu);
-                ipu++;
-                sprintf (npuuid, "%x", ipu);
-                sys_printf ("echo \"x\ni\n0x%s\nr\nw\n\" | fdisk %s", npuuid, dst_dev);
-            }
-        }
+        if (puid) sys_printf ("echo \"x\ni\n0x%s\nr\nw\n\" | fdisk %s", new_uuid ? npuuid : puuid, dst_dev);
 
         // set the flags        
         if (!strcmp (parts[p].flags, "lba"))
@@ -504,7 +494,7 @@ static gpointer backup_thread (gpointer data)
         gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 1.0);
 
         // fix up relevant files if changing partition UUID
-        if (puid && !copy_uuid)
+        if (puid && new_uuid)
         {
             // relevant files are dst_mnt/etc/fstab and dst_mnt/boot/cmdline.txt
             sys_printf ("if [ -e /%s/etc/fstab ] ; then sed -i s/%s/%s/g /%s/etc/fstab ; fi", dst_mnt, puuid, npuuid, dst_mnt);
@@ -653,7 +643,7 @@ static void on_confirm (void)
     strcpy (src_dev, strtok (NULL, ")"));
 
     // read the UUID clone setting
-    copy_uuid = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (cpuidcheck));
+    new_uuid = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (cpuidcheck));
 
     // basic sanity check - don't do anything if src == dest
     if (!strcmp (src_dev, dst_dev)) return;
@@ -824,9 +814,9 @@ int main (int argc, char *argv[])
     // get the table which holds the other elements
     GtkWidget *table = (GtkWidget *) gtk_builder_get_object (builder, "table1");
 
-    // get the clone UUID checkbox - check it by default
+    // get the new UUID checkbox - uncheck it by default
     cpuidcheck = (GtkWidget *) gtk_builder_get_object (builder, "cpcheck");
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (cpuidcheck), TRUE);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (cpuidcheck), FALSE);
 
     // create and add the source combobox
     src_count = 0;

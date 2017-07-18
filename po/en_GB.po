@@ -154,12 +154,12 @@ msgid "Select the device to which to copy"
 msgstr "Select the device to which to copy"
 
 #: ../data/piclone.ui.h:8
-msgid "Clone Partition UUIDs"
-msgstr "Clone Partition UUIDs"
+msgid "New Partition UUIDs"
+msgstr "New Partition UUIDs"
 
 #: ../data/piclone.ui.h:9
-msgid "Uncheck this box to create new partition UUIDs on the copy"
-msgstr "Uncheck this box to create new partition UUIDs on the copy"
+msgid "Check this box to create new partition UUIDs on the copy"
+msgstr "Check this box to create new partition UUIDs on the copy"
 
 #: ../data/piclone.ui.h:10
 msgid ""
@@ -194,7 +194,7 @@ msgid ""
 "Under Raspbian Stretch and later versions, you cannot mount two partitions "
 "with the same UUID, so you will not be able to mount a cloned SD card when "
 "booted from the disk from which it was cloned. If you need to do this, "
-"uncheck the \"Clone Partition UUIDs\" box before copying.\n"
+"check the \"New Partition UUIDs\" box before copying.\n"
 msgstr ""
 "SD Card Copier v1.0\n"
 "\n"
@@ -227,7 +227,7 @@ msgstr ""
 "Under Raspbian Stretch and later versions, you cannot mount two partitions "
 "with the same UUID, so you will not be able to mount a cloned SD card when "
 "booted from the disk from which it was cloned. If you need to do this, "
-"uncheck the \"Clone Partition UUIDs\" box before copying.\n"
+"check the \"New Partition UUIDs\" box before copying.\n"
 
 #: ../data/piclone.ui.h:26
 msgid "SD Card Copier Help"

@@ -121,8 +121,8 @@
             </child>
             <child>
               <object class="GtkCheckButton" id="cpcheck">
-                <property name="label" translatable="yes">Clone Partition UUIDs</property>
-                <property name="tooltip_text" translatable="yes">Uncheck this box to create new partition UUIDs on the copy</property>
+                <property name="label" translatable="yes">New Partition UUIDs</property>
+                <property name="tooltip_text" translatable="yes">Check this box to create new partition UUIDs on the copy</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
@@ -163,7 +163,7 @@ Note that you cannot copy onto the SD card from which your Pi is currently boote
 
 Note also that the destination card doesn’t need to be the same size as the source card, but it must have enough space to hold all the data that is on it. The application will warn you if there is insufficient space on the destination.
 
-Under Raspbian Stretch and later versions, you cannot mount two partitions with the same UUID, so you will not be able to mount a cloned SD card when booted from the disk from which it was cloned. If you need to do this, uncheck the "Clone Partition UUIDs" box before copying.
+Under Raspbian Stretch and later versions, you cannot mount two partitions with the same UUID, so you will not be able to mount a cloned SD card when booted from the disk from which it was cloned. If you need to do this, check the "New Partition UUIDs" box before copying.
 </property>
   </object>
   <object class="GtkDialog" id="dialog2">
