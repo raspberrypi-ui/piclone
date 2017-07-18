@@ -171,7 +171,7 @@ static gpointer copy_thread (gpointer data)
 
 static gpointer backup_thread (gpointer data)
 {
-    char buffer[256], res[256], dev[16], uuid[64], puuid[64];
+    char buffer[256], res[256], dev[16], uuid[64], puuid[64], npuuid[64];
     int n, p, lbl, uid, puid;
     long srcsz, dstsz, stime;
     double prog;
@@ -335,8 +335,8 @@ static gpointer backup_thread (gpointer data)
         if (!strlen (res)) lbl = 0;
 
         // get the partition UUID
-		sprintf (buffer, "blkid %s | rev | cut -f 2 -d ' ' | rev | cut -f 2 -d \\\"", src_dev);
-		puid = get_string (buffer, puuid);
+        sprintf (buffer, "blkid %s | rev | cut -f 2 -d ' ' | rev | cut -f 2 -d \\\"", src_dev);
+        puid = get_string (buffer, puuid);
         if (!strlen (puuid)) puid = 0;
 
         // create file systems
@@ -397,7 +397,20 @@ static gpointer backup_thread (gpointer data)
         CANCEL_CHECK;
 
         // write the partition UUID
-        if (copy_uuid && puid) sys_printf ("echo \"x\ni\n0x%s\nr\nw\n\" | fdisk %s", puuid, dst_dev);
+        if (puid)
+        {
+            if (copy_uuid)
+                sys_printf ("echo \"x\ni\n0x%s\nr\nw\n\" | fdisk %s", puuid, dst_dev);
+            else
+            {
+                // increment the partition UUID by 1 before writing it
+                int ipu;
+                sscanf (puuid, "%x", &ipu);
+                ipu++;
+                sprintf (npuuid, "%x", ipu);
+                sys_printf ("echo \"x\ni\n0x%s\nr\nw\n\" | fdisk %s", npuuid, dst_dev);
+            }
+        }
 
         // set the flags        
         if (!strcmp (parts[p].flags, "lba"))
@@ -489,6 +502,14 @@ static gpointer backup_thread (gpointer data)
         }
 
         gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 1.0);
+
+        // fix up relevant files if changing partition UUID
+        if (puid && !copy_uuid)
+        {
+            // relevant files are dst_mnt/etc/fstab and dst_mnt/boot/cmdline.txt
+            sys_printf ("if [ -e /%s/etc/fstab ] ; then sed -i s/%s/%s/g /%s/etc/fstab ; fi", dst_mnt, puuid, npuuid, dst_mnt);
+            sys_printf ("if [ -e /%s/cmdline.txt ] ; then sed -i s/%s/%s/g /%s/cmdline.txt ; fi", dst_mnt, puuid, npuuid, dst_mnt);
+        }
 
         // unmount partitions
         if (sys_printf ("umount %s", dst_mnt))
