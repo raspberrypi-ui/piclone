@@ -570,26 +570,34 @@ static void on_cancel (void)
 
 static void on_start (void)
 {
+    GdkColor col;
+
     // close the confirm dialog
     gtk_widget_destroy (msg_dlg);
 
     // create the progress dialog
-    msg_dlg = (GtkWidget *) gtk_dialog_new ();
+    msg_dlg = (GtkWidget *) gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (msg_dlg), "");
     gtk_window_set_modal (GTK_WINDOW (msg_dlg), TRUE);
     gtk_window_set_decorated (GTK_WINDOW (msg_dlg), FALSE);
     gtk_window_set_destroy_with_parent (GTK_WINDOW (msg_dlg), TRUE);
     gtk_window_set_skip_taskbar_hint (GTK_WINDOW (msg_dlg), TRUE);
     gtk_window_set_transient_for (GTK_WINDOW (msg_dlg), GTK_WINDOW (main_dlg));
+    gtk_window_set_position (GTK_WINDOW (msg_dlg), GTK_WIN_POS_CENTER_ON_PARENT);
 
     // add border
     GtkWidget *frame = gtk_frame_new (NULL);
-    gtk_container_add (GTK_CONTAINER (gtk_dialog_get_action_area (GTK_DIALOG (msg_dlg))), frame);
+    gtk_container_add (GTK_CONTAINER (msg_dlg), frame);
+
+    GtkWidget *eb = gtk_event_box_new ();
+    gtk_container_add (GTK_CONTAINER (frame), eb);
+    gdk_color_parse ("#FFFFFF", &col);
+    gtk_widget_modify_bg (eb, GTK_STATE_NORMAL, &col);
 
     // add container
     GtkWidget *box = (GtkWidget *) gtk_vbox_new (TRUE, 5);
     gtk_container_set_border_width (GTK_CONTAINER (box), 10);
-    gtk_container_add (GTK_CONTAINER (frame), box);
+    gtk_container_add (GTK_CONTAINER (eb), box);
 
     // add message
     status = (GtkWidget *) gtk_label_new (_("Checking source..."));
@@ -632,6 +640,7 @@ static void on_confirm (void)
     char buffer[256], res[256];
     char *src, *dst;
     int len;
+    GdkColor col;
 
     // set up source and target devices from combobox values
     dst = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (to_cb));
@@ -649,22 +658,28 @@ static void on_confirm (void)
     if (!strcmp (src_dev, dst_dev)) return;
 
     // create the confirm dialog
-    msg_dlg = (GtkWidget *) gtk_dialog_new ();
+    msg_dlg = (GtkWidget *) gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (msg_dlg), "");
     gtk_window_set_modal (GTK_WINDOW (msg_dlg), TRUE);
     gtk_window_set_decorated (GTK_WINDOW (msg_dlg), FALSE);
     gtk_window_set_destroy_with_parent (GTK_WINDOW (msg_dlg), TRUE);
     gtk_window_set_skip_taskbar_hint (GTK_WINDOW (msg_dlg), TRUE);
     gtk_window_set_transient_for (GTK_WINDOW (msg_dlg), GTK_WINDOW (main_dlg));
+    gtk_window_set_position (GTK_WINDOW (msg_dlg), GTK_WIN_POS_CENTER_ON_PARENT);
 
     // add border
     GtkWidget *frame = gtk_frame_new (NULL);
-    gtk_container_add (GTK_CONTAINER (gtk_dialog_get_action_area (GTK_DIALOG (msg_dlg))), frame);
+    gtk_container_add (GTK_CONTAINER (msg_dlg), frame);
+
+    GtkWidget *eb = gtk_event_box_new ();
+    gtk_container_add (GTK_CONTAINER (frame), eb);
+    gdk_color_parse ("#FFFFFF", &col);
+    gtk_widget_modify_bg (eb, GTK_STATE_NORMAL, &col);
 
     // add container
     GtkWidget *box = (GtkWidget *) gtk_vbox_new (TRUE, 5);
     gtk_container_set_border_width (GTK_CONTAINER (box), 10);
-    gtk_container_add (GTK_CONTAINER (frame), box);
+    gtk_container_add (GTK_CONTAINER (eb), box);
 
     // add message
     len = strlen (dst);
