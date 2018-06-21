@@ -1,3 +1,9 @@
+piclone (0.9) stretch; urgency=medium
+
+  * Move password prompt into /usr/lib/
+
+ -- Simon Long <simon@raspberrypi.org>  Thu, 21 Jun 2018 15:24:34 +0100
+
 piclone (0.8) stretch; urgency=medium
 
   * Use new style for message box
