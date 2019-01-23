@@ -7,7 +7,7 @@ Standards-Version: 3.9.5
 
 Package: piclone
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, parted, dosfstools, e2fsprogs, coreutils, mount, uuid, zenity
+Depends: ${shlibs:Depends}, ${misc:Depends}, parted, dosfstools, e2fsprogs, coreutils, mount, uuid, zenity, dbus-x11
 Description: SD Card backup program for Raspberry Pi
  This is a GTK application to copy the contents of SD cards and other USB
  drives. It mirrors the partition layout of the source device onto the

@@ -1,3 +1,9 @@
+piclone (0.11) stretch; urgency=medium
+
+  * Add dependency on dbus package
+
+ -- Simon Long <simon@raspberrypi.org>  Wed, 23 Jan 2019 09:09:28 +0000
+
 piclone (0.10) stretch; urgency=medium
 
   * Move password prompt into subdir of /usr/lib/
