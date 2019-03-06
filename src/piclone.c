@@ -428,8 +428,104 @@ static gpointer backup_thread (gpointer data)
 
         // write the partition UUID
         if (puid) sys_printf ("echo \"x\ni\n0x%s\nr\nw\n\" | fdisk %s", new_uuid ? npuuid : puuid, dst_dev);
+        CANCEL_CHECK;
 
-        // set the flags        
+        prog = p + 1;
+        prog /= n;
+        gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), prog);
+    }
+
+    // do the copy for each partition
+    for (p = 0; p < n; p++)
+    {
+        // don't try to copy extended partitions
+        if (strcmp (parts[p].ptype, "extended"))
+        {
+            sprintf (buffer, _("Copying partition %d of %d..."), p + 1, n);
+            gtk_label_set_text (GTK_LABEL (status), buffer);
+            gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 0.0);
+
+            // mount partitions
+            if (sys_printf ("mount %s%d %s", partition_name (dst_dev, dev), parts[p].pnum, dst_mnt))
+            {
+                terminate_dialog (_("Could not mount partition."));
+                return NULL;
+            }
+            CANCEL_CHECK;
+            if (sys_printf ("mount %s%d %s", partition_name (src_dev, dev), parts[p].pnum, src_mnt))
+            {
+                terminate_dialog (_("Could not mount partition."));
+                return NULL;
+            }
+            CANCEL_CHECK;
+
+            // check there is enough space...
+            sprintf (buffer, "df %s | tail -n 1 | tr -s \" \" \" \" | cut -d ' ' -f 3", src_mnt);
+            get_string (buffer, res);
+            sscanf (res, "%ld", &srcsz);
+
+            sprintf (buffer, "df %s | tail -n 1 | tr -s \" \" \" \" | cut -d ' ' -f 4", dst_mnt);
+            get_string (buffer, res);
+            sscanf (res, "%ld", &dstsz);
+
+            if (srcsz >= dstsz)
+            {
+                sys_printf ("umount %s", dst_mnt);
+                sys_printf ("umount %s", src_mnt);
+                terminate_dialog (_("Insufficient space. Backup aborted."));
+                return NULL;
+            }
+
+            // start the copy itself in a new thread
+            g_thread_new (NULL, copy_thread, NULL);
+
+            // get the size to be copied
+            sprintf (buffer, "du -s %s", src_mnt);
+            get_string (buffer, res);
+            sscanf (res, "%ld", &srcsz);
+            if (srcsz < 50000) stime = 1;
+            else if (srcsz < 500000) stime = 5;
+            else stime = 10;
+
+            // wait for the copy to complete, while updating the progress bar...
+            sprintf (buffer, "du -s %s", dst_mnt);
+            while (copying)
+            {
+                get_string (buffer, res);
+                sscanf (res, "%ld", &dstsz);
+                prog = dstsz;
+                prog /= srcsz;
+                gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), prog);
+                sleep (stime);
+                CANCEL_CHECK;
+            }
+
+            gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 1.0);
+
+            // fix up relevant files if changing partition UUID
+            if (puid && new_uuid)
+            {
+                // relevant files are dst_mnt/etc/fstab and dst_mnt/boot/cmdline.txt
+                sys_printf ("if [ -e /%s/etc/fstab ] ; then sed -i s/%s/%s/g /%s/etc/fstab ; fi", dst_mnt, puuid, npuuid, dst_mnt);
+                sys_printf ("if [ -e /%s/cmdline.txt ] ; then sed -i s/%s/%s/g /%s/cmdline.txt ; fi", dst_mnt, puuid, npuuid, dst_mnt);
+            }
+
+            // unmount partitions
+            if (sys_printf ("umount %s", dst_mnt))
+            {
+                terminate_dialog (_("Could not unmount partition."));
+                return NULL;
+            }
+            CANCEL_CHECK;
+            if (sys_printf ("umount %s", src_mnt))
+            {
+                terminate_dialog (_("Could not unmount partition."));
+                return NULL;
+            }
+            CANCEL_CHECK;
+        }
+
+        // set the flags
         if (!strcmp (parts[p].flags, "lba"))
         {
             if (sys_printf ("parted -s %s set %d lba on", dst_dev, parts[p].pnum))
@@ -445,100 +541,6 @@ static gpointer backup_thread (gpointer data)
                 terminate_dialog (_("Could not set flags."));
                 return NULL;
             }
-        }
-        CANCEL_CHECK;
-        
-        prog = p + 1;
-        prog /= n;
-        gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), prog);
-    }
-
-    // do the copy for each partition
-    for (p = 0; p < n; p++)
-    {
-        // don't try to copy extended partitions
-        if (!strcmp (parts[p].ptype, "extended")) continue;
-
-        sprintf (buffer, _("Copying partition %d of %d..."), p + 1, n);
-        gtk_label_set_text (GTK_LABEL (status), buffer);
-        gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 0.0);
-
-        // mount partitions
-        if (sys_printf ("mount %s%d %s", partition_name (dst_dev, dev), parts[p].pnum, dst_mnt))
-        {
-            terminate_dialog (_("Could not mount partition."));
-            return NULL;
-        }
-        CANCEL_CHECK;
-        if (sys_printf ("mount %s%d %s", partition_name (src_dev, dev), parts[p].pnum, src_mnt))
-        {
-            terminate_dialog (_("Could not mount partition."));
-            return NULL;
-        }
-        CANCEL_CHECK;
-
-        // check there is enough space...
-        sprintf (buffer, "df %s | tail -n 1 | tr -s \" \" \" \" | cut -d ' ' -f 3", src_mnt);
-        get_string (buffer, res);
-        sscanf (res, "%ld", &srcsz);
-
-        sprintf (buffer, "df %s | tail -n 1 | tr -s \" \" \" \" | cut -d ' ' -f 4", dst_mnt);
-        get_string (buffer, res);
-        sscanf (res, "%ld", &dstsz);
-
-        if (srcsz >= dstsz)
-        {
-            sys_printf ("umount %s", dst_mnt);
-            sys_printf ("umount %s", src_mnt);
-            terminate_dialog (_("Insufficient space. Backup aborted."));
-            return NULL;
-        }
-
-        // start the copy itself in a new thread
-        g_thread_new (NULL, copy_thread, NULL);
-
-        // get the size to be copied
-        sprintf (buffer, "du -s %s", src_mnt);
-        get_string (buffer, res);
-        sscanf (res, "%ld", &srcsz);
-        if (srcsz < 50000) stime = 1;
-        else if (srcsz < 500000) stime = 5;
-        else stime = 10;
-
-        // wait for the copy to complete, while updating the progress bar...
-        sprintf (buffer, "du -s %s", dst_mnt);
-        while (copying)
-        {
-            get_string (buffer, res);
-            sscanf (res, "%ld", &dstsz);
-            prog = dstsz;
-            prog /= srcsz;
-            gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), prog);
-            sleep (stime);
-            CANCEL_CHECK;
-        }
-
-        gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 1.0);
-
-        // fix up relevant files if changing partition UUID
-        if (puid && new_uuid)
-        {
-            // relevant files are dst_mnt/etc/fstab and dst_mnt/boot/cmdline.txt
-            sys_printf ("if [ -e /%s/etc/fstab ] ; then sed -i s/%s/%s/g /%s/etc/fstab ; fi", dst_mnt, puuid, npuuid, dst_mnt);
-            sys_printf ("if [ -e /%s/cmdline.txt ] ; then sed -i s/%s/%s/g /%s/cmdline.txt ; fi", dst_mnt, puuid, npuuid, dst_mnt);
-        }
-
-        // unmount partitions
-        if (sys_printf ("umount %s", dst_mnt))
-        {
-            terminate_dialog (_("Could not unmount partition."));
-            return NULL;
-        }
-        CANCEL_CHECK;
-        if (sys_printf ("umount %s", src_mnt))
-        {
-            terminate_dialog (_("Could not unmount partition."));
-            return NULL;
         }
         CANCEL_CHECK;
     }
