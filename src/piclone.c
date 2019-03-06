@@ -88,15 +88,6 @@ char ended;
 char cancelled;
 #define CANCEL_CHECK if (cancelled) { g_idle_add (close_msg, NULL); return NULL; }
 
-/* debug system function - remove when no longer needed !!!! */
-
-void dsystem (char * cmd)
-{
-    printf ("%s\n", cmd);
-    system (cmd);
-}
-//#define system dsystem
-
 /*---------------------------------------------------------------------------*/
 /* Function definitions */
 /*---------------------------------------------------------------------------*/
@@ -326,7 +317,7 @@ static gpointer backup_thread (gpointer data)
         CANCEL_CHECK;
 
         // refresh the kernel partion table
-        system ("partprobe");
+        sys_printf ("partprobe");
         CANCEL_CHECK;
 
         // get the UUID
@@ -444,6 +435,9 @@ static gpointer backup_thread (gpointer data)
             sprintf (buffer, _("Copying partition %d of %d..."), p + 1, n);
             gtk_label_set_text (GTK_LABEL (status), buffer);
             gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 0.0);
+
+            // belt-and-braces call to partprobe to make sure devices are found...
+            get_string ("partprobe", res);
 
             // mount partitions
             if (sys_printf ("mount %s%d %s", partition_name (dst_dev, dev), parts[p].pnum, dst_mnt))
