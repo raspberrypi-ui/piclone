@@ -363,15 +363,15 @@ static gpointer backup_thread (gpointer data)
         // create file systems
         if (!strncmp (parts[p].ftype, "fat", 3))
         {
-            if (uid) sprintf (buffer, "mkfs.fat -i %s %s%d", uuid, partition_name (dst_dev, dev), parts[p].pnum);
-            else sprintf (buffer, "mkfs.fat %s%d", partition_name (dst_dev, dev), parts[p].pnum);
+            if (uid) sprintf (buffer, "mkfs.fat -F 32 -i %s %s%d", uuid, partition_name (dst_dev, dev), parts[p].pnum);
+            else sprintf (buffer, "mkfs.fat -F 32 %s%d", partition_name (dst_dev, dev), parts[p].pnum);
 
             if (sys_printf (buffer))
             {
                 if (uid)
                 {
                     // second try just in case the only problem was a corrupt UUID
-                    sprintf (buffer, "mkfs.fat %s%d", partition_name (dst_dev, dev), parts[p].pnum);
+                    sprintf (buffer, "mkfs.fat -F 32 %s%d", partition_name (dst_dev, dev), parts[p].pnum);
                     if (sys_printf (buffer))
                     {
                         terminate_dialog (_("Could not create file system."));
