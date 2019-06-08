@@ -328,7 +328,7 @@ static gpointer backup_thread (gpointer data)
             // sanity check the ID
             if (strlen (uuid) == 9)
             {
-                if (uuid[4] = '-')
+                if (uuid[4] == '-')
                 {
                     // remove the hyphen from the middle of a FAT volume ID
                     uuid[4] = uuid[5];
