@@ -1,4 +1,4 @@
-# English translations for piclone package.
+# Norwegian Bokmål translations for piclone package.
 # Copyright (C) 2017 Raspberry Pi
 # This file is distributed under the same license as the piclone package.
 # Imre Kristoffer Eilertsen <imreeil42@gmail.com>, 2019
