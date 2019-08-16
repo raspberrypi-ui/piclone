@@ -1,0 +1,246 @@
+# Norwegian Bokmål translations for piclone package.
+# Copyright (C) 2017 Raspberry Pi
+# This file is distributed under the same license as the piclone package.
+# Imre Kristoffer Eilertsen <imreeil42@gmail.com>, 2019
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: piclone 0.5\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-07-18 08:18+0100\n"
+"PO-Revision-Date: 2019-08-14 18:45+0200\n"
+"Language-Team: Norwegian Bokmål\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.2.3\n"
+"Last-Translator: Imre Kristoffer Eilertsen <imreeil42@gmail.com>\n"
+"Language: nb\n"
+
+#: ../src/piclone.c:139
+msgid "OK"
+msgstr "OK"
+
+#: ../src/piclone.c:187
+msgid "Unable to read source."
+msgstr "Klarte ikke å lese kilden."
+
+#: ../src/piclone.c:193
+msgid "Non-MSDOS partition table on source."
+msgstr "Kilden har en ikke-MSDOS-partisjonstabell."
+
+#: ../src/piclone.c:200
+msgid "Preparing target..."
+msgstr "Forbereder mål-enheten …"
+
+#: ../src/piclone.c:213
+msgid "Could not write to destination."
+msgstr "Klarte ikke å lagre til destinasjonen."
+
+#: ../src/piclone.c:227
+msgid "Could not create FAT."
+msgstr "Klarte ikke å opprette FAT."
+
+#: ../src/piclone.c:233
+msgid "Reading partitions..."
+msgstr "Leser inn partisjoner …"
+
+#: ../src/piclone.c:248
+msgid "Too many partitions on source."
+msgstr "For mange partisjoner i kilden."
+
+#: ../src/piclone.c:260
+msgid "Preparing partitions..."
+msgstr "Forbereder partisjoner …"
+
+#: ../src/piclone.c:271 ../src/piclone.c:282 ../src/piclone.c:291
+msgid "Could not create partition."
+msgstr "Klarte ikke å opprette partisjon."
+
+#: ../src/piclone.c:356 ../src/piclone.c:362 ../src/piclone.c:384
+#: ../src/piclone.c:390
+msgid "Could not create file system."
+msgstr "Klarte ikke å opprette filsystem."
+
+#: ../src/piclone.c:407 ../src/piclone.c:415
+msgid "Could not set flags."
+msgstr "Klarte ikke å iverksette flaggene."
+
+#: ../src/piclone.c:432
+#, c-format
+msgid "Copying partition %d of %d..."
+msgstr "Kopierer partisjon %d av %d …"
+
+#: ../src/piclone.c:439 ../src/piclone.c:445
+msgid "Could not mount partition."
+msgstr "Klarte ikke å montere partisjonen."
+
+#: ../src/piclone.c:463
+msgid "Insufficient space. Backup aborted."
+msgstr "Utilstrekkelig lagringsplass. Sikkerhetskopieringen ble avbrutt."
+
+#: ../src/piclone.c:496 ../src/piclone.c:502
+msgid "Could not unmount partition."
+msgstr "Klarte ikke å avmontere partisjonen."
+
+#: ../src/piclone.c:508
+msgid "Copy complete."
+msgstr "Kopieringen er fullført."
+
+#. add message
+#: ../src/piclone.c:584
+msgid "Checking source..."
+msgstr "Sjekker kilden …"
+
+#. add cancel button
+#: ../src/piclone.c:594
+msgid "Cancel"
+msgstr "Avbrytt"
+
+#: ../src/piclone.c:661
+#, c-format
+msgid "This will erase all content on the device '%s'. Are you sure?"
+msgstr "Dette vil slette alt innhold på '%s'-enheten. Er du sikker?"
+
+#. add buttons
+#: ../src/piclone.c:669
+msgid "No"
+msgstr "Nei"
+
+#: ../src/piclone.c:673
+msgid "Yes"
+msgstr "Ja"
+
+#: ../src/piclone.c:710 ../src/piclone.c:763
+msgid "No devices available"
+msgstr "Ingen enheter er tilgjengelige"
+
+#: ../src/piclone.c:813
+msgid "Select the device to copy from"
+msgstr "Velg enheten det skal kopieres ifra"
+
+#: ../src/piclone.c:821
+msgid "Select the device to copy to"
+msgstr "Velg enheten som det skal kopieres til"
+
+#. End of file
+#. ===========================================================================
+#: ../data/piclone.ui.h:1 ../data/piclone.desktop.in.h:1
+msgid "SD Card Copier"
+msgstr "SD Card Copier"
+
+#: ../data/piclone.ui.h:2
+msgid "Help"
+msgstr "Hjelp"
+
+#: ../data/piclone.ui.h:3
+msgid "Start"
+msgstr "Begynn"
+
+#: ../data/piclone.ui.h:4
+msgid "Copy From Device:"
+msgstr "Kopier fra enhet:"
+
+#: ../data/piclone.ui.h:5
+msgid "Select the device from which to copy"
+msgstr "Velg enheten det skal kopieres ifra"
+
+#: ../data/piclone.ui.h:6
+msgid "Copy To Device:"
+msgstr "Kopier til enhet:"
+
+#: ../data/piclone.ui.h:7
+msgid "Select the device to which to copy"
+msgstr "Velg enheten det skal kopieres til"
+
+#: ../data/piclone.ui.h:8
+msgid "New Partition UUIDs"
+msgstr "Nye partisjons-UUID-er"
+
+#: ../data/piclone.ui.h:9
+msgid "Check this box to create new partition UUIDs on the copy"
+msgstr "Huk av denne boksen for å opprette nye partisjons-UUID-er hos kopien"
+
+#: ../data/piclone.ui.h:10
+msgid ""
+"SD Card Copier v1.0\n"
+"\n"
+"This is an application to copy and back up SD cards. To use it, you will "
+"need a USB SD card writer.\n"
+"\n"
+"To back up your Raspberry Pi's internal SD card, insert a blank SD card into "
+"a USB card writer and connect it to your Pi. Then start the application, "
+"choose your card writer from the “Copy To Device” drop-down box and press "
+"“Start”. The copy process will take 10-15 minutes depending on the size of "
+"your card.\n"
+"\n"
+"The resulting card should be a bootable copy of your existing card; to "
+"restore, simply place the backup card into the onboard SD card slot, put the "
+"card to restore onto into the USB writer and repeat the copy process above.\n"
+"\n"
+"You can also back up to a standard USB stick, and then restore from the USB "
+"stick to an SD card by setting the “Copy From Device” drop-down to the USB "
+"stick and the “Copy To Device” to a USB card writer containing the card to "
+"restore onto.\n"
+"\n"
+"Note that you cannot copy onto the SD card from which your Pi is currently "
+"booted, which is why it does not appear in the “Copy To Device” dropdown.\n"
+"\n"
+"Note also that the destination card doesn’t need to be the same size as the "
+"source card, but it must have enough space to hold all the data that is on "
+"it. The application will warn you if there is insufficient space on the "
+"destination.\n"
+"\n"
+"Under Raspbian Stretch and later versions, you cannot mount two partitions "
+"with the same UUID, so you will not be able to mount a cloned SD card when "
+"booted from the disk from which it was cloned. If you need to do this, check "
+"the \"New Partition UUIDs\" box before copying.\n"
+msgstr ""
+"SD Card Copier v1.0\n"
+"\n"
+"Dette er et program for å (sikkerhets)kopiere SD-kort. For å bruke det, må "
+"du ha en SD-til-USB-adapter.\n"
+"\n"
+"For å sikkerhetskopiere din Raspberry Pis interne SD-kort, sett inn et "
+"blankt SD-kort i en USB-kortskriver og koble den til din Pi. Start deretter "
+"programmer, velg kortskriveren din fra «Kopier til enhet»-nedfallsmenyen, og "
+"trykk på «Begynn». Kopieringsprosessen vil ta 10-15 minutter avhengig av "
+"kortets størrelse.\n"
+"\n"
+"Det resulterende kortet burde da bli en oppstartsbar kopi av ditt "
+"eksisterende kort; for å gjenopprette fra den, bare sett inn "
+"sikkerhetskopikortet i Pi-ens SD-kortinngang, sett kortet det skal "
+"gjenopprettes til inn i USB-kortskriveren, og gjenta kopieringsprosessen "
+"ovenfor.\n"
+"\n"
+"Du kan også sikkerhetskopiere til en vanlig USB-pinne, og deretter "
+"gjenopprette fra USB-pinnen til et SD-kort ved å velge USB-pinnen i «Kopier "
+"fra enhet»-nedfallsmenyen, og sett «Kopier til enhet» til en USB-kortskriver "
+"som har kortet det skal gjenopprettes til inni seg.\n"
+"\n"
+"Bemerk at du ikke kan kopiere til SD-kortet som Pi-en din for øyeblikket er "
+"startet opp ifra, som er grunnen til at den ikke dukker opp i «Kopier til "
+"enhet»-nedfallsmenyen.\n"
+"\n"
+"Bemerk også at mål-enheten ikke behøver å ha samme størrelse som "
+"kildekortet, men den må ha nok størrelse til å romme alle dataene som er på "
+"den. Programmet vil advare deg dersom det ikke er tilstrekkelig plass på mål-"
+"enheten.\n"
+"\n"
+"I Raspbian Stretch og senere versjoner, kan du ikke montere to partisjoner "
+"med den samme UUID-en, så du vil ikke kunne montere et klonet SD-kort når "
+"det startes opp fra disken som den ble klonet ifra. Hvis du behøver å gjøre "
+"dette, huk av «Nye partisjons-UUID-er»-boksen før du kopierer.\n"
+
+#: ../data/piclone.ui.h:26
+msgid "SD Card Copier Help"
+msgstr "SD Card Copier-hjelp"
+
+#: ../data/piclone.desktop.in.h:2
+msgid "Make a copy of the Raspbian SD card"
+msgstr "Lag en kopi av Raspbian-SD-kortet"
+
+#: ../data/pwdpic.sh:6
+msgid "Password Required"
+msgstr "Passord påkrevd"
