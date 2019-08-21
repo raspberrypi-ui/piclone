@@ -1,6 +1,12 @@
+piclone (0.14) buster; urgency=medium
+
+  * Added Norwegian translation
+
+ -- Simon Long <simon@raspberrypi.org>  Wed, 21 Aug 2019 09:59:22 +0100
+
 piclone (0.13) unstable; urgency=medium
 
-  * Create new FATs as be FAT32 by default.
+  * Create new FATs as FAT32 by default.
 
  -- Simon Long <simon@raspberrypi.org>  Fri, 10 May 2019 07:46:46 +0100
 
