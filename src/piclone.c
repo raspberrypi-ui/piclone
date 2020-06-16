@@ -64,7 +64,7 @@ partition_t parts[MAXPART];
 GVolumeMonitor *monitor;
 
 /* control widget globals */
-static GtkWidget *main_dlg, *msg_dlg, *status, *progress, *cancel, *to_cb, *from_cb, *start_btn, *help_btn, *cpuidcheck;
+static GtkWidget *main_dlg, *msg_dlg, *status, *no, *yes, *progress, *cancel, *to_cb, *from_cb, *start_btn, *help_btn, *cpuidcheck;
 
 /* combo box counters */
 int src_count, dst_count;
@@ -86,7 +86,16 @@ char ended;
 
 /* flag to show that backup has been cancelled by the user */
 char cancelled;
-#define CANCEL_CHECK if (cancelled) { g_idle_add (close_msg, NULL); return NULL; }
+#define CANCEL_CHECK if (cancelled) { if (cancelled == 1) g_idle_add (close_msg, NULL); else terminate_dialog (_("Drives changed - copy aborted")); return NULL; }
+
+/* flag to show state - inactive, confirm prompt or cloning */
+typedef enum {
+    STATE_IDLE,
+    STATE_CONF,
+    STATE_COPY
+} state_t;
+
+state_t state;
 
 /*---------------------------------------------------------------------------*/
 /* Function definitions */
@@ -155,7 +164,9 @@ static void terminate_dialog (char *msg)
     gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 1.0);
     gtk_label_set_text (GTK_LABEL (status), msg);
     gtk_button_set_label (GTK_BUTTON (cancel), _("OK"));
+    gtk_widget_set_sensitive (GTK_WIDGET (cancel), TRUE);
     ended = 1;
+    state = STATE_IDLE;
 }
 
 
@@ -547,26 +558,12 @@ static gpointer backup_thread (gpointer data)
 /*---------------------------------------------------------------------------*/
 /* Progress dialog UI handlers */
 
-/* Handler for cancel button */
-
-static void on_cancel (void)
+static void kill_copy (void)
 {
     FILE *fp;
     char buffer[256];
     int pid;
 
-    if (ended)
-    {
-        g_idle_add (close_msg, NULL);
-        return;
-    }
-
-    // hide the progress bar and disable the cancel button
-    gtk_progress_bar_pulse (GTK_PROGRESS_BAR (progress));
-    gtk_label_set_text (GTK_LABEL (status), "Cancelling...");
-    gtk_widget_set_sensitive (GTK_WIDGET (cancel), FALSE);
-
-    // kill copy processes if running
     if (copying)
     {
         sprintf (buffer, "ps ax | grep \"cp -ax %s/. %s/.\" | grep -v \"grep\"", src_mnt, dst_mnt);
@@ -582,7 +579,27 @@ static void on_cancel (void)
         }
         copying = 0;
     }
+}
+
+/* Handler for cancel button */
+
+static void on_cancel (void)
+{
+    if (ended)
+    {
+        g_idle_add (close_msg, NULL);
+        return;
+    }
+
+    // hide the progress bar and disable the cancel button
+    gtk_progress_bar_pulse (GTK_PROGRESS_BAR (progress));
+    gtk_label_set_text (GTK_LABEL (status), _("Cancelling..."));
+    gtk_widget_set_sensitive (GTK_WIDGET (cancel), FALSE);
+
+    // kill copy processes if running
+    kill_copy ();
     cancelled = 1;
+    state = STATE_IDLE;
 }
 
 
@@ -597,6 +614,7 @@ static void on_start (void)
 
     // close the confirm dialog
     gtk_widget_destroy (msg_dlg);
+    state = STATE_COPY;
 
     // create the progress dialog
     msg_dlg = (GtkWidget *) gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -651,6 +669,7 @@ static void on_start (void)
 static void on_close (void)
 {
     gtk_widget_destroy (msg_dlg);
+    state = STATE_IDLE;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -708,18 +727,18 @@ static void on_confirm (void)
     len = strlen (dst);
     if (len >= 2) dst[len - 2] = 0;
     sprintf (buffer, _("This will erase all content on the device '%s'. Are you sure?"), dst);
-    GtkWidget* status = (GtkWidget *) gtk_label_new (buffer);
+    status = (GtkWidget *) gtk_label_new (buffer);
     gtk_box_pack_start (GTK_BOX (box), status, FALSE, FALSE, 5);
 
     GtkWidget *hbox = gtk_hbox_new (TRUE, 10);
     gtk_box_pack_start (GTK_BOX (box), hbox, FALSE, FALSE, 5);
 
     // add buttons
-    GtkWidget *no = (GtkWidget *) gtk_button_new_with_label (_("No"));
+    no = (GtkWidget *) gtk_button_new_with_label (_("No"));
     gtk_box_pack_start (GTK_BOX (hbox), no, FALSE, TRUE, 40);
     g_signal_connect (no, "clicked", G_CALLBACK (on_close), NULL);
 
-    GtkWidget *yes = (GtkWidget *) gtk_button_new_with_label (_("Yes"));
+    yes = (GtkWidget *) gtk_button_new_with_label (_("Yes"));
     gtk_box_pack_start (GTK_BOX (hbox), yes, FALSE, TRUE, 40);
     g_signal_connect (yes, "clicked", G_CALLBACK (on_start), NULL);
 
@@ -727,6 +746,7 @@ static void on_confirm (void)
     g_free (dst);
 
     gtk_widget_show_all (GTK_WIDGET (msg_dlg));
+    state = STATE_CONF;
  }
 
 
@@ -765,11 +785,32 @@ static void on_cb_changed (void)
 
 /* Handler for drives changed signal from volume monitor */
 
-static void on_drives_changed (void)
+static void on_drives_changed (GVolumeMonitor *volume_monitor, GDrive *drive, gpointer user_data)
 {
     char buffer[256], test[128];
     FILE *fp;
     int devlen;
+
+    if (state == STATE_CONF)
+    {
+        gtk_label_set_text (GTK_LABEL (status), _("Drives changed - copy aborted"));
+        gtk_button_set_label (GTK_BUTTON (no), _("OK"));
+        gtk_widget_hide (yes);
+        state = STATE_IDLE;
+    }
+
+    if (state == STATE_COPY && (int) user_data == 1)
+    {
+        // hide the progress bar and disable the cancel button
+        gtk_progress_bar_pulse (GTK_PROGRESS_BAR (progress));
+        gtk_label_set_text (GTK_LABEL (status), _("Drives changed - cancelling..."));
+        gtk_widget_set_sensitive (GTK_WIDGET (cancel), FALSE);
+
+        // kill copy processes if running
+        kill_copy ();
+        cancelled = 2;
+        state = STATE_IDLE;
+    }
 
     // empty the comboboxes
     while (src_count)
@@ -876,14 +917,16 @@ int main (int argc, char *argv[])
     monitor = g_volume_monitor_get ();
 
     // populate the comboboxes
-    on_drives_changed ();
+    on_drives_changed (NULL, NULL, 0);
 
-    g_signal_connect (monitor, "drive_changed", G_CALLBACK (on_drives_changed), NULL);
-    g_signal_connect (monitor, "drive_connected", G_CALLBACK (on_drives_changed), NULL);
-    g_signal_connect (monitor, "drive_disconnected", G_CALLBACK (on_drives_changed), NULL);
-    g_signal_connect (monitor, "mount_changed", G_CALLBACK (on_drives_changed), NULL);
-    g_signal_connect (monitor, "mount_added", G_CALLBACK (on_drives_changed), NULL);
-    g_signal_connect (monitor, "mount_removed", G_CALLBACK (on_drives_changed), NULL);
+    g_signal_connect (monitor, "drive_changed", G_CALLBACK (on_drives_changed), (void *) 0);
+    g_signal_connect (monitor, "drive_connected", G_CALLBACK (on_drives_changed), (void *) 1);
+    g_signal_connect (monitor, "drive_disconnected", G_CALLBACK (on_drives_changed), (void *) 1);
+    g_signal_connect (monitor, "mount_changed", G_CALLBACK (on_drives_changed), (void *) 0);
+    g_signal_connect (monitor, "mount_added", G_CALLBACK (on_drives_changed), (void *) 0);
+    g_signal_connect (monitor, "mount_removed", G_CALLBACK (on_drives_changed), (void *) 0);
+
+    state = STATE_IDLE;
 
     g_object_unref (builder);
     gtk_dialog_run (GTK_DIALOG (main_dlg));

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: piclone 0.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-18 08:18+0100\n"
+"POT-Creation-Date: 2020-06-15 18:37+0100\n"
 "PO-Revision-Date: 2017-07-18 08:19+0100\n"
 "Last-Translator: Simon Long <simon@raspberrypi.org>\n"
 "Language-Team: English (British)\n"
@@ -17,109 +17,121 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../src/piclone.c:139
+#: ../src/piclone.c:89 ../src/piclone.c:793
+msgid "Drives changed - copy aborted"
+msgstr "Drives changed - copy aborted"
+
+#: ../src/piclone.c:163 ../src/piclone.c:794
 msgid "OK"
 msgstr "OK"
 
-#: ../src/piclone.c:187
+#: ../src/piclone.c:216
 msgid "Unable to read source."
 msgstr "Unable to read source."
 
-#: ../src/piclone.c:193
+#: ../src/piclone.c:222
 msgid "Non-MSDOS partition table on source."
-msgstr "Non-MSDOS partition table on source."
+msgstr "Non MS-DOS partition table on source."
 
-#: ../src/piclone.c:200
+#: ../src/piclone.c:229
 msgid "Preparing target..."
 msgstr "Preparing target..."
 
-#: ../src/piclone.c:213
+#: ../src/piclone.c:242
 msgid "Could not write to destination."
 msgstr "Could not write to destination."
 
-#: ../src/piclone.c:227
+#: ../src/piclone.c:256
 msgid "Could not create FAT."
 msgstr "Could not create FAT."
 
-#: ../src/piclone.c:233
+#: ../src/piclone.c:262
 msgid "Reading partitions..."
 msgstr "Reading partitions..."
 
-#: ../src/piclone.c:248
+#: ../src/piclone.c:277
 msgid "Too many partitions on source."
 msgstr "Too many partitions on source."
 
-#: ../src/piclone.c:260
+#: ../src/piclone.c:289
 msgid "Preparing partitions..."
 msgstr "Preparing partitions..."
 
-#: ../src/piclone.c:271 ../src/piclone.c:282 ../src/piclone.c:291
+#: ../src/piclone.c:300 ../src/piclone.c:311 ../src/piclone.c:320
 msgid "Could not create partition."
 msgstr "Could not create partition."
 
-#: ../src/piclone.c:356 ../src/piclone.c:362 ../src/piclone.c:384
-#: ../src/piclone.c:390
+#: ../src/piclone.c:385 ../src/piclone.c:391 ../src/piclone.c:413
+#: ../src/piclone.c:419
 msgid "Could not create file system."
 msgstr "Could not create file system."
 
-#: ../src/piclone.c:407 ../src/piclone.c:415
-msgid "Could not set flags."
-msgstr "Could not set flags."
-
-#: ../src/piclone.c:432
+#: ../src/piclone.c:443
 #, c-format
 msgid "Copying partition %d of %d..."
 msgstr "Copying partition %d of %d..."
 
-#: ../src/piclone.c:439 ../src/piclone.c:445
+#: ../src/piclone.c:453 ../src/piclone.c:459
 msgid "Could not mount partition."
 msgstr "Could not mount partition."
 
-#: ../src/piclone.c:463
+#: ../src/piclone.c:477
 msgid "Insufficient space. Backup aborted."
 msgstr "Insufficient space. Backup aborted."
 
-#: ../src/piclone.c:496 ../src/piclone.c:502
+#: ../src/piclone.c:518 ../src/piclone.c:524
 msgid "Could not unmount partition."
 msgstr "Could not unmount partition."
 
-#: ../src/piclone.c:508
+#: ../src/piclone.c:535 ../src/piclone.c:543
+msgid "Could not set flags."
+msgstr "Could not set flags."
+
+#: ../src/piclone.c:550
 msgid "Copy complete."
 msgstr "Copy complete."
 
+#: ../src/piclone.c:593
+msgid "Cancelling..."
+msgstr "Cancelling..."
+
 #. add message
-#: ../src/piclone.c:584
+#: ../src/piclone.c:641
 msgid "Checking source..."
 msgstr "Checking source..."
 
 #. add cancel button
-#: ../src/piclone.c:594
+#: ../src/piclone.c:651
 msgid "Cancel"
 msgstr "Cancel"
 
-#: ../src/piclone.c:661
+#: ../src/piclone.c:726
 #, c-format
 msgid "This will erase all content on the device '%s'. Are you sure?"
 msgstr "This will erase all content on the device '%s'. Are you sure?"
 
 #. add buttons
-#: ../src/piclone.c:669
+#: ../src/piclone.c:734
 msgid "No"
 msgstr "No"
 
-#: ../src/piclone.c:673
+#: ../src/piclone.c:738
 msgid "Yes"
 msgstr "Yes"
 
-#: ../src/piclone.c:710 ../src/piclone.c:763
+#: ../src/piclone.c:776 ../src/piclone.c:850
 msgid "No devices available"
 msgstr "No devices available"
 
-#: ../src/piclone.c:813
+#: ../src/piclone.c:803
+msgid "Drives changed - cancelling..."
+msgstr "Drives changed - cancelling..."
+
+#: ../src/piclone.c:900
 msgid "Select the device to copy from"
 msgstr "Select the device to copy from"
 
-#: ../src/piclone.c:821
+#: ../src/piclone.c:908
 msgid "Select the device to copy to"
 msgstr "Select the device to copy to"
 
@@ -159,7 +171,7 @@ msgstr "New Partition UUIDs"
 
 #: ../data/piclone.ui.h:9
 msgid "Check this box to create new partition UUIDs on the copy"
-msgstr "Check this box to create new partition UUIDs on the copy"
+msgstr "Tick this box to create new partition UUIDs on the copy"
 
 #: ../data/piclone.ui.h:10
 msgid ""
@@ -193,16 +205,17 @@ msgid ""
 "\n"
 "Under Raspbian Stretch and later versions, you cannot mount two partitions "
 "with the same UUID, so you will not be able to mount a cloned SD card when "
-"booted from the disk from which it was cloned. If you need to do this, "
-"check the \"New Partition UUIDs\" box before copying.\n"
+"booted from the disk from which it was cloned. If you need to do this, check "
+"the \"New Partition UUIDs\" box before copying.\n"
 msgstr ""
-"SD Card Copier v1.0\n"
+"SD Card Copier\n"
 "\n"
 "This is an application to copy and back up SD cards. To use it, you will "
 "need a USB SD card writer.\n"
 "\n"
 "To back up your Raspberry Pi's internal SD card, insert a blank SD card into "
-"a USB card writer and connect it to your Pi. Then start the application, "
+"a USB card writer connected to the Raspberry Pi. Then choose the internal SD "
+"card (labelled as '/dev/mmcblk0') from the “Copy From Device” drop-down box, "
 "choose your card writer from the “Copy To Device” drop-down box and press "
 "“Start”. The copy process will take 10-15 minutes depending on the size of "
 "your card.\n"
@@ -216,18 +229,18 @@ msgstr ""
 "stick and the “Copy To Device” to a USB card writer containing the card to "
 "restore onto.\n"
 "\n"
-"Note that you cannot copy onto the SD card from which your Pi is currently "
+"Note that you cannot copy onto the SD card from which your Raspberry Pi is "
 "booted, which is why it does not appear in the “Copy To Device” dropdown.\n"
 "\n"
 "Note also that the destination card doesn’t need to be the same size as the "
 "source card, but the destination must have enough space for all the data on "
-"the source. The application will warn you if there is insufficient space on the "
-"destination.\n"
+"the source. The application will warn you if there is insufficient space on "
+"the destination.\n"
 "\n"
-"Under Raspbian Stretch and later versions, you cannot mount two partitions "
+"Under some versions of the operating system, you cannot mount two partitions "
 "with the same UUID, so you will not be able to mount a cloned SD card when "
-"booted from the disk from which it was cloned. If you need to do this, "
-"check the \"New Partition UUIDs\" box before copying.\n"
+"booted from the disk from which it was cloned. If you need to do this, tick "
+"the \"New Partition UUIDs\" box before copying.\n"
 
 #: ../data/piclone.ui.h:26
 msgid "SD Card Copier Help"
@@ -235,7 +248,7 @@ msgstr "SD Card Copier Help"
 
 #: ../data/piclone.desktop.in.h:2
 msgid "Make a copy of the Raspbian SD card"
-msgstr "Make a copy of the Raspbian SD card"
+msgstr "Copy SD cards and USB devices"
 
 #: ../data/pwdpic.sh:6
 msgid "Password Required"
