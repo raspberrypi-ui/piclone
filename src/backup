@@ -48,11 +48,25 @@ sudo parted /dev/mmcblk0 unit s print | tail -n +8 | head -n -1 | while read lin
 
 		# create file systems
 
+		puuid=$(lsblk -o name,uuid /dev/mmcblk0 | grep -E "\\bmmcblk0p$pnum " | cut -d ' ' -f2-)
+		plabel=$(lsblk -o name,label /dev/mmcblk0 | grep -E "\\bmmcblk0p$pnum " | cut -d ' ' -f2-)
+
 		if [ "$fstype" == "fat32" ] || [ "$fstype" == "fat16" ]; then
-			sudo mkfs.fat $1$pnum
+			if [ "$fstype" == "fat32" ]; then
+				sudo mkfs.fat -F 32 -i "$(echo "$puuid" | tr -d "-")" "$1$pnum"
+			else
+				sudo mkfs.fat -i "$(echo "$puuid" | tr -d "-")" "$1$pnum"
+			fi
+
+			if [ -n "$plabel" ]; then
+				sudo fatlabel "$1$pnum" "$plabel"
+			fi
 		fi
 		if [ "$fstype" == "ext4" ]; then
-			sudo mkfs.ext4 -F $1$pnum
+			sudo mkfs.ext4 -F -U "$puuid" "$1$pnum"
+			if [ -n "$plabel" ]; then
+				sudo e2label "$1$pnum" "$plabel"
+			fi
 		fi
 
 		# mount and copy
