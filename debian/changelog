@@ -1,3 +1,9 @@
+piclone (0.17) buster; urgency=medium
+
+  * Added Slovak translation
+
+ -- Simon Long <simon@raspberrypi.com>  Sun, 03 Jan 2021 21:54:22 +0000
+
 piclone (0.16) buster; urgency=medium
 
   * Abort copy if drives changed while in progress
