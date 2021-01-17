@@ -815,12 +815,12 @@ static void on_drives_changed (GVolumeMonitor *volume_monitor, GDrive *drive, gp
     // empty the comboboxes
     while (src_count)
     {
-        gtk_combo_box_remove_text (GTK_COMBO_BOX (from_cb), 0);
+        gtk_combo_box_text_remove (GTK_COMBO_BOX_TEXT (from_cb), 0);
         src_count--;
     }
     while (dst_count)
     {
-        gtk_combo_box_remove_text (GTK_COMBO_BOX (to_cb), 0);
+        gtk_combo_box_text_remove (GTK_COMBO_BOX_TEXT (to_cb), 0);
         dst_count--;
     }
 
@@ -832,7 +832,7 @@ static void on_drives_changed (GVolumeMonitor *volume_monitor, GDrive *drive, gp
         char *id = g_drive_get_identifier (d, "unix-device");
         char *n = g_drive_get_name (d);
         sprintf (buffer, "%s  (%s)", n, id);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (from_cb), buffer);
+        gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (from_cb), buffer);
         src_count++;
 
         // do not allow the current root and boot devices as targets
@@ -840,7 +840,7 @@ static void on_drives_changed (GVolumeMonitor *volume_monitor, GDrive *drive, gp
         fp = popen (test, "r");
         if (fp && pclose (fp))
         {
-            gtk_combo_box_append_text (GTK_COMBO_BOX (to_cb), buffer);
+            gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (to_cb), buffer);
             dst_count++;
         }
         g_free (id);
@@ -850,7 +850,7 @@ static void on_drives_changed (GVolumeMonitor *volume_monitor, GDrive *drive, gp
 
     if (dst_count == 0)
     {
-        gtk_combo_box_append_text (GTK_COMBO_BOX (to_cb), _("No devices available"));
+        gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (to_cb), _("No devices available"));
         gtk_combo_box_set_active (GTK_COMBO_BOX (to_cb), 0);
         gtk_widget_set_sensitive (GTK_WIDGET (to_cb), FALSE);
         dst_count++;
@@ -883,11 +883,11 @@ int main (int argc, char *argv[])
     main_dlg = (GtkWidget *) gtk_builder_get_object (builder, "dialog1");
 
     // set up the start button
-    start_btn = (GtkWidget *) gtk_builder_get_object (builder, "button1");
+    start_btn = (GtkWidget *) gtk_builder_get_object (builder, "btn_start");
     g_signal_connect (start_btn, "clicked", G_CALLBACK (on_confirm), NULL);
 
     // set up the help button
-    help_btn = (GtkWidget *) gtk_builder_get_object (builder, "button4");
+    help_btn = (GtkWidget *) gtk_builder_get_object (builder, "btn_help");
     g_signal_connect (help_btn, "clicked", G_CALLBACK (on_help), NULL);
 
     // get the table which holds the other elements
@@ -899,18 +899,12 @@ int main (int argc, char *argv[])
 
     // create and add the source combobox
     src_count = 0;
-    from_cb = (GtkWidget *)  (GObject *) gtk_combo_box_text_new ();
-    gtk_widget_set_tooltip_text (from_cb, _("Select the device to copy from"));
-    gtk_table_attach (GTK_TABLE (table), GTK_WIDGET (from_cb), 1, 2, 0, 1, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 5);
-    gtk_widget_show_all (GTK_WIDGET (from_cb));
+    from_cb = (GtkWidget *) gtk_builder_get_object (builder, "cb_from");
     g_signal_connect (from_cb, "changed", G_CALLBACK (on_cb_changed), NULL);
 
     // create and add the destination combobox
     dst_count = 0;
-    to_cb = (GtkWidget *)  (GObject *) gtk_combo_box_text_new ();
-    gtk_widget_set_tooltip_text (to_cb, _("Select the device to copy to"));
-    gtk_table_attach (GTK_TABLE (table), GTK_WIDGET (to_cb), 1, 2, 1, 2, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 5);
-    gtk_widget_show_all (GTK_WIDGET (to_cb));
+    to_cb = (GtkWidget *) gtk_builder_get_object (builder, "cb_to");
     g_signal_connect (to_cb, "changed", G_CALLBACK (on_cb_changed), NULL);
 
     // configure monitoring for drives being connected or disconnected
