@@ -610,49 +610,24 @@ static void on_cancel (void)
 
 static void on_start (void)
 {
-    GdkColor col;
+    GtkBuilder *builder;
 
     // close the confirm dialog
     gtk_widget_destroy (msg_dlg);
     state = STATE_COPY;
 
-    // create the progress dialog
-    msg_dlg = (GtkWidget *) gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title (GTK_WINDOW (msg_dlg), "");
-    gtk_window_set_modal (GTK_WINDOW (msg_dlg), TRUE);
-    gtk_window_set_decorated (GTK_WINDOW (msg_dlg), FALSE);
-    gtk_window_set_destroy_with_parent (GTK_WINDOW (msg_dlg), TRUE);
-    gtk_window_set_skip_taskbar_hint (GTK_WINDOW (msg_dlg), TRUE);
+    builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/piclone.ui");
+    msg_dlg = (GtkWidget *) gtk_builder_get_object (builder, "process");
     gtk_window_set_transient_for (GTK_WINDOW (msg_dlg), GTK_WINDOW (main_dlg));
-    gtk_window_set_position (GTK_WINDOW (msg_dlg), GTK_WIN_POS_CENTER_ON_PARENT);
-
-    // add border
-    GtkWidget *frame = gtk_frame_new (NULL);
-    gtk_container_add (GTK_CONTAINER (msg_dlg), frame);
-
-    GtkWidget *eb = gtk_event_box_new ();
-    gtk_container_add (GTK_CONTAINER (frame), eb);
-    gdk_color_parse ("#FFFFFF", &col);
-    gtk_widget_modify_bg (eb, GTK_STATE_NORMAL, &col);
-
-    // add container
-    GtkWidget *box = (GtkWidget *) gtk_vbox_new (TRUE, 5);
-    gtk_container_set_border_width (GTK_CONTAINER (box), 10);
-    gtk_container_add (GTK_CONTAINER (eb), box);
 
     // add message
-    status = (GtkWidget *) gtk_label_new (_("Checking source..."));
-    gtk_label_set_width_chars (GTK_LABEL (status), 30);
-    gtk_box_pack_start (GTK_BOX (box), status, FALSE, FALSE, 5);
+    status = (GtkWidget *) gtk_builder_get_object (builder, "label_status");
 
     // add progress bar
-    progress = (GtkWidget *) gtk_progress_bar_new ();
-    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 0.0);
-    gtk_box_pack_start (GTK_BOX (box), progress, FALSE, FALSE, 5);
+    progress = (GtkWidget *) gtk_builder_get_object (builder, "pb_progress");
 
     // add cancel button
-    cancel = (GtkWidget *) gtk_button_new_with_label (_("Cancel"));
-    gtk_box_pack_start (GTK_BOX (box), cancel, FALSE, FALSE, 5);
+    cancel = (GtkWidget *) gtk_builder_get_object (builder, "btn_cancel");
     g_signal_connect (cancel, "clicked", G_CALLBACK (on_cancel), NULL);
 
     gtk_widget_show_all (GTK_WIDGET (msg_dlg));
@@ -682,7 +657,7 @@ static void on_confirm (void)
     char buffer[256], res[256];
     char *src, *dst;
     int len;
-    GdkColor col;
+    GtkBuilder *builder;
 
     // set up source and target devices from combobox values
     dst = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (to_cb));
@@ -700,46 +675,22 @@ static void on_confirm (void)
     if (!strcmp (src_dev, dst_dev)) return;
 
     // create the confirm dialog
-    msg_dlg = (GtkWidget *) gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title (GTK_WINDOW (msg_dlg), "");
-    gtk_window_set_modal (GTK_WINDOW (msg_dlg), TRUE);
-    gtk_window_set_decorated (GTK_WINDOW (msg_dlg), FALSE);
-    gtk_window_set_destroy_with_parent (GTK_WINDOW (msg_dlg), TRUE);
-    gtk_window_set_skip_taskbar_hint (GTK_WINDOW (msg_dlg), TRUE);
+    builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/piclone.ui");
+    msg_dlg = (GtkWidget *) gtk_builder_get_object (builder, "confirm");
     gtk_window_set_transient_for (GTK_WINDOW (msg_dlg), GTK_WINDOW (main_dlg));
-    gtk_window_set_position (GTK_WINDOW (msg_dlg), GTK_WIN_POS_CENTER_ON_PARENT);
-
-    // add border
-    GtkWidget *frame = gtk_frame_new (NULL);
-    gtk_container_add (GTK_CONTAINER (msg_dlg), frame);
-
-    GtkWidget *eb = gtk_event_box_new ();
-    gtk_container_add (GTK_CONTAINER (frame), eb);
-    gdk_color_parse ("#FFFFFF", &col);
-    gtk_widget_modify_bg (eb, GTK_STATE_NORMAL, &col);
-
-    // add container
-    GtkWidget *box = (GtkWidget *) gtk_vbox_new (TRUE, 5);
-    gtk_container_set_border_width (GTK_CONTAINER (box), 10);
-    gtk_container_add (GTK_CONTAINER (eb), box);
 
     // add message
     len = strlen (dst);
     if (len >= 2) dst[len - 2] = 0;
     sprintf (buffer, _("This will erase all content on the device '%s'. Are you sure?"), dst);
-    status = (GtkWidget *) gtk_label_new (buffer);
-    gtk_box_pack_start (GTK_BOX (box), status, FALSE, FALSE, 5);
-
-    GtkWidget *hbox = gtk_hbox_new (TRUE, 10);
-    gtk_box_pack_start (GTK_BOX (box), hbox, FALSE, FALSE, 5);
+    status = (GtkWidget *) gtk_builder_get_object (builder, "label_prompt");
+    gtk_label_set_text (GTK_LABEL (status), buffer);
 
     // add buttons
-    no = (GtkWidget *) gtk_button_new_with_label (_("No"));
-    gtk_box_pack_start (GTK_BOX (hbox), no, FALSE, TRUE, 40);
+    no = (GtkWidget *) gtk_builder_get_object (builder, "btn_no");
     g_signal_connect (no, "clicked", G_CALLBACK (on_close), NULL);
 
-    yes = (GtkWidget *) gtk_button_new_with_label (_("Yes"));
-    gtk_box_pack_start (GTK_BOX (hbox), yes, FALSE, TRUE, 40);
+    yes = (GtkWidget *) gtk_builder_get_object (builder, "btn_yes");
     g_signal_connect (yes, "clicked", G_CALLBACK (on_start), NULL);
 
     g_free (src);
@@ -878,8 +829,7 @@ int main (int argc, char *argv[])
     gtk_icon_theme_prepend_search_path (gtk_icon_theme_get_default(), PACKAGE_DATA_DIR);
 
     // build the UI
-    builder = gtk_builder_new ();
-    gtk_builder_add_from_file (builder, PACKAGE_DATA_DIR "/piclone.ui", NULL);
+    builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/piclone.ui");
     main_dlg = (GtkWidget *) gtk_builder_get_object (builder, "dialog1");
 
     // set up the start button
