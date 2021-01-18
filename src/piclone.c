@@ -616,6 +616,16 @@ static void kill_copy (void)
 
 /* Handler for cancel button */
 
+
+static gboolean cb_cancel (gpointer data)
+{
+    // hide the progress bar and disable the cancel button
+    gtk_progress_bar_pulse (GTK_PROGRESS_BAR (progress));
+    gtk_label_set_text (GTK_LABEL (status), _("Cancelling..."));
+    gtk_widget_set_sensitive (GTK_WIDGET (cancel), FALSE);
+    return FALSE;
+}
+
 static void on_cancel (void)
 {
     if (ended)
@@ -624,10 +634,7 @@ static void on_cancel (void)
         return;
     }
 
-    // hide the progress bar and disable the cancel button
-    gtk_progress_bar_pulse (GTK_PROGRESS_BAR (progress));
-    gtk_label_set_text (GTK_LABEL (status), _("Cancelling..."));
-    gtk_widget_set_sensitive (GTK_WIDGET (cancel), FALSE);
+    gdk_threads_add_idle (cb_cancel, NULL);
 
     // kill copy processes if running
     kill_copy ();
