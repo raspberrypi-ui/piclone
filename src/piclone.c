@@ -874,9 +874,6 @@ int main (int argc, char *argv[])
     help_btn = (GtkWidget *) gtk_builder_get_object (builder, "btn_help");
     g_signal_connect (help_btn, "clicked", G_CALLBACK (on_help), NULL);
 
-    // get the table which holds the other elements
-    GtkWidget *table = (GtkWidget *) gtk_builder_get_object (builder, "table1");
-
     // get the new UUID checkbox - uncheck it by default
     cpuidcheck = (GtkWidget *) gtk_builder_get_object (builder, "cpcheck");
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (cpuidcheck), FALSE);
