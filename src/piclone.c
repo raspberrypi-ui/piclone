@@ -181,6 +181,33 @@ static char *partition_name (char *device, char *buffer)
     return buffer;
 }
 
+/* Callbacks to main thread to update UI */
+
+static gboolean cb_update_progress (gpointer data)
+{
+    float *fptr = (float *) &data;
+    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), *fptr);
+    return FALSE;
+}
+
+static void update_progress (float prog)
+{
+    void *ptr;
+    float *fptr = (float *) &ptr;
+    *fptr = prog;
+    gdk_threads_add_idle (cb_update_progress, ptr);
+}
+
+static gboolean cb_update_label (gpointer data)
+{
+    gtk_label_set_text (GTK_LABEL (status), (char *) data);
+    return FALSE;
+}
+
+static void update_label (char *msg)
+{
+    gdk_threads_add_idle (cb_update_label, msg);
+}
 
 /*---------------------------------------------------------------------------*/
 /* Threads */
@@ -228,9 +255,9 @@ static gpointer backup_thread (gpointer data)
     else
     CANCEL_CHECK;
 
-    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 1.0);
-    gtk_label_set_text (GTK_LABEL (status), _("Preparing target..."));
-    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 0.0);
+    update_progress (1.0);
+    update_label (_("Preparing target..."));
+    update_progress (0.0);
 
     // unmount any partitions on the target device
     for (n = 9; n >= 1; n--)
@@ -261,9 +288,9 @@ static gpointer backup_thread (gpointer data)
     }
     CANCEL_CHECK;
 
-    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 1.0);
-    gtk_label_set_text (GTK_LABEL (status), _("Reading partitions..."));
-    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 0.0);
+    update_progress (1.0);
+    update_label (_("Reading partitions..."));
+    update_progress (0.0);
 
     // read in the source partition table
     n = 0;
@@ -288,9 +315,9 @@ static gpointer backup_thread (gpointer data)
     }
     CANCEL_CHECK;
 
-    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 1.0);
-    gtk_label_set_text (GTK_LABEL (status), _("Preparing partitions..."));
-    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 0.0);
+    update_progress (1.0);
+    update_label (_("Preparing partitions..."));
+    update_progress (0.0);
     
     // recreate the partitions on the target
     for (p = 0; p < n; p++)
@@ -434,7 +461,7 @@ static gpointer backup_thread (gpointer data)
 
         prog = p + 1;
         prog /= n;
-        gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), prog);
+        update_progress (prog);
     }
 
     // do the copy for each partition
@@ -444,8 +471,8 @@ static gpointer backup_thread (gpointer data)
         if (strcmp (parts[p].ptype, "extended"))
         {
             sprintf (buffer, _("Copying partition %d of %d..."), p + 1, n);
-            gtk_label_set_text (GTK_LABEL (status), buffer);
-            gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 0.0);
+            update_label (buffer);
+            update_progress (0.0);
 
             // belt-and-braces call to partprobe to make sure devices are found...
             get_string ("partprobe", res);
@@ -500,12 +527,12 @@ static gpointer backup_thread (gpointer data)
                 sscanf (res, "%ld", &dstsz);
                 prog = dstsz;
                 prog /= srcsz;
-                gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), prog);
+                update_progress (prog);
                 sleep (stime);
                 CANCEL_CHECK;
             }
 
-            gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 1.0);
+            update_progress (1.0);
 
             // fix up relevant files if changing partition UUID
             if (puid && new_uuid)
