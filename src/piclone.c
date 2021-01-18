@@ -159,14 +159,20 @@ static gboolean close_msg (gpointer data)
 
 /* Update the progress dialog with a message to show that backup has ended */
 
-static void terminate_dialog (char *msg)
+static gboolean cb_terminate (gpointer data)
 {
     gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 1.0);
-    gtk_label_set_text (GTK_LABEL (status), msg);
+    gtk_label_set_text (GTK_LABEL (status), (char *) data);
     gtk_button_set_label (GTK_BUTTON (cancel), _("OK"));
     gtk_widget_set_sensitive (GTK_WIDGET (cancel), TRUE);
+    return FALSE;
+}
+
+static void terminate_dialog (char *msg)
+{
     ended = 1;
     state = STATE_IDLE;
+    gdk_threads_add_idle (cb_terminate, msg);
 }
 
 
@@ -862,6 +868,7 @@ int main (int argc, char *argv[])
     // set up the start button
     start_btn = (GtkWidget *) gtk_builder_get_object (builder, "btn_start");
     g_signal_connect (start_btn, "clicked", G_CALLBACK (on_confirm), NULL);
+    gtk_widget_set_sensitive (GTK_WIDGET (start_btn), FALSE);
 
     // set up the help button
     help_btn = (GtkWidget *) gtk_builder_get_object (builder, "btn_help");
