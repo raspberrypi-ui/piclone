@@ -748,8 +748,7 @@ static void on_help (void)
     GtkBuilder *builder;
     GtkWidget *dlg;
 
-    builder = gtk_builder_new ();
-    gtk_builder_add_from_file (builder, PACKAGE_DATA_DIR "/piclone.ui", NULL);
+    builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/piclone.ui");
     dlg = (GtkWidget *) gtk_builder_get_object (builder, "dialog2");
     g_object_unref (builder);
     gtk_dialog_run (GTK_DIALOG (dlg));
