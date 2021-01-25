@@ -64,7 +64,7 @@ partition_t parts[MAXPART];
 GVolumeMonitor *monitor;
 
 /* control widget globals */
-static GtkWidget *main_dlg, *msg_dlg, *status, *no, *yes, *progress, *cancel, *to_cb, *from_cb, *start_btn, *help_btn, *cpuidcheck;
+static GtkWidget *main_dlg, *msg_dlg, *status, *no, *yes, *progress, *cancel, *to_cb, *from_cb, *start_btn, *help_btn, *close_btn, *cpuidcheck;
 
 /* combo box counters */
 int src_count, dst_count;
@@ -626,12 +626,12 @@ static gboolean cb_cancel (gpointer data)
     return FALSE;
 }
 
-static void on_cancel (void)
+static gboolean on_cancel (void)
 {
     if (ended)
     {
         g_idle_add (close_msg, NULL);
-        return;
+        return FALSE;
     }
 
     gdk_threads_add_idle (cb_cancel, NULL);
@@ -640,6 +640,7 @@ static void on_cancel (void)
     kill_copy ();
     cancelled = 1;
     state = STATE_IDLE;
+    return FALSE;
 }
 
 
@@ -648,7 +649,7 @@ static void on_cancel (void)
 
 /* Handler for Yes button */
 
-static void on_start (void)
+static gboolean on_start (void)
 {
     GtkBuilder *builder;
 
@@ -676,15 +677,17 @@ static void on_start (void)
     cancelled = 0;
     ended = 0;
     g_thread_new (NULL, backup_thread, NULL);
+    return FALSE;
 }
 
 
 /* Handler for No button */
 
-static void on_close (void)
+static gboolean on_close (void)
 {
     gtk_widget_destroy (msg_dlg);
     state = STATE_IDLE;
+    return FALSE;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -692,7 +695,7 @@ static void on_close (void)
 
 /* Handler for Start button */
 
-static void on_confirm (void)
+static gboolean on_confirm (void)
 {
     char buffer[256], res[256];
     char *src, *dst;
@@ -712,7 +715,7 @@ static void on_confirm (void)
     new_uuid = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (cpuidcheck));
 
     // basic sanity check - don't do anything if src == dest
-    if (!strcmp (src_dev, dst_dev)) return;
+    if (!strcmp (src_dev, dst_dev)) return FALSE;
 
     // create the confirm dialog
     builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/piclone.ui");
@@ -738,21 +741,32 @@ static void on_confirm (void)
 
     gtk_widget_show_all (GTK_WIDGET (msg_dlg));
     state = STATE_CONF;
- }
+    return FALSE;
+}
 
 
 /* Handler for Help button */
 
-static void on_help (void)
+static gboolean on_help (void)
 {
     GtkBuilder *builder;
     GtkWidget *dlg;
 
     builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/piclone.ui");
-    dlg = (GtkWidget *) gtk_builder_get_object (builder, "dialog2");
+    dlg = (GtkWidget *) gtk_builder_get_object (builder, "help");
     g_object_unref (builder);
     gtk_dialog_run (GTK_DIALOG (dlg));
     gtk_widget_destroy (dlg);
+    return FALSE;
+}
+
+
+/* Handler for Close button */
+
+static gboolean on_quit (void)
+{
+    gtk_main_quit ();
+    return FALSE;
 }
 
 
@@ -869,12 +883,16 @@ int main (int argc, char *argv[])
 
     // build the UI
     builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/piclone.ui");
-    main_dlg = (GtkWidget *) gtk_builder_get_object (builder, "dialog1");
+    main_dlg = (GtkWidget *) gtk_builder_get_object (builder, "main_window");
 
     // set up the start button
     start_btn = (GtkWidget *) gtk_builder_get_object (builder, "btn_start");
     g_signal_connect (start_btn, "clicked", G_CALLBACK (on_confirm), NULL);
     gtk_widget_set_sensitive (GTK_WIDGET (start_btn), FALSE);
+
+    // set up the close button
+    close_btn = (GtkWidget *) gtk_builder_get_object (builder, "btn_close");
+    g_signal_connect (close_btn, "clicked", G_CALLBACK (on_quit), NULL);
 
     // set up the help button
     help_btn = (GtkWidget *) gtk_builder_get_object (builder, "btn_help");
@@ -910,7 +928,10 @@ int main (int argc, char *argv[])
     state = STATE_IDLE;
 
     g_object_unref (builder);
-    gtk_dialog_run (GTK_DIALOG (main_dlg));
+
+    gtk_widget_show (main_dlg);
+    gtk_main ();
+
     gtk_widget_destroy (main_dlg);
 
     return 0;
