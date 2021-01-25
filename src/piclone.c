@@ -652,26 +652,31 @@ static gboolean on_cancel (void)
 static gboolean on_start (void)
 {
     GtkBuilder *builder;
+    GtkWidget *wid;
 
     // close the confirm dialog
     gtk_widget_destroy (msg_dlg);
     state = STATE_COPY;
 
     builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/piclone.ui");
-    msg_dlg = (GtkWidget *) gtk_builder_get_object (builder, "process");
+    msg_dlg = (GtkWidget *) gtk_builder_get_object (builder, "modal");
     gtk_window_set_transient_for (GTK_WINDOW (msg_dlg), GTK_WINDOW (main_dlg));
 
     // add message
-    status = (GtkWidget *) gtk_builder_get_object (builder, "label_status");
+    status = (GtkWidget *) gtk_builder_get_object (builder, "modal_msg");
+    gtk_label_set_text (GTK_LABEL (status), _("Checking source..."));
 
     // add progress bar
-    progress = (GtkWidget *) gtk_builder_get_object (builder, "pb_progress");
+    progress = (GtkWidget *) gtk_builder_get_object (builder, "modal_pb");
 
     // add cancel button
-    cancel = (GtkWidget *) gtk_builder_get_object (builder, "btn_cancel");
+    cancel = (GtkWidget *) gtk_builder_get_object (builder, "modal_cancel");
     g_signal_connect (cancel, "clicked", G_CALLBACK (on_cancel), NULL);
 
-    gtk_widget_show_all (GTK_WIDGET (msg_dlg));
+    wid = (GtkWidget *) gtk_builder_get_object (builder, "modal_ok");
+    gtk_widget_hide (wid);
+
+    gtk_widget_show (GTK_WIDGET (msg_dlg));
 
     // launch a thread with the system call to run the backup
     cancelled = 0;
@@ -701,6 +706,7 @@ static gboolean on_confirm (void)
     char *src, *dst;
     int len;
     GtkBuilder *builder;
+    GtkWidget *wid;
 
     // set up source and target devices from combobox values
     dst = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (to_cb));
@@ -719,27 +725,32 @@ static gboolean on_confirm (void)
 
     // create the confirm dialog
     builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/piclone.ui");
-    msg_dlg = (GtkWidget *) gtk_builder_get_object (builder, "confirm");
+    msg_dlg = (GtkWidget *) gtk_builder_get_object (builder, "modal");
     gtk_window_set_transient_for (GTK_WINDOW (msg_dlg), GTK_WINDOW (main_dlg));
 
     // add message
     len = strlen (dst);
     if (len >= 2) dst[len - 2] = 0;
     sprintf (buffer, _("This will erase all content on the device '%s'. Are you sure?"), dst);
-    status = (GtkWidget *) gtk_builder_get_object (builder, "label_prompt");
+    status = (GtkWidget *) gtk_builder_get_object (builder, "modal_msg");
     gtk_label_set_text (GTK_LABEL (status), buffer);
 
+    wid = (GtkWidget *) gtk_builder_get_object (builder, "modal_pb");
+    gtk_widget_hide (wid);
+
     // add buttons
-    no = (GtkWidget *) gtk_builder_get_object (builder, "btn_no");
+    no = (GtkWidget *) gtk_builder_get_object (builder, "modal_cancel");
+    gtk_button_set_label (GTK_BUTTON (no), _("_No"));
     g_signal_connect (no, "clicked", G_CALLBACK (on_close), NULL);
 
-    yes = (GtkWidget *) gtk_builder_get_object (builder, "btn_yes");
+    yes = (GtkWidget *) gtk_builder_get_object (builder, "modal_ok");
+    gtk_button_set_label (GTK_BUTTON (yes), _("_Yes"));
     g_signal_connect (yes, "clicked", G_CALLBACK (on_start), NULL);
 
     g_free (src);
     g_free (dst);
 
-    gtk_widget_show_all (GTK_WIDGET (msg_dlg));
+    gtk_widget_show (GTK_WIDGET (msg_dlg));
     state = STATE_CONF;
     return FALSE;
 }
