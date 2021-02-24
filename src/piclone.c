@@ -180,7 +180,7 @@ static void terminate_dialog (char *msg)
 
 static char *partition_name (char *device, char *buffer)
 {
-    if (!strncmp (device, "/dev/mmcblk", 11))
+    if (!strncmp (device, "/dev/mmcblk", 11) || !strncmp (device, "/dev/nvme", 9))
         sprintf (buffer, "%sp", device);
     else
         sprintf (buffer, "%s", device);
