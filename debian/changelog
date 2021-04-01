@@ -1,3 +1,9 @@
+piclone (0.19) buster; urgency=medium
+
+  * Remove hiding of application in other desktops
+
+ -- Simon Long <simon@raspberrypi.com>  Thu, 01 Apr 2021 20:38:12 +0100
+
 piclone (0.18) buster; urgency=medium
 
   * Fix issue with NVME devices
