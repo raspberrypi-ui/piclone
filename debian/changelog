@@ -1,3 +1,9 @@
+piclone (0.20) bullseye; urgency=medium
+
+  * Added Armenian translation
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 26 Apr 2021 09:04:29 +0100
+
 piclone (0.19) buster; urgency=medium
 
   * Remove hiding of application in other desktops
