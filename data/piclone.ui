@@ -8,7 +8,6 @@
     <property name="title" translatable="yes">SD Card Copier</property>
     <property name="resizable">False</property>
     <property name="icon_name">media-removable</property>
-    <property name="type_hint">dialog</property>
     <child>
       <placeholder/>
     </child>
