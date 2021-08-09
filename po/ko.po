@@ -1,0 +1,252 @@
+# English translations for piclone package.
+# Copyright (C) 2017 Raspberry Pi
+# This file is distributed under the same license as the piclone package.
+# Simon Long <simon@raspberrypi.org>, 2017.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: piclone 0.5\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-06-15 18:37+0100\n"
+"PO-Revision-Date: 2021-08-02 20:14+0900\n"
+"Language-Team: English (British)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 2.4.2\n"
+"Last-Translator: Lee Yunseok <ironyunseok@protonmail.com>\n"
+"Language: ko\n"
+
+#: ../src/piclone.c:89 ../src/piclone.c:793
+msgid "Drives changed - copy aborted"
+msgstr "드라이브 변경으로 복사 중단됨"
+
+#: ../src/piclone.c:163 ../src/piclone.c:794
+msgid "OK"
+msgstr "확인"
+
+#: ../src/piclone.c:216
+msgid "Unable to read source."
+msgstr "소스를 읽을 수 없습니다."
+
+#: ../src/piclone.c:222
+msgid "Non-MSDOS partition table on source."
+msgstr "소스 파티션 테이블이 MSDOS가 아닙니다."
+
+#: ../src/piclone.c:229
+msgid "Preparing target..."
+msgstr "대상 준비 중..."
+
+#: ../src/piclone.c:242
+msgid "Could not write to destination."
+msgstr "대상에 쓸 수 없습니다."
+
+#: ../src/piclone.c:256
+msgid "Could not create FAT."
+msgstr "FAT을 생성할 수 없습니다."
+
+#: ../src/piclone.c:262
+msgid "Reading partitions..."
+msgstr "파티션 읽는 중..."
+
+#: ../src/piclone.c:277
+msgid "Too many partitions on source."
+msgstr "소스에 파티션이 너무 많습니다."
+
+#: ../src/piclone.c:289
+msgid "Preparing partitions..."
+msgstr "파티션 준비 중..."
+
+#: ../src/piclone.c:300 ../src/piclone.c:311 ../src/piclone.c:320
+msgid "Could not create partition."
+msgstr "파티션을 생성할 수 없습니다."
+
+#: ../src/piclone.c:385 ../src/piclone.c:391 ../src/piclone.c:413
+#: ../src/piclone.c:419
+msgid "Could not create file system."
+msgstr "파일 시스템을 생성할 수 없습니다."
+
+#: ../src/piclone.c:443
+#, c-format
+msgid "Copying partition %d of %d..."
+msgstr "%d / %d 파티션 복사 중..."
+
+#: ../src/piclone.c:453 ../src/piclone.c:459
+msgid "Could not mount partition."
+msgstr "파티션을 마운트할 수 없습니다."
+
+#: ../src/piclone.c:477
+msgid "Insufficient space. Backup aborted."
+msgstr "공간이 부족해 백업이 중단되었습니다."
+
+#: ../src/piclone.c:518 ../src/piclone.c:524
+msgid "Could not unmount partition."
+msgstr "마운트된 파티션을 해제할 수 없습니다."
+
+#: ../src/piclone.c:535 ../src/piclone.c:543
+msgid "Could not set flags."
+msgstr "플래그를 설정할 수 없습니다."
+
+#: ../src/piclone.c:550
+msgid "Copy complete."
+msgstr "복사가 완료되었습니다."
+
+#: ../src/piclone.c:593
+msgid "Cancelling..."
+msgstr "취소하는 중..."
+
+#. add message
+#: ../src/piclone.c:641
+msgid "Checking source..."
+msgstr "소스 확인 중..."
+
+#. add cancel button
+#: ../src/piclone.c:651
+msgid "Cancel"
+msgstr "취소"
+
+#: ../src/piclone.c:726
+#, c-format
+msgid "This will erase all content on the device '%s'. Are you sure?"
+msgstr "장치 '%s'의 모든 콘텐츠가 삭제됩니다. 계속하시겠습니까?"
+
+#. add buttons
+#: ../src/piclone.c:734
+msgid "No"
+msgstr "아니오"
+
+#: ../src/piclone.c:738
+msgid "Yes"
+msgstr "네"
+
+#: ../src/piclone.c:776 ../src/piclone.c:850
+msgid "No devices available"
+msgstr "사용 가능한 장치 없음"
+
+#: ../src/piclone.c:803
+msgid "Drives changed - cancelling..."
+msgstr "드라이브가 변경돼 취소하는 중..."
+
+#: ../src/piclone.c:900
+msgid "Select the device to copy from"
+msgstr "복사할 장치 선택"
+
+#: ../src/piclone.c:908
+msgid "Select the device to copy to"
+msgstr "복사될 장치 선택"
+
+#. End of file
+#. ===========================================================================
+#: ../data/piclone.ui.h:1 ../data/piclone.desktop.in.h:1
+msgid "SD Card Copier"
+msgstr "SD 카드 복사기"
+
+#: ../data/piclone.ui.h:2
+msgid "Help"
+msgstr "도움말"
+
+#: ../data/piclone.ui.h:3
+msgid "Start"
+msgstr "시작"
+
+#: ../data/piclone.ui.h:4
+msgid "Copy From Device:"
+msgstr "장치에서 복사:"
+
+#: ../data/piclone.ui.h:5
+msgid "Select the device from which to copy"
+msgstr "어느 장치를 복사할 지 선택"
+
+#: ../data/piclone.ui.h:6
+msgid "Copy To Device:"
+msgstr "장치로 복사:"
+
+#: ../data/piclone.ui.h:7
+msgid "Select the device to which to copy"
+msgstr "어느 장치에 복사할 지 선택"
+
+#: ../data/piclone.ui.h:8
+msgid "New Partition UUIDs"
+msgstr "새 파티션 UUID"
+
+#: ../data/piclone.ui.h:9
+msgid "Check this box to create new partition UUIDs on the copy"
+msgstr "복사본에 새 파티션 UUID를 생성하려면 선택"
+
+#: ../data/piclone.ui.h:10
+msgid ""
+"SD Card Copier v1.0\n"
+"\n"
+"This is an application to copy and back up SD cards. To use it, you will "
+"need a USB SD card writer.\n"
+"\n"
+"To back up your Raspberry Pi's internal SD card, insert a blank SD card into "
+"a USB card writer and connect it to your Pi. Then start the application, "
+"choose your card writer from the “Copy To Device” drop-down box and press "
+"“Start”. The copy process will take 10-15 minutes depending on the size of "
+"your card.\n"
+"\n"
+"The resulting card should be a bootable copy of your existing card; to "
+"restore, simply place the backup card into the onboard SD card slot, put the "
+"card to restore onto into the USB writer and repeat the copy process above.\n"
+"\n"
+"You can also back up to a standard USB stick, and then restore from the USB "
+"stick to an SD card by setting the “Copy From Device” drop-down to the USB "
+"stick and the “Copy To Device” to a USB card writer containing the card to "
+"restore onto.\n"
+"\n"
+"Note that you cannot copy onto the SD card from which your Pi is currently "
+"booted, which is why it does not appear in the “Copy To Device” dropdown.\n"
+"\n"
+"Note also that the destination card doesn’t need to be the same size as the "
+"source card, but it must have enough space to hold all the data that is on "
+"it. The application will warn you if there is insufficient space on the "
+"destination.\n"
+"\n"
+"Under Raspbian Stretch and later versions, you cannot mount two partitions "
+"with the same UUID, so you will not be able to mount a cloned SD card when "
+"booted from the disk from which it was cloned. If you need to do this, check "
+"the \"New Partition UUIDs\" box before copying.\n"
+msgstr ""
+"SD 카드 복사기 v1.0\n"
+"\n"
+"SD 카드를 복사 및 백업하는 애플리케이션입니다. 사용하려면 USB SD 카드 라이터"
+"가 필요합니다.\n"
+"\n"
+"라즈베리 파이(Raspberry Pi)의 내부 SD 카드를 백업하려면 USB 카드 라이터에 빈 "
+"SD 카드를 삽입하고 장치에 연결합니다. 그런 다음 응용 프로그램을 시작하고 드롭"
+"다운 상자에서 \"장치로 복사\"를 선택한 다음 \"시작\"을 누릅니다. 복사는 카드 "
+"크기에 따라 10-15분 정도 소요됩니다.\n"
+"\n"
+"결과 카드는 기존 카드의 부팅 가능한 복사본이어야 합니다. 복원하려면 백업 카드"
+"를 온보드 SD 카드 슬롯에 넣고 복원할 카드를 USB 라이터에 넣은 다음 위의 복사 "
+"과정을 반복하면 됩니다.\n"
+"\n"
+"표준 USB 스틱으로 백업한 다음 \"장치에서 복사\" 드롭다운을 USB 스틱으로 설정"
+"하고 \"장치로 복사\"를 USB 카드 리더로 설정하여 USB 스틱에서 SD 카드로 복원"
+"할 수도 있습니다.\n"
+"\n"
+"현재 부팅된 SD 카드에는 복사할 수 없으므로 \"장치로 복사\" 드롭다운에 표시되"
+"지 않습니다.\n"
+"\n"
+"또한 대상 카드의 크기가 원본 카드와 같을 필요는 없지만 모든 데이터를 저장할 "
+"수 있는 충분한 공간이 있어야 합니다. 대상에 공간이 충분하지 않으면 프로그램에"
+"서 경고할 것입니다.\n"
+"\n"
+"라즈비안 스트레치(Raspbian Stretch) 및 이후 버전에서는 동일한 UUID로 두 개의 "
+"파티션을 마운트할 수 없으므로 부팅할 때 원본 SD 카드가 부팅된 장치에서 복제"
+"된 SD 카드를 마운트할 수 없습니다. 이 작업을 수행해야 하는 경우 복사하기 전"
+"에 \"새 파티션 UUID\" 상자를 선택하십시오.\n"
+
+#: ../data/piclone.ui.h:26
+msgid "SD Card Copier Help"
+msgstr "SD 카드 복사기 도움말"
+
+#: ../data/piclone.desktop.in.h:2
+msgid "Make a copy of the Raspbian SD card"
+msgstr "라즈비안(Raspbian) SD 카드의 복사본 만들기"
+
+#: ../data/pwdpic.sh:6
+msgid "Password Required"
+msgstr "비밀번호 필요"
