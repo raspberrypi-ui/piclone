@@ -1,0 +1,261 @@
+# Italian translations for piclone package.
+# Copyright (C) 2021 Raspberry Pi
+# This file is distributed under the same license as the piclone package.
+# Emanuele Goldoni <emanuele.goldoni@gmail.com>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-08-14 09:13+0200\n"
+"PO-Revision-Date: 2021-08-14 09:47+0200\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.4.1\n"
+"Last-Translator: Emanuele Goldoni <emanuele.goldoni@gmail.com>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: it\n"
+
+#: ../src/piclone.c:89 ../src/piclone.c:811
+msgid "Drives changed - copy aborted"
+msgstr "Dispositivi cambiati - copia annullata"
+
+#: ../src/piclone.c:166 ../src/piclone.c:812
+msgid "OK"
+msgstr "OK"
+
+#: ../src/piclone.c:252
+msgid "Unable to read source."
+msgstr "Impossibile leggere la sorgente."
+
+#: ../src/piclone.c:258
+msgid "Non-MSDOS partition table on source."
+msgstr "Tabella delle partizioni non-MSDOS sulla sorgente."
+
+#: ../src/piclone.c:265
+msgid "Preparing target..."
+msgstr "Preparazione della destinazione..."
+
+#: ../src/piclone.c:278
+msgid "Could not write to destination."
+msgstr "Impossibile scrivere sulla destinazione."
+
+#: ../src/piclone.c:292
+msgid "Could not create FAT."
+msgstr "Impossibile creare la FAT."
+
+#: ../src/piclone.c:298
+msgid "Reading partitions..."
+msgstr "Lettura delle partizioni..."
+
+#: ../src/piclone.c:313
+msgid "Too many partitions on source."
+msgstr "Troppe partizioni sulla sorgente."
+
+#: ../src/piclone.c:325
+msgid "Preparing partitions..."
+msgstr "Preparazione delle partizioni..."
+
+#: ../src/piclone.c:336 ../src/piclone.c:347 ../src/piclone.c:356
+msgid "Could not create partition."
+msgstr "Impossibile creare la partizione."
+
+#: ../src/piclone.c:421 ../src/piclone.c:427 ../src/piclone.c:449
+#: ../src/piclone.c:455
+msgid "Could not create file system."
+msgstr "Impossibile creare il file system."
+
+#: ../src/piclone.c:479
+#, c-format
+msgid "Copying partition %d of %d..."
+msgstr "Copia della partizione %d di %d..."
+
+#: ../src/piclone.c:489 ../src/piclone.c:495
+msgid "Could not mount partition."
+msgstr "Impossibile montare la partizione."
+
+#: ../src/piclone.c:513
+msgid "Insufficient space. Backup aborted."
+msgstr "Spazio insufficiente. Backup annullato."
+
+#: ../src/piclone.c:554 ../src/piclone.c:560
+msgid "Could not unmount partition."
+msgstr "Impossibile smontare la partizione."
+
+#: ../src/piclone.c:571 ../src/piclone.c:579
+msgid "Could not set flags."
+msgstr "Impossibile impostare i flag."
+
+#: ../src/piclone.c:586
+msgid "Copy complete."
+msgstr "Copia completa."
+
+#: ../src/piclone.c:624
+msgid "Cancelling..."
+msgstr "Annullamento..."
+
+#: ../src/piclone.c:667
+msgid "Checking source..."
+msgstr "Verifica della sorgente..."
+
+#: ../src/piclone.c:734
+#, c-format
+msgid "This will erase all content on the device '%s'. Are you sure?"
+msgstr "Tutti i dati sul dispositivo «%s» verranno cancellati. Proseguire?"
+
+#: ../src/piclone.c:743
+msgid "_No"
+msgstr "_No"
+
+#: ../src/piclone.c:747
+msgid "_Yes"
+msgstr "_Sì"
+
+#: ../src/piclone.c:794 ../src/piclone.c:868
+msgid "No devices available"
+msgstr "Nessun dispositivo disponibile"
+
+#: ../src/piclone.c:821
+msgid "Drives changed - cancelling..."
+msgstr "I dispositivi sono cambiati - annullamento..."
+
+#. End of file
+#. ===========================================================================
+#: ../data/piclone.ui.h:1 ../data/piclone.desktop.in.h:1
+msgid "SD Card Copier"
+msgstr "SD Card Copier"
+
+#: ../data/piclone.ui.h:2
+msgid "Select the device from which to copy"
+msgstr "Selezionare il dispositivo dal quale copiare"
+
+#: ../data/piclone.ui.h:3
+msgid "Copy From Device:"
+msgstr "Copia dal dispositivo:"
+
+#: ../data/piclone.ui.h:4
+msgid "Select the device to copy from"
+msgstr "Selezionare il dispositivo sorgente"
+
+#: ../data/piclone.ui.h:5
+msgid "Select the device to which to copy"
+msgstr "Selezionare il dispositivo sul quale copiare"
+
+#: ../data/piclone.ui.h:6
+msgid "Copy To Device:"
+msgstr "Copia al dispositivo:"
+
+#: ../data/piclone.ui.h:7
+msgid "Select the device to copy to"
+msgstr "Selezionare il dispositivo di destinazione"
+
+#: ../data/piclone.ui.h:8
+msgid "New Partition UUIDs"
+msgstr "Nuovi UUID delle partizioni"
+
+#: ../data/piclone.ui.h:9
+msgid "Check this box to create new partition UUIDs on the copy"
+msgstr ""
+"Spuntare questa caselle per creare nuovi UUID delle partizioni durante la "
+"copia"
+
+#: ../data/piclone.ui.h:10
+msgid "Start"
+msgstr "Avvio"
+
+#: ../data/piclone.ui.h:11
+msgid "label"
+msgstr "etichetta"
+
+#: ../data/piclone.ui.h:12
+msgid "_Cancel"
+msgstr "_Annulla"
+
+#: ../data/piclone.ui.h:13
+msgid "_OK"
+msgstr "_OK"
+
+#: ../data/piclone.ui.h:14
+msgid ""
+"SD Card Copier v1.0\n"
+"\n"
+"This is an application to copy and back up SD cards. To use it, you will "
+"need a USB SD card writer.\n"
+"\n"
+"To back up your Raspberry Pi's internal SD card, insert a blank SD card into "
+"a USB card writer and connect it to your Pi. Then start the application, "
+"choose your card writer from the “Copy To Device” drop-down box and press "
+"“Start”. The copy process will take 10-15 minutes depending on the size of "
+"your card.\n"
+"\n"
+"The resulting card should be a bootable copy of your existing card; to "
+"restore, simply place the backup card into the onboard SD card slot, put the "
+"card to restore onto into the USB writer and repeat the copy process above.\n"
+"\n"
+"You can also back up to a standard USB stick, and then restore from the USB "
+"stick to an SD card by setting the “Copy From Device” drop-down to the USB "
+"stick and the “Copy To Device” to a USB card writer containing the card to "
+"restore onto.\n"
+"\n"
+"Note that you cannot copy onto the SD card from which your Pi is currently "
+"booted, which is why it does not appear in the “Copy To Device” dropdown.\n"
+"\n"
+"Note also that the destination card doesn’t need to be the same size as the "
+"source card, but it must have enough space to hold all the data that is on "
+"it. The application will warn you if there is insufficient space on the "
+"destination.\n"
+"\n"
+"Under Raspbian Stretch and later versions, you cannot mount two partitions "
+"with the same UUID, so you will not be able to mount a cloned SD card when "
+"booted from the disk from which it was cloned. If you need to do this, check "
+"the \"New Partition UUIDs\" box before copying.\n"
+msgstr ""
+"SD Card Copier v1.0\n"
+"\n"
+"Questa è un'applicazione per copiare e salvare schede SD. Per utilizzarla è "
+"necessario un lettore USB di schede SD.\n"
+"\n"
+"Per fare il backup della scheda SD interna del Raspberry Pi, inserire una "
+"scheda SD vuota in un lettore USB e collegarla al Pi. Poi avviare "
+"l'applicazione, scegliere il lettore esterno dal menu a tendina «Copia sul "
+"dispositivo» e premere «Avvia». Il processo di copia richiederà 10-15 minuti "
+"a seconda della dimensione della scheda.\n"
+"\n"
+"La scheda risultante dovrebbe essere una copia avviabile della scheda "
+"esistente; per ripristinare il backup, inserire semplicemente la scheda di "
+"backup nello slot SD del Pi, mettere la scheda da ripristinare nel lettore "
+"USB e ripetere il processo di copia di cui sopra.\n"
+"\n"
+"E' possibile anche fare il backup su una chiavetta USB, e poi ripristinare "
+"dalla chiavetta USB a una scheda SD impostando la chiavetta USB nel menu a "
+"tendina «Copia dal dispositivo» e un lettore USB contenente la scheda su cui "
+"ripristinare in «Copia al dispositivo».\n"
+"\n"
+"Si noti che non è possibile copiare sulla scheda SD con cui il Pi è "
+"attualmente avviato; per questo motivo essa non appare nel menu a tendina "
+"«Copia dal dispositivo».\n"
+"\n"
+"Si noti anche che la scheda di destinazione non ha bisogno di essere della "
+"stessa dimensione della scheda sorgente, ma deve avere abbastanza spazio per "
+"contenere tutti i dati che sono su di essa. L'applicazione avviserà se lo "
+"spazio sulla destinazione è insufficiente.\n"
+"\n"
+"In Raspbian Stretch e versioni successive, non è possibile montare due "
+"partizioni con lo stesso UUID, quindi non sarà possibile montare una scheda "
+"SD clonata quando si avvia dal disco da cui è stata clonata. Se dovesse "
+"essere necessario, spuntare la casella «Nuovi UUID delle partizioni» prima "
+"di copiare.\n"
+
+#: ../data/piclone.ui.h:30
+msgid "SD Card Copier Help"
+msgstr "Aiuto di SD Card Copier"
+
+#: ../data/piclone.desktop.in.h:2
+msgid "Make a copy of the Raspbian SD card"
+msgstr "Crea una copia della scheda SD Raspbian"
+
+#: ../data/pwdpic.sh:6
+msgid "Password Required"
+msgstr "Password necessaria"
