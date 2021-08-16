@@ -1,3 +1,9 @@
+piclone (0.23) bullseye; urgency=medium
+
+  * Added Italian translation
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 16 Aug 2021 10:34:05 +0100
+
 piclone (0.22) bullseye; urgency=medium
 
   * Korean translation added
