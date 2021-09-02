@@ -1,3 +1,9 @@
+piclone (0.24) bullseye; urgency=medium
+
+  * Add call to lxplug-ejecter external eject command at end
+
+ -- Simon Long <simon@raspberrypi.com>  Thu, 02 Sep 2021 12:06:59 +0100
+
 piclone (0.23) bullseye; urgency=medium
 
   * Added Italian translation

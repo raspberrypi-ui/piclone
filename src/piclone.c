@@ -583,6 +583,7 @@ static gpointer backup_thread (gpointer data)
         CANCEL_CHECK;
     }
 
+    sys_printf ("lxpanelctl command ejecter %s", dst_dev);
     terminate_dialog (_("Copy complete."));
     return NULL;
 }
