@@ -1,4 +1,4 @@
-# English translations for piclone package.
+# Armenian translations for piclone package.
 # Copyright (C) 2017 Raspberry Pi
 # This file is distributed under the same license as the piclone package.
 # Simon Long <simon@raspberrypi.org>, 2017.
@@ -9,9 +9,9 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-06-15 18:37+0100\n"
 "PO-Revision-Date: 2017-07-18 08:19+0100\n"
-"Last-Translator: Simon Long <simon@raspberrypi.org>\n"
-"Language-Team: English (British)\n"
-"Language: en_GB\n"
+"Last-Translator: Avag Sayan <info@armath.am>\n"
+"Language-Team: Armenian\n"
+"Language: hy\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,159 +19,159 @@ msgstr ""
 
 #: ../src/piclone.c:89 ../src/piclone.c:793
 msgid "Drives changed - copy aborted"
-msgstr "Drives changed - copy aborted"
+msgstr "Սարքը տեղում չէ- պատճենումը դադարեցվեց"
 
 #: ../src/piclone.c:163 ../src/piclone.c:794
 msgid "OK"
-msgstr "OK"
+msgstr "Լավ"
 
 #: ../src/piclone.c:216
 msgid "Unable to read source."
-msgstr "Unable to read source."
+msgstr "Հնարավոր չէ ընթերցել աղբյուրը։"
 
 #: ../src/piclone.c:222
 msgid "Non-MSDOS partition table on source."
-msgstr "Non MS-DOS partition table on source."
+msgstr "Սկավառակի ոչ MS-DOS հատորի աղյուսակը"
 
 #: ../src/piclone.c:229
 msgid "Preparing target..."
-msgstr "Preparing target..."
+msgstr "Թիրախի նախապատրաստում..."
 
 #: ../src/piclone.c:242
 msgid "Could not write to destination."
-msgstr "Could not write to destination."
+msgstr "Չհաջողվեց գրառել նպատակակետը։"
 
 #: ../src/piclone.c:256
 msgid "Could not create FAT."
-msgstr "Could not create FAT."
+msgstr "Չհաջողվեց ստեղծել FAT -ը"
 
 #: ../src/piclone.c:262
 msgid "Reading partitions..."
-msgstr "Reading partitions..."
+msgstr "Հատորների ընթերցում..."
 
 #: ../src/piclone.c:277
 msgid "Too many partitions on source."
-msgstr "Too many partitions on source."
+msgstr "Սարքի վրա առկա է սահմանվածից շատ հատորներ"
 
 #: ../src/piclone.c:289
 msgid "Preparing partitions..."
-msgstr "Preparing partitions..."
+msgstr "Հատորների նախապատրաստում..."
 
 #: ../src/piclone.c:300 ../src/piclone.c:311 ../src/piclone.c:320
 msgid "Could not create partition."
-msgstr "Could not create partition."
+msgstr "Չկարողացավ ստեղծել հատորը։"
 
 #: ../src/piclone.c:385 ../src/piclone.c:391 ../src/piclone.c:413
 #: ../src/piclone.c:419
 msgid "Could not create file system."
-msgstr "Could not create file system."
+msgstr "Չհաջողվեց ստեղծել նիշային համակարգը"
 
 #: ../src/piclone.c:443
 #, c-format
 msgid "Copying partition %d of %d..."
-msgstr "Copying partition %d of %d..."
+msgstr "Հատորի պատճենում՝ %d -ն %d -ի..."
 
 #: ../src/piclone.c:453 ../src/piclone.c:459
 msgid "Could not mount partition."
-msgstr "Could not mount partition."
+msgstr "Չհաջողվեց տեղակայել հատորը"
 
 #: ../src/piclone.c:477
 msgid "Insufficient space. Backup aborted."
-msgstr "Insufficient space. Backup aborted."
+msgstr "Անբավարար տարածք։ Պահուստավորումը դադարեցվեց։"
 
 #: ../src/piclone.c:518 ../src/piclone.c:524
 msgid "Could not unmount partition."
-msgstr "Could not unmount partition."
+msgstr "Չհաջողվեց ապատեղակայել հատորը"
 
 #: ../src/piclone.c:535 ../src/piclone.c:543
 msgid "Could not set flags."
-msgstr "Could not set flags."
+msgstr "Չհաջողվեց սահմանել դրոշակները"
 
 #: ../src/piclone.c:550
 msgid "Copy complete."
-msgstr "Copy complete."
+msgstr "Պատճենումը ավարտվեց"
 
 #: ../src/piclone.c:593
 msgid "Cancelling..."
-msgstr "Cancelling..."
+msgstr "Չեղարկում..."
 
 #. add message
 #: ../src/piclone.c:641
 msgid "Checking source..."
-msgstr "Checking source..."
+msgstr "Աղբյուրի ստուգում..."
 
 #. add cancel button
 #: ../src/piclone.c:651
 msgid "Cancel"
-msgstr "Cancel"
+msgstr "Չեղարկել"
 
 #: ../src/piclone.c:726
 #, c-format
 msgid "This will erase all content on the device '%s'. Are you sure?"
-msgstr "This will erase all content on the device '%s'. Are you sure?"
+msgstr "Սա կջնջի '%s' սարքի ամբողջ բովանդակությունը. Իրո՞ք ցանկանում եք"
 
 #. add buttons
 #: ../src/piclone.c:734
 msgid "No"
-msgstr "No"
+msgstr "Ոչ"
 
 #: ../src/piclone.c:738
 msgid "Yes"
-msgstr "Yes"
+msgstr "Այո"
 
 #: ../src/piclone.c:776 ../src/piclone.c:850
 msgid "No devices available"
-msgstr "No devices available"
+msgstr "Հասանելի սարքեր առկա չեն"
 
 #: ../src/piclone.c:803
 msgid "Drives changed - cancelling..."
-msgstr "Drives changed - cancelling..."
+msgstr "Սարքը տեղում չէ - չեղարկում..."
 
 #: ../src/piclone.c:900
 msgid "Select the device to copy from"
-msgstr "Select the device to copy from"
+msgstr "Ընտրել սարքը, ոպես պատճենման աղբյուր"
 
 #: ../src/piclone.c:908
 msgid "Select the device to copy to"
-msgstr "Select the device to copy to"
+msgstr "Ընտրել սարքը, որպես պատճենման նպատակակետ"
 
 #. End of file
 #. ===========================================================================
 #: ../data/piclone.ui.h:1 ../data/piclone.desktop.in.h:1
 msgid "SD Card Copier"
-msgstr "SD Card Copier"
+msgstr "SD կլոնավորում"
 
 #: ../data/piclone.ui.h:2
 msgid "Help"
-msgstr "Help"
+msgstr "Օգնություն"
 
 #: ../data/piclone.ui.h:3
 msgid "Start"
-msgstr "Start"
+msgstr "Մեկնարկ"
 
 #: ../data/piclone.ui.h:4
 msgid "Copy From Device:"
-msgstr "Copy From Device:"
+msgstr "Պատճենել հետևյալ սարքից՝"
 
 #: ../data/piclone.ui.h:5
 msgid "Select the device from which to copy"
-msgstr "Select the device from which to copy"
+msgstr "Ընտրեք սարքը, որից պետք է պատճենել"
 
 #: ../data/piclone.ui.h:6
 msgid "Copy To Device:"
-msgstr "Copy To Device:"
+msgstr "Պատճենել հետևյալ սարքի վրա՝"
 
 #: ../data/piclone.ui.h:7
 msgid "Select the device to which to copy"
-msgstr "Select the device to which to copy"
+msgstr "Ընտրեք սարքը, որի վրա պետք է պատճենել"
 
 #: ../data/piclone.ui.h:8
 msgid "New Partition UUIDs"
-msgstr "New Partition UUIDs"
+msgstr "Նոր Հատոր UUIDs"
 
 #: ../data/piclone.ui.h:9
 msgid "Check this box to create new partition UUIDs on the copy"
-msgstr "Tick this box to create new partition UUIDs on the copy"
+msgstr "Նոր UUIDs հատորի պատճենը ստեղծելու համար նշեք այս վանդակը"
 
 #: ../data/piclone.ui.h:10
 msgid ""
@@ -208,26 +208,26 @@ msgid ""
 "booted from the disk from which it was cloned. If you need to do this, check "
 "the \"New Partition UUIDs\" box before copying.\n"
 msgstr ""
-"SD Card Copier\n"
+"SD կլոնավորում\n"
 "\n"
-"This is an application to copy and back up SD cards. To use it, you will "
-"need a USB SD card writer.\n"
+"Սա SD կրիչի կլոնավորման և պահուստավորման ծրագիր է։ Այն օգտագործելու համար "
+"անհրաժեշտ է USB SD կրիչ գրառող սարք։\n"
 "\n"
-"To back up your Raspberry Pi's internal SD card, insert a blank SD card into "
-"a USB card writer connected to the Raspberry Pi. Then choose the internal SD "
-"card (labelled as '/dev/mmcblk0') from the “Copy From Device” drop-down box, "
-"choose your card writer from the “Copy To Device” drop-down box and press "
-"“Start”. The copy process will take 10-15 minutes depending on the size of "
-"your card.\n"
+"Raspberry Pi-ի ներքին կրիչը պահուստավորելու համար, տեղադրեք դատարկ SD կրիչը "
+"USB գրառման սարքի մեջ և միացրեք Raspberry Pi-ին։ Ապա ընտրեք ներքին SD կրիչը "
+"(պիտակավորված է լինում, որպես '/dev/mmcblk0') «Պատճենել սարքից»-ի միջոցով ընտրացանկից, "
+"ընտրել կրիչի գրառման սարքը «Պատճենել սարքի վրա» ընտրացանկից և սեղմել "
+"«Մեկնարկ»։ Պատճենումը կտևի մոտ 10-15 րոպե կախված ձեր համակարգի "
+"ծավալից։\n"
 "\n"
-"The resulting card should be a bootable copy of your existing card; to "
-"restore, simply place the backup card into the onboard SD card slot, put the "
-"card to restore onto into the USB writer and repeat the copy process above.\n"
+"Արդյունքում ստացված քարտը պետք է լինի ձեր առկա քարտի պատճենը։ վերականգնելու համար "
+"ուղարկի անհրաժեշտ է տեղադրել պահուստային կրիչը և գրառել այնպես, ինչպես ստեղծել ենք "
+"պահուստային կրիչւ\n"
 "\n"
-"You can also back up to a standard USB stick, and then restore from the USB "
-"stick to an SD card by setting the “Copy From Device” drop-down to the USB "
-"stick and the “Copy To Device” to a USB card writer containing the card to "
-"restore onto.\n"
+"Կարող եք նաև պահուստավորել սովորական USB սարքը, և ապա վերականգնել USB -ից "
+" "
+" "
+"\n"
 "\n"
 "Note that you cannot copy onto the SD card from which your Raspberry Pi is "
 "booted, which is why it does not appear in the “Copy To Device” dropdown.\n"
@@ -244,12 +244,12 @@ msgstr ""
 
 #: ../data/piclone.ui.h:26
 msgid "SD Card Copier Help"
-msgstr "SD Card Copier Help"
+msgstr "SD կլոնավորման օգնություն"
 
 #: ../data/piclone.desktop.in.h:2
 msgid "Make a copy of the Raspbian SD card"
-msgstr "Copy SD cards and USB devices"
+msgstr "Պատճենել SD կրիչներ և USB սարքեր"
 
 #: ../data/pwdpic.sh:6
 msgid "Password Required"
-msgstr "Password Required"
+msgstr "Պահանւում է գաղտնաբառի մուտքագրում"

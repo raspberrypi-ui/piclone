@@ -64,7 +64,7 @@ partition_t parts[MAXPART];
 GVolumeMonitor *monitor;
 
 /* control widget globals */
-static GtkWidget *main_dlg, *msg_dlg, *status, *progress, *cancel, *to_cb, *from_cb, *start_btn, *help_btn, *cpuidcheck;
+static GtkWidget *main_dlg, *msg_dlg, *status, *no, *yes, *progress, *cancel, *to_cb, *from_cb, *start_btn, *help_btn, *close_btn, *cpuidcheck;
 
 /* combo box counters */
 int src_count, dst_count;
@@ -86,7 +86,16 @@ char ended;
 
 /* flag to show that backup has been cancelled by the user */
 char cancelled;
-#define CANCEL_CHECK if (cancelled) { g_idle_add (close_msg, NULL); return NULL; }
+#define CANCEL_CHECK if (cancelled) { if (cancelled == 1) g_idle_add (close_msg, NULL); else terminate_dialog (_("Drives changed - copy aborted")); return NULL; }
+
+/* flag to show state - inactive, confirm prompt or cloning */
+typedef enum {
+    STATE_IDLE,
+    STATE_CONF,
+    STATE_COPY
+} state_t;
+
+state_t state;
 
 /*---------------------------------------------------------------------------*/
 /* Function definitions */
@@ -150,12 +159,20 @@ static gboolean close_msg (gpointer data)
 
 /* Update the progress dialog with a message to show that backup has ended */
 
-static void terminate_dialog (char *msg)
+static gboolean cb_terminate (gpointer data)
 {
     gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 1.0);
-    gtk_label_set_text (GTK_LABEL (status), msg);
+    gtk_label_set_text (GTK_LABEL (status), (char *) data);
     gtk_button_set_label (GTK_BUTTON (cancel), _("OK"));
+    gtk_widget_set_sensitive (GTK_WIDGET (cancel), TRUE);
+    return FALSE;
+}
+
+static void terminate_dialog (char *msg)
+{
     ended = 1;
+    state = STATE_IDLE;
+    gdk_threads_add_idle (cb_terminate, msg);
 }
 
 
@@ -163,13 +180,40 @@ static void terminate_dialog (char *msg)
 
 static char *partition_name (char *device, char *buffer)
 {
-    if (!strncmp (device, "/dev/mmcblk", 11))
+    if (!strncmp (device, "/dev/mmcblk", 11) || !strncmp (device, "/dev/nvme", 9))
         sprintf (buffer, "%sp", device);
     else
         sprintf (buffer, "%s", device);
     return buffer;
 }
 
+/* Callbacks to main thread to update UI */
+
+static gboolean cb_update_progress (gpointer data)
+{
+    float *fptr = (float *) &data;
+    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), *fptr);
+    return FALSE;
+}
+
+static void update_progress (float prog)
+{
+    void *ptr;
+    float *fptr = (float *) &ptr;
+    *fptr = prog;
+    gdk_threads_add_idle (cb_update_progress, ptr);
+}
+
+static gboolean cb_update_label (gpointer data)
+{
+    gtk_label_set_text (GTK_LABEL (status), (char *) data);
+    return FALSE;
+}
+
+static void update_label (char *msg)
+{
+    gdk_threads_add_idle (cb_update_label, msg);
+}
 
 /*---------------------------------------------------------------------------*/
 /* Threads */
@@ -217,9 +261,9 @@ static gpointer backup_thread (gpointer data)
     else
     CANCEL_CHECK;
 
-    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 1.0);
-    gtk_label_set_text (GTK_LABEL (status), _("Preparing target..."));
-    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 0.0);
+    update_progress (1.0);
+    update_label (_("Preparing target..."));
+    update_progress (0.0);
 
     // unmount any partitions on the target device
     for (n = 9; n >= 1; n--)
@@ -250,9 +294,9 @@ static gpointer backup_thread (gpointer data)
     }
     CANCEL_CHECK;
 
-    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 1.0);
-    gtk_label_set_text (GTK_LABEL (status), _("Reading partitions..."));
-    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 0.0);
+    update_progress (1.0);
+    update_label (_("Reading partitions..."));
+    update_progress (0.0);
 
     // read in the source partition table
     n = 0;
@@ -277,9 +321,9 @@ static gpointer backup_thread (gpointer data)
     }
     CANCEL_CHECK;
 
-    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 1.0);
-    gtk_label_set_text (GTK_LABEL (status), _("Preparing partitions..."));
-    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 0.0);
+    update_progress (1.0);
+    update_label (_("Preparing partitions..."));
+    update_progress (0.0);
     
     // recreate the partitions on the target
     for (p = 0; p < n; p++)
@@ -423,7 +467,7 @@ static gpointer backup_thread (gpointer data)
 
         prog = p + 1;
         prog /= n;
-        gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), prog);
+        update_progress (prog);
     }
 
     // do the copy for each partition
@@ -433,8 +477,8 @@ static gpointer backup_thread (gpointer data)
         if (strcmp (parts[p].ptype, "extended"))
         {
             sprintf (buffer, _("Copying partition %d of %d..."), p + 1, n);
-            gtk_label_set_text (GTK_LABEL (status), buffer);
-            gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 0.0);
+            update_label (buffer);
+            update_progress (0.0);
 
             // belt-and-braces call to partprobe to make sure devices are found...
             get_string ("partprobe", res);
@@ -489,12 +533,12 @@ static gpointer backup_thread (gpointer data)
                 sscanf (res, "%ld", &dstsz);
                 prog = dstsz;
                 prog /= srcsz;
-                gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), prog);
+                update_progress (prog);
                 sleep (stime);
                 CANCEL_CHECK;
             }
 
-            gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 1.0);
+            update_progress (1.0);
 
             // fix up relevant files if changing partition UUID
             if (puid && new_uuid)
@@ -539,6 +583,7 @@ static gpointer backup_thread (gpointer data)
         CANCEL_CHECK;
     }
 
+    sys_printf ("lxpanelctl command ejecter %s", dst_dev);
     terminate_dialog (_("Copy complete."));
     return NULL;
 }
@@ -547,26 +592,12 @@ static gpointer backup_thread (gpointer data)
 /*---------------------------------------------------------------------------*/
 /* Progress dialog UI handlers */
 
-/* Handler for cancel button */
-
-static void on_cancel (void)
+static void kill_copy (void)
 {
     FILE *fp;
     char buffer[256];
     int pid;
 
-    if (ended)
-    {
-        g_idle_add (close_msg, NULL);
-        return;
-    }
-
-    // hide the progress bar and disable the cancel button
-    gtk_progress_bar_pulse (GTK_PROGRESS_BAR (progress));
-    gtk_label_set_text (GTK_LABEL (status), "Cancelling...");
-    gtk_widget_set_sensitive (GTK_WIDGET (cancel), FALSE);
-
-    // kill copy processes if running
     if (copying)
     {
         sprintf (buffer, "ps ax | grep \"cp -ax %s/. %s/.\" | grep -v \"grep\"", src_mnt, dst_mnt);
@@ -582,7 +613,35 @@ static void on_cancel (void)
         }
         copying = 0;
     }
+}
+
+/* Handler for cancel button */
+
+
+static gboolean cb_cancel (gpointer data)
+{
+    // hide the progress bar and disable the cancel button
+    gtk_progress_bar_pulse (GTK_PROGRESS_BAR (progress));
+    gtk_label_set_text (GTK_LABEL (status), _("Cancelling..."));
+    gtk_widget_set_sensitive (GTK_WIDGET (cancel), FALSE);
+    return FALSE;
+}
+
+static gboolean on_cancel (void)
+{
+    if (ended)
+    {
+        g_idle_add (close_msg, NULL);
+        return FALSE;
+    }
+
+    gdk_threads_add_idle (cb_cancel, NULL);
+
+    // kill copy processes if running
+    kill_copy ();
     cancelled = 1;
+    state = STATE_IDLE;
+    return FALSE;
 }
 
 
@@ -591,66 +650,50 @@ static void on_cancel (void)
 
 /* Handler for Yes button */
 
-static void on_start (void)
+static gboolean on_start (void)
 {
-    GdkColor col;
+    GtkBuilder *builder;
+    GtkWidget *wid;
 
     // close the confirm dialog
     gtk_widget_destroy (msg_dlg);
+    state = STATE_COPY;
 
-    // create the progress dialog
-    msg_dlg = (GtkWidget *) gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title (GTK_WINDOW (msg_dlg), "");
-    gtk_window_set_modal (GTK_WINDOW (msg_dlg), TRUE);
-    gtk_window_set_decorated (GTK_WINDOW (msg_dlg), FALSE);
-    gtk_window_set_destroy_with_parent (GTK_WINDOW (msg_dlg), TRUE);
-    gtk_window_set_skip_taskbar_hint (GTK_WINDOW (msg_dlg), TRUE);
+    builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/piclone.ui");
+    msg_dlg = (GtkWidget *) gtk_builder_get_object (builder, "modal");
     gtk_window_set_transient_for (GTK_WINDOW (msg_dlg), GTK_WINDOW (main_dlg));
-    gtk_window_set_position (GTK_WINDOW (msg_dlg), GTK_WIN_POS_CENTER_ON_PARENT);
-
-    // add border
-    GtkWidget *frame = gtk_frame_new (NULL);
-    gtk_container_add (GTK_CONTAINER (msg_dlg), frame);
-
-    GtkWidget *eb = gtk_event_box_new ();
-    gtk_container_add (GTK_CONTAINER (frame), eb);
-    gdk_color_parse ("#FFFFFF", &col);
-    gtk_widget_modify_bg (eb, GTK_STATE_NORMAL, &col);
-
-    // add container
-    GtkWidget *box = (GtkWidget *) gtk_vbox_new (TRUE, 5);
-    gtk_container_set_border_width (GTK_CONTAINER (box), 10);
-    gtk_container_add (GTK_CONTAINER (eb), box);
 
     // add message
-    status = (GtkWidget *) gtk_label_new (_("Checking source..."));
-    gtk_label_set_width_chars (GTK_LABEL (status), 30);
-    gtk_box_pack_start (GTK_BOX (box), status, FALSE, FALSE, 5);
+    status = (GtkWidget *) gtk_builder_get_object (builder, "modal_msg");
+    gtk_label_set_text (GTK_LABEL (status), _("Checking source..."));
 
     // add progress bar
-    progress = (GtkWidget *) gtk_progress_bar_new ();
-    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), 0.0);
-    gtk_box_pack_start (GTK_BOX (box), progress, FALSE, FALSE, 5);
+    progress = (GtkWidget *) gtk_builder_get_object (builder, "modal_pb");
 
     // add cancel button
-    cancel = (GtkWidget *) gtk_button_new_with_label (_("Cancel"));
-    gtk_box_pack_start (GTK_BOX (box), cancel, FALSE, FALSE, 5);
+    cancel = (GtkWidget *) gtk_builder_get_object (builder, "modal_cancel");
     g_signal_connect (cancel, "clicked", G_CALLBACK (on_cancel), NULL);
 
-    gtk_widget_show_all (GTK_WIDGET (msg_dlg));
+    wid = (GtkWidget *) gtk_builder_get_object (builder, "modal_ok");
+    gtk_widget_hide (wid);
+
+    gtk_widget_show (GTK_WIDGET (msg_dlg));
 
     // launch a thread with the system call to run the backup
     cancelled = 0;
     ended = 0;
     g_thread_new (NULL, backup_thread, NULL);
+    return FALSE;
 }
 
 
 /* Handler for No button */
 
-static void on_close (void)
+static gboolean on_close (void)
 {
     gtk_widget_destroy (msg_dlg);
+    state = STATE_IDLE;
+    return FALSE;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -658,12 +701,13 @@ static void on_close (void)
 
 /* Handler for Start button */
 
-static void on_confirm (void)
+static gboolean on_confirm (void)
 {
     char buffer[256], res[256];
     char *src, *dst;
     int len;
-    GdkColor col;
+    GtkBuilder *builder;
+    GtkWidget *wid;
 
     // set up source and target devices from combobox values
     dst = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (to_cb));
@@ -678,71 +722,63 @@ static void on_confirm (void)
     new_uuid = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (cpuidcheck));
 
     // basic sanity check - don't do anything if src == dest
-    if (!strcmp (src_dev, dst_dev)) return;
+    if (!strcmp (src_dev, dst_dev)) return FALSE;
 
     // create the confirm dialog
-    msg_dlg = (GtkWidget *) gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title (GTK_WINDOW (msg_dlg), "");
-    gtk_window_set_modal (GTK_WINDOW (msg_dlg), TRUE);
-    gtk_window_set_decorated (GTK_WINDOW (msg_dlg), FALSE);
-    gtk_window_set_destroy_with_parent (GTK_WINDOW (msg_dlg), TRUE);
-    gtk_window_set_skip_taskbar_hint (GTK_WINDOW (msg_dlg), TRUE);
+    builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/piclone.ui");
+    msg_dlg = (GtkWidget *) gtk_builder_get_object (builder, "modal");
     gtk_window_set_transient_for (GTK_WINDOW (msg_dlg), GTK_WINDOW (main_dlg));
-    gtk_window_set_position (GTK_WINDOW (msg_dlg), GTK_WIN_POS_CENTER_ON_PARENT);
-
-    // add border
-    GtkWidget *frame = gtk_frame_new (NULL);
-    gtk_container_add (GTK_CONTAINER (msg_dlg), frame);
-
-    GtkWidget *eb = gtk_event_box_new ();
-    gtk_container_add (GTK_CONTAINER (frame), eb);
-    gdk_color_parse ("#FFFFFF", &col);
-    gtk_widget_modify_bg (eb, GTK_STATE_NORMAL, &col);
-
-    // add container
-    GtkWidget *box = (GtkWidget *) gtk_vbox_new (TRUE, 5);
-    gtk_container_set_border_width (GTK_CONTAINER (box), 10);
-    gtk_container_add (GTK_CONTAINER (eb), box);
 
     // add message
     len = strlen (dst);
     if (len >= 2) dst[len - 2] = 0;
     sprintf (buffer, _("This will erase all content on the device '%s'. Are you sure?"), dst);
-    GtkWidget* status = (GtkWidget *) gtk_label_new (buffer);
-    gtk_box_pack_start (GTK_BOX (box), status, FALSE, FALSE, 5);
+    status = (GtkWidget *) gtk_builder_get_object (builder, "modal_msg");
+    gtk_label_set_text (GTK_LABEL (status), buffer);
 
-    GtkWidget *hbox = gtk_hbox_new (TRUE, 10);
-    gtk_box_pack_start (GTK_BOX (box), hbox, FALSE, FALSE, 5);
+    wid = (GtkWidget *) gtk_builder_get_object (builder, "modal_pb");
+    gtk_widget_hide (wid);
 
     // add buttons
-    GtkWidget *no = (GtkWidget *) gtk_button_new_with_label (_("No"));
-    gtk_box_pack_start (GTK_BOX (hbox), no, FALSE, TRUE, 40);
+    no = (GtkWidget *) gtk_builder_get_object (builder, "modal_cancel");
+    gtk_button_set_label (GTK_BUTTON (no), _("_No"));
     g_signal_connect (no, "clicked", G_CALLBACK (on_close), NULL);
 
-    GtkWidget *yes = (GtkWidget *) gtk_button_new_with_label (_("Yes"));
-    gtk_box_pack_start (GTK_BOX (hbox), yes, FALSE, TRUE, 40);
+    yes = (GtkWidget *) gtk_builder_get_object (builder, "modal_ok");
+    gtk_button_set_label (GTK_BUTTON (yes), _("_Yes"));
     g_signal_connect (yes, "clicked", G_CALLBACK (on_start), NULL);
 
     g_free (src);
     g_free (dst);
 
-    gtk_widget_show_all (GTK_WIDGET (msg_dlg));
- }
+    gtk_widget_show (GTK_WIDGET (msg_dlg));
+    state = STATE_CONF;
+    return FALSE;
+}
 
 
 /* Handler for Help button */
 
-static void on_help (void)
+static gboolean on_help (void)
 {
     GtkBuilder *builder;
     GtkWidget *dlg;
 
-    builder = gtk_builder_new ();
-    gtk_builder_add_from_file (builder, PACKAGE_DATA_DIR "/piclone.ui", NULL);
-    dlg = (GtkWidget *) gtk_builder_get_object (builder, "dialog2");
+    builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/piclone.ui");
+    dlg = (GtkWidget *) gtk_builder_get_object (builder, "help");
     g_object_unref (builder);
     gtk_dialog_run (GTK_DIALOG (dlg));
     gtk_widget_destroy (dlg);
+    return FALSE;
+}
+
+
+/* Handler for Close button */
+
+static gboolean on_quit (void)
+{
+    gtk_main_quit ();
+    return FALSE;
 }
 
 
@@ -765,21 +801,42 @@ static void on_cb_changed (void)
 
 /* Handler for drives changed signal from volume monitor */
 
-static void on_drives_changed (void)
+static void on_drives_changed (GVolumeMonitor *volume_monitor, GDrive *drive, gpointer user_data)
 {
     char buffer[256], test[128];
     FILE *fp;
     int devlen;
 
+    if (state == STATE_CONF)
+    {
+        gtk_label_set_text (GTK_LABEL (status), _("Drives changed - copy aborted"));
+        gtk_button_set_label (GTK_BUTTON (no), _("OK"));
+        gtk_widget_hide (yes);
+        state = STATE_IDLE;
+    }
+
+    if (state == STATE_COPY && (int) user_data == 1)
+    {
+        // hide the progress bar and disable the cancel button
+        gtk_progress_bar_pulse (GTK_PROGRESS_BAR (progress));
+        gtk_label_set_text (GTK_LABEL (status), _("Drives changed - cancelling..."));
+        gtk_widget_set_sensitive (GTK_WIDGET (cancel), FALSE);
+
+        // kill copy processes if running
+        kill_copy ();
+        cancelled = 2;
+        state = STATE_IDLE;
+    }
+
     // empty the comboboxes
     while (src_count)
     {
-        gtk_combo_box_remove_text (GTK_COMBO_BOX (from_cb), 0);
+        gtk_combo_box_text_remove (GTK_COMBO_BOX_TEXT (from_cb), 0);
         src_count--;
     }
     while (dst_count)
     {
-        gtk_combo_box_remove_text (GTK_COMBO_BOX (to_cb), 0);
+        gtk_combo_box_text_remove (GTK_COMBO_BOX_TEXT (to_cb), 0);
         dst_count--;
     }
 
@@ -791,7 +848,7 @@ static void on_drives_changed (void)
         char *id = g_drive_get_identifier (d, "unix-device");
         char *n = g_drive_get_name (d);
         sprintf (buffer, "%s  (%s)", n, id);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (from_cb), buffer);
+        gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (from_cb), buffer);
         src_count++;
 
         // do not allow the current root and boot devices as targets
@@ -799,7 +856,7 @@ static void on_drives_changed (void)
         fp = popen (test, "r");
         if (fp && pclose (fp))
         {
-            gtk_combo_box_append_text (GTK_COMBO_BOX (to_cb), buffer);
+            gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (to_cb), buffer);
             dst_count++;
         }
         g_free (id);
@@ -809,7 +866,7 @@ static void on_drives_changed (void)
 
     if (dst_count == 0)
     {
-        gtk_combo_box_append_text (GTK_COMBO_BOX (to_cb), _("No devices available"));
+        gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (to_cb), _("No devices available"));
         gtk_combo_box_set_active (GTK_COMBO_BOX (to_cb), 0);
         gtk_widget_set_sensitive (GTK_WIDGET (to_cb), FALSE);
         dst_count++;
@@ -827,9 +884,9 @@ int main (int argc, char *argv[])
 
 #ifdef ENABLE_NLS
     setlocale (LC_ALL, "");
-    bindtextdomain ( GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR );
-    bind_textdomain_codeset ( GETTEXT_PACKAGE, "UTF-8" );
-    textdomain ( GETTEXT_PACKAGE );
+    bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
+    bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+    textdomain (GETTEXT_PACKAGE);
 #endif
 
     // GTK setup
@@ -837,20 +894,21 @@ int main (int argc, char *argv[])
     gtk_icon_theme_prepend_search_path (gtk_icon_theme_get_default(), PACKAGE_DATA_DIR);
 
     // build the UI
-    builder = gtk_builder_new ();
-    gtk_builder_add_from_file (builder, PACKAGE_DATA_DIR "/piclone.ui", NULL);
-    main_dlg = (GtkWidget *) gtk_builder_get_object (builder, "dialog1");
+    builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/piclone.ui");
+    main_dlg = (GtkWidget *) gtk_builder_get_object (builder, "main_window");
 
     // set up the start button
-    start_btn = (GtkWidget *) gtk_builder_get_object (builder, "button1");
+    start_btn = (GtkWidget *) gtk_builder_get_object (builder, "btn_start");
     g_signal_connect (start_btn, "clicked", G_CALLBACK (on_confirm), NULL);
+    gtk_widget_set_sensitive (GTK_WIDGET (start_btn), FALSE);
+
+    // set up the close button
+    close_btn = (GtkWidget *) gtk_builder_get_object (builder, "btn_close");
+    g_signal_connect (close_btn, "clicked", G_CALLBACK (on_quit), NULL);
 
     // set up the help button
-    help_btn = (GtkWidget *) gtk_builder_get_object (builder, "button4");
+    help_btn = (GtkWidget *) gtk_builder_get_object (builder, "btn_help");
     g_signal_connect (help_btn, "clicked", G_CALLBACK (on_help), NULL);
-
-    // get the table which holds the other elements
-    GtkWidget *table = (GtkWidget *) gtk_builder_get_object (builder, "table1");
 
     // get the new UUID checkbox - uncheck it by default
     cpuidcheck = (GtkWidget *) gtk_builder_get_object (builder, "cpcheck");
@@ -858,35 +916,34 @@ int main (int argc, char *argv[])
 
     // create and add the source combobox
     src_count = 0;
-    from_cb = (GtkWidget *)  (GObject *) gtk_combo_box_text_new ();
-    gtk_widget_set_tooltip_text (from_cb, _("Select the device to copy from"));
-    gtk_table_attach (GTK_TABLE (table), GTK_WIDGET (from_cb), 1, 2, 0, 1, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 5);
-    gtk_widget_show_all (GTK_WIDGET (from_cb));
+    from_cb = (GtkWidget *) gtk_builder_get_object (builder, "cb_from");
     g_signal_connect (from_cb, "changed", G_CALLBACK (on_cb_changed), NULL);
 
     // create and add the destination combobox
     dst_count = 0;
-    to_cb = (GtkWidget *)  (GObject *) gtk_combo_box_text_new ();
-    gtk_widget_set_tooltip_text (to_cb, _("Select the device to copy to"));
-    gtk_table_attach (GTK_TABLE (table), GTK_WIDGET (to_cb), 1, 2, 1, 2, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 5);
-    gtk_widget_show_all (GTK_WIDGET (to_cb));
+    to_cb = (GtkWidget *) gtk_builder_get_object (builder, "cb_to");
     g_signal_connect (to_cb, "changed", G_CALLBACK (on_cb_changed), NULL);
 
     // configure monitoring for drives being connected or disconnected
     monitor = g_volume_monitor_get ();
 
     // populate the comboboxes
-    on_drives_changed ();
+    on_drives_changed (NULL, NULL, 0);
 
-    g_signal_connect (monitor, "drive_changed", G_CALLBACK (on_drives_changed), NULL);
-    g_signal_connect (monitor, "drive_connected", G_CALLBACK (on_drives_changed), NULL);
-    g_signal_connect (monitor, "drive_disconnected", G_CALLBACK (on_drives_changed), NULL);
-    g_signal_connect (monitor, "mount_changed", G_CALLBACK (on_drives_changed), NULL);
-    g_signal_connect (monitor, "mount_added", G_CALLBACK (on_drives_changed), NULL);
-    g_signal_connect (monitor, "mount_removed", G_CALLBACK (on_drives_changed), NULL);
+    g_signal_connect (monitor, "drive_changed", G_CALLBACK (on_drives_changed), (void *) 0);
+    g_signal_connect (monitor, "drive_connected", G_CALLBACK (on_drives_changed), (void *) 1);
+    g_signal_connect (monitor, "drive_disconnected", G_CALLBACK (on_drives_changed), (void *) 1);
+    g_signal_connect (monitor, "mount_changed", G_CALLBACK (on_drives_changed), (void *) 0);
+    g_signal_connect (monitor, "mount_added", G_CALLBACK (on_drives_changed), (void *) 0);
+    g_signal_connect (monitor, "mount_removed", G_CALLBACK (on_drives_changed), (void *) 0);
+
+    state = STATE_IDLE;
 
     g_object_unref (builder);
-    gtk_dialog_run (GTK_DIALOG (main_dlg));
+
+    gtk_widget_show (main_dlg);
+    gtk_main ();
+
     gtk_widget_destroy (main_dlg);
 
     return 0;

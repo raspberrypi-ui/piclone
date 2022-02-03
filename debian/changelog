@@ -1,3 +1,57 @@
+piclone (0.24) bullseye; urgency=medium
+
+  * Add call to lxplug-ejecter external eject command at end
+
+ -- Simon Long <simon@raspberrypi.com>  Thu, 02 Sep 2021 12:06:59 +0100
+
+piclone (0.23) bullseye; urgency=medium
+
+  * Added Italian translation
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 16 Aug 2021 10:34:05 +0100
+
+piclone (0.22) bullseye; urgency=medium
+
+  * Korean translation added
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 09 Aug 2021 10:05:14 +0100
+
+piclone (0.21) bullseye; urgency=medium
+
+  * Remove dialog hint
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 12 Jul 2021 13:31:11 +0100
+
+piclone (0.20) bullseye; urgency=medium
+
+  * Added Armenian translation
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 26 Apr 2021 09:04:29 +0100
+
+piclone (0.19) buster; urgency=medium
+
+  * Remove hiding of application in other desktops
+
+ -- Simon Long <simon@raspberrypi.com>  Thu, 01 Apr 2021 20:38:12 +0100
+
+piclone (0.18) buster; urgency=medium
+
+  * Fix issue with NVME devices
+
+ -- Simon Long <simon@raspberrypi.com>  Wed, 24 Feb 2021 14:13:30 +0000
+
+piclone (0.17) buster; urgency=medium
+
+  * Added Slovak translation
+
+ -- Simon Long <simon@raspberrypi.com>  Sun, 03 Jan 2021 21:54:22 +0000
+
+piclone (0.16) buster; urgency=medium
+
+  * Abort copy if drives changed while in progress
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 15 Jun 2020 13:37:29 +0100
+
 piclone (0.15) buster; urgency=medium
 
   * Modify desktop file to preserve environment

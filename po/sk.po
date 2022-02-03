@@ -1,0 +1,253 @@
+# Slovak translations for piclone package.
+# Copyright (C) 2017 Raspberry Pi
+# This file is distributed under the same license as the piclone package.
+# Jose Riha <jose1711 gmail com>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: piclone 0.5\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-06-15 18:37+0100\n"
+"PO-Revision-Date: 2020-12-12 18:13+0100\n"
+"Last-Translator: Jose Riha <jose1711@gmail.com>\n"
+"Language-Team: Slovak\n"
+"Language: sk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.4.1\n"
+
+#: ../src/piclone.c:89 ../src/piclone.c:793
+msgid "Drives changed - copy aborted"
+msgstr "Zariadenia sa zmenili - kopírovanie zrušené"
+
+#: ../src/piclone.c:163 ../src/piclone.c:794
+msgid "OK"
+msgstr "OK"
+
+#: ../src/piclone.c:216
+msgid "Unable to read source."
+msgstr "Nie je možné čítať zo zdroja."
+
+#: ../src/piclone.c:222
+msgid "Non-MSDOS partition table on source."
+msgstr "Zdroj používa inú ako MS-DOS tabuľku partícií."
+
+#: ../src/piclone.c:229
+msgid "Preparing target..."
+msgstr "Pripravujem cieľ..."
+
+#: ../src/piclone.c:242
+msgid "Could not write to destination."
+msgstr "Nie je možné zapisovať na cieľové zariadenie."
+
+#: ../src/piclone.c:256
+msgid "Could not create FAT."
+msgstr "Nepodarilo sa vytvoriť tabuľku FAT."
+
+#: ../src/piclone.c:262
+msgid "Reading partitions..."
+msgstr "Čítam partície..."
+
+#: ../src/piclone.c:277
+msgid "Too many partitions on source."
+msgstr "Zdroj obsahuje príliš mnoho partícií."
+
+#: ../src/piclone.c:289
+msgid "Preparing partitions..."
+msgstr "Pripravujem partície..."
+
+#: ../src/piclone.c:300 ../src/piclone.c:311 ../src/piclone.c:320
+msgid "Could not create partition."
+msgstr "Nepodarilo sa vytvoriť partíciu."
+
+#: ../src/piclone.c:385 ../src/piclone.c:391 ../src/piclone.c:413 ../src/piclone.c:419
+msgid "Could not create file system."
+msgstr "Nepodarilo sa vytvoriť súborový systém."
+
+#: ../src/piclone.c:443
+#, c-format
+msgid "Copying partition %d of %d..."
+msgstr "Kopírujem partíciu %d of %d..."
+
+#: ../src/piclone.c:453 ../src/piclone.c:459
+msgid "Could not mount partition."
+msgstr "Nepodarilo sa pripojiť partíciu."
+
+#: ../src/piclone.c:477
+msgid "Insufficient space. Backup aborted."
+msgstr "Nedostatok miesta. Záloha bola zrušená."
+
+#: ../src/piclone.c:518 ../src/piclone.c:524
+msgid "Could not unmount partition."
+msgstr "Nepodarilo sa odpojiť partíciu."
+
+#: ../src/piclone.c:535 ../src/piclone.c:543
+msgid "Could not set flags."
+msgstr "Nepodarilo sa nastaviť príznaky."
+
+#: ../src/piclone.c:550
+msgid "Copy complete."
+msgstr "Kopírovanie dokončené."
+
+#: ../src/piclone.c:593
+msgid "Cancelling..."
+msgstr "Ruším..."
+
+#. add message
+#: ../src/piclone.c:641
+msgid "Checking source..."
+msgstr "Kontrolujem zdroj..."
+
+#. add cancel button
+#: ../src/piclone.c:651
+msgid "Cancel"
+msgstr "Zrušiť"
+
+#: ../src/piclone.c:726
+#, c-format
+msgid "This will erase all content on the device '%s'. Are you sure?"
+msgstr "Týmto odstránite všetok obsah na zariadení '%s'. Ste si istý?"
+
+#. add buttons
+#: ../src/piclone.c:734
+msgid "No"
+msgstr "Nie"
+
+#: ../src/piclone.c:738
+msgid "Yes"
+msgstr "Áno"
+
+#: ../src/piclone.c:776 ../src/piclone.c:850
+msgid "No devices available"
+msgstr "Nie sú dostupné žiadne zariadenia"
+
+#: ../src/piclone.c:803
+msgid "Drives changed - cancelling..."
+msgstr "Zariadenia sa zmenili - ruším..."
+
+#: ../src/piclone.c:900
+msgid "Select the device to copy from"
+msgstr "Vyberte zariadenie, z ktorého sa má kopírovať"
+
+#: ../src/piclone.c:908
+msgid "Select the device to copy to"
+msgstr "Vyberte zariadenia, na ktoré sa má kopírovať"
+
+#. End of file
+#. ===========================================================================
+#: ../data/piclone.ui.h:1 ../data/piclone.desktop.in.h:1
+msgid "SD Card Copier"
+msgstr "Kopírovanie SD kariet"
+
+#: ../data/piclone.ui.h:2
+msgid "Help"
+msgstr "Pomocník"
+
+#: ../data/piclone.ui.h:3
+msgid "Start"
+msgstr "Spustiť"
+
+#: ../data/piclone.ui.h:4
+msgid "Copy From Device:"
+msgstr "Kopírovať zo zariadenia:"
+
+#: ../data/piclone.ui.h:5
+msgid "Select the device from which to copy"
+msgstr "Vyberte zariadenie, z ktorého sa má kopírovať"
+
+#: ../data/piclone.ui.h:6
+msgid "Copy To Device:"
+msgstr "Kopírovať na zariadenie:"
+
+#: ../data/piclone.ui.h:7
+msgid "Select the device to which to copy"
+msgstr "Vyberte zariadenie, na ktoré sa má kopírovať"
+
+#: ../data/piclone.ui.h:8
+msgid "New Partition UUIDs"
+msgstr "Nové identifikátory (UUID) partícií"
+
+#: ../data/piclone.ui.h:9
+msgid "Check this box to create new partition UUIDs on the copy"
+msgstr "Zaškrtnite toto políčko pre vytvorenie nových UUID partícií počas kopírovania"
+
+#: ../data/piclone.ui.h:10
+msgid ""
+"SD Card Copier v1.0\n"
+"\n"
+"This is an application to copy and back up SD cards. To use it, you will need a USB "
+"SD card writer.\n"
+"\n"
+"To back up your Raspberry Pi's internal SD card, insert a blank SD card into a USB "
+"card writer and connect it to your Pi. Then start the application, choose your card "
+"writer from the “Copy To Device” drop-down box and press “Start”. The copy process "
+"will take 10-15 minutes depending on the size of your card.\n"
+"\n"
+"The resulting card should be a bootable copy of your existing card; to restore, "
+"simply place the backup card into the onboard SD card slot, put the card to restore "
+"onto into the USB writer and repeat the copy process above.\n"
+"\n"
+"You can also back up to a standard USB stick, and then restore from the USB stick "
+"to an SD card by setting the “Copy From Device” drop-down to the USB stick and the "
+"“Copy To Device” to a USB card writer containing the card to restore onto.\n"
+"\n"
+"Note that you cannot copy onto the SD card from which your Pi is currently booted, "
+"which is why it does not appear in the “Copy To Device” dropdown.\n"
+"\n"
+"Note also that the destination card doesn’t need to be the same size as the source "
+"card, but it must have enough space to hold all the data that is on it. The "
+"application will warn you if there is insufficient space on the destination.\n"
+"\n"
+"Under Raspbian Stretch and later versions, you cannot mount two partitions with the "
+"same UUID, so you will not be able to mount a cloned SD card when booted from the "
+"disk from which it was cloned. If you need to do this, check the \"New Partition "
+"UUIDs\" box before copying.\n"
+msgstr ""
+"Kopírovanie SD kariet v1.0\n"
+"\n"
+"Toto je program na kopírovanie a zálohu SD kariet. Na jeho fungovanie budete "
+"potrebovať USB čítačku SD kariet.\n"
+"\n"
+"Pre zálohovanie internej SD karty Vášho Raspberry Pi, vložte prázdnu SD kartu do "
+"USB čítačky pripojenej k Vášmu Raspberry Pi. Potom vyberte internú SD kartu "
+"(označenú ako '/dev/mmcblk0') v rozbaľovacej ponuke \"Kopírovať zo zariadenia\", v "
+"ponuke \"Kopírovať na zariadenie\" vyberte čítačku a kliknite na \"Spustiť\". "
+"Proces kopírovania zaberie 10-15 minút v závislosti od veľkosti Vašej karty.\n"
+"\n"
+"Zapísaná karta by mala byt spustiteľnou kópiou existujúcej karty; pre obnovenie dát "
+"jednoducho vložte kartu so zálohou do interného slotu Raspberry Pi, do čítačky "
+"kariet vložte kartu, na ktorú chcete obnovu zapísať a zopakujte proces kopírovania "
+"popísaný vyššie.\n"
+"\n"
+"Zálohu môžete tiež zapísať na bežný USB kľúč - pre obnovu dát na SD kartu v ponuke "
+"\"Kopírovať zo zariadenia\" vyberiete USB kľúč a v ponuke \"Kopírovať na zariadenie"
+"\" zvolíte USB čítačku kariet, do ktorej vložíte kartu, na ktorú chcete obnovené "
+"údaje zapísať.\n"
+"\n"
+"Všimnite si, že nemôžete kopírovať na SD kartu, z ktorej Vašej Raspberry Pi "
+"naštartovalo, čo je dôvodom, prečo sa táto nezobrazuje v ponuke \"Kopírovať na "
+"zariadenie\".\n"
+"\n"
+"Rovnako si všimnite, že cieľová karta nemusí mať rovnakú veľkosť ako karta, z "
+"ktorej sa kopíruje, ale musí mať dostatok voľného miesta pre všetky kopírované "
+"údaje. Aplikácia Vás upozorní, ak na cieľovej karte chýba voľné miesto.\n"
+"\n"
+"Niektoré verzie operačného systému neumožňujú pripojenie dvoch partícií s rovnakým "
+"identifikátorom (UUID) dôsledkom čoho nebudete môcť pripojiť klonovanú SD kartu v "
+"systéme, ktorý naštartoval z karty, z ktorej bola záloha spustená. Ak to "
+"potrebujete, aktivujte pred kopírovaním voľbu \"Nové identifikátory (UUID) partícií"
+"\".\n"
+
+#: ../data/piclone.ui.h:26
+msgid "SD Card Copier Help"
+msgstr "Pomocník Kopírovania SD kariet"
+
+#: ../data/piclone.desktop.in.h:2
+msgid "Make a copy of the Raspbian SD card"
+msgstr "Kopírovať SD karty a USB zariadenia"
+
+#: ../data/pwdpic.sh:6
+msgid "Password Required"
+msgstr "Je potrebné zadať heslo"

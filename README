@@ -1,9 +1,42 @@
 This is an application which allows the SD card inserted into the Pi to be copied to one in a connected USB reader.
 
-To build, run autogen.sh, then ./configure and make.
-Use sudo make install to install data files.
 
-To generate a Debian package for piclone:
-1/ run autogen.sh
-2/ run dpkg-buildpackage -us -uc
-3/ install the deb package with sudo dpkg -i piclone_0.?_armhf.deb 
+How to build
+------------
+
+1. Install dependencies
+
+The dependencies of any Debian project are listed in the "Build-Depends" section
+of the file named "control" in the "debian" subdirectory of the project.
+
+If the project has already been released into apt, then the build dependencies
+can be automatically installed using the command "sudo apt build-dep <package-name>".
+
+2. Prepare project
+
+To create the "configure" file and prepare the project directory, use the command
+"./autogen.sh" in the top directory of the project.
+
+If this file is not present, then instead use the command "autoreconf -i -f"
+followed by the command "intltoolize -c --automake --force", both in the top directory
+of the project.
+
+3. Configure
+
+To configure the make system, use the command "./configure" in the top directory of
+the project. This will by default set the project for installation in the /usr/local tree,
+which will not overwrite a version which has been installed from apt.
+
+If you wish to overwrite a preinstalled version in the /usr tree, supply the arguments
+"./configure --prefix=/usr --libdir=/usr/lib/<library-location>" to the configure command.
+On a 32-bit system, <library-location> should be "arm-linux-gnueabihf".
+On a 64-bit system, <library-location> should be "aarch64-linux-gnu".
+
+4. Build
+
+To build the application, use the command "make" in the top directory of the project.
+
+5. Install
+
+To install the application and all required data files, use the command "sudo make install"
+in the top directory of the project.
