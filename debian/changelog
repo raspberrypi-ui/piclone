@@ -1,3 +1,9 @@
+piclone (0.25) bullseye; urgency=medium
+
+  * Fix size of modal dialog
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 15 Mar 2022 10:10:48 +0000
+
 piclone (0.24) bullseye; urgency=medium
 
   * Add call to lxplug-ejecter external eject command at end
