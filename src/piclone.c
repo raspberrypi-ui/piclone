@@ -191,8 +191,7 @@ static char *partition_name (char *device, char *buffer)
 
 static gboolean cb_update_progress (gpointer data)
 {
-    float *fptr = (float *) data;
-    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), *fptr);
+    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), *((float *) data));
     return FALSE;
 }
 
