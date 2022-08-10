@@ -191,17 +191,14 @@ static char *partition_name (char *device, char *buffer)
 
 static gboolean cb_update_progress (gpointer data)
 {
-    float *fptr = (float *) &data;
+    float *fptr = (float *) data;
     gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progress), *fptr);
     return FALSE;
 }
 
 static void update_progress (float prog)
 {
-    void *ptr;
-    float *fptr = (float *) &ptr;
-    *fptr = prog;
-    gdk_threads_add_idle (cb_update_progress, ptr);
+    gdk_threads_add_idle (cb_update_progress, (void *) &prog);
 }
 
 static gboolean cb_update_label (gpointer data)
@@ -703,7 +700,7 @@ static gboolean on_close (void)
 
 static gboolean on_confirm (void)
 {
-    char buffer[256], res[256];
+    char buffer[256];
     char *src, *dst;
     int len;
     GtkBuilder *builder;
@@ -805,7 +802,6 @@ static void on_drives_changed (GVolumeMonitor *volume_monitor, GDrive *drive, gp
 {
     char buffer[256], test[128];
     FILE *fp;
-    int devlen;
 
     if (state == STATE_CONF)
     {
