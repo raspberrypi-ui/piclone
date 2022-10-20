@@ -3,7 +3,6 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_INIT(piclone,0.5,http://raspberrypi.org/)
 AM_INIT_AUTOMAKE([-Wall foreign subdir-objects no-dist-gzip dist-xz])
 AC_CONFIG_HEADER([config.h])
-AC_CONFIG_MACRO_DIR([m4])
 
 # Support silent build rules. Disable by either passing --disable-silent-rules
 # to configure or passing V=1 to make
