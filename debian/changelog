@@ -1,3 +1,9 @@
+piclone (0.26) bullseye; urgency=medium
+
+  * Set undecorated dialogs in code
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 31 Jan 2023 09:56:21 +0000
+
 piclone (0.25) bullseye; urgency=medium
 
   * Fix size of modal dialog

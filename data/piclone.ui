@@ -217,7 +217,6 @@
     <property name="type-hint">dialog</property>
     <property name="skip-taskbar-hint">True</property>
     <property name="skip-pager-hint">True</property>
-    <property name="decorated">False</property>
     <child>
       <object class="GtkBox">
         <property name="visible">True</property>
