@@ -1,3 +1,9 @@
+piclone (0.27) bookworm; urgency=medium
+
+  * Remove -AE from desktop file
+
+ -- Simon Long <simon@raspberrypi.com>  Thu, 13 Jul 2023 11:46:47 +0100
+
 piclone (0.26) bullseye; urgency=medium
 
   * Set undecorated dialogs in code
