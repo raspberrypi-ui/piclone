@@ -359,7 +359,7 @@ static gpointer backup_thread (gpointer data)
         CANCEL_CHECK;
 
         // refresh the kernel partion table
-        sys_printf ("partprobe");
+        sys_printf (SUDO_PREFIX "partprobe");
         CANCEL_CHECK;
 
         // get the UUID
@@ -608,7 +608,7 @@ static void kill_copy (void)
             while (1)
             {
                 if (fgets (buffer, sizeof (buffer) - 1, fp) == NULL) break;
-                if (sscanf (buffer, "%d", &pid) == 1) sys_printf ("kill %d", pid);
+                if (sscanf (buffer, "%d", &pid) == 1) sys_printf (SUDO_PREFIX "kill %d", pid);
             }
             pclose (fp);
         }
