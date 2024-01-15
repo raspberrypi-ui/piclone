@@ -674,7 +674,6 @@ static gboolean on_start (void)
     gtk_widget_hide (wid);
 
     gtk_widget_show (msg_dlg);
-    gtk_window_set_decorated (GTK_WINDOW (msg_dlg), FALSE);
 
     // launch a thread with the system call to run the backup
     cancelled = 0;
@@ -749,7 +748,6 @@ static gboolean on_confirm (void)
     g_free (dst);
 
     gtk_widget_show (msg_dlg);
-    gtk_window_set_decorated (GTK_WINDOW (msg_dlg), FALSE);
     state = STATE_CONF;
     return FALSE;
 }

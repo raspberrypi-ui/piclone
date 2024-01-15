@@ -210,6 +210,7 @@
     <property name="name">pixbox</property>
     <property name="can-focus">False</property>
     <property name="resizable">False</property>
+    <property name="decorated">False</property>
     <property name="modal">True</property>
     <property name="window-position">center-on-parent</property>
     <property name="default-width">340</property>
@@ -293,6 +294,15 @@
             <property name="fill">True</property>
             <property name="position">2</property>
           </packing>
+        </child>
+      </object>
+    </child>
+    <child type="titlebar">
+      <object class="GtkHeaderBar">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <child>
+          <placeholder/>
         </child>
       </object>
     </child>
