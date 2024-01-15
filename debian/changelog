@@ -1,4 +1,4 @@
-]piclone (0.28) bookworm; urgency=medium
+piclone (0.28) bookworm; urgency=medium
 
   * Fix hiding of titlebars under Wayland
 
