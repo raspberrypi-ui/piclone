@@ -1,8 +1,14 @@
-piclone (0.27) bookworm; urgency=medium
+]piclone (0.28) bookworm; urgency=medium
 
   * Fix hiding of titlebars under Wayland
 
  -- Simon Long <simon@raspberrypi.com>  Mon, 15 Jan 2024 07:59:21 +0000
+
+piclone (0.27) bookworm; urgency=medium
+
+  * Run GUI without sudo
+
+ -- Simon Long <simon@raspberrypi.com>  Wed, 26 Jul 2023 10:58:57 +0100
 
 piclone (0.26) bullseye; urgency=medium
 
