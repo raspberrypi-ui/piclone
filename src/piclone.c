@@ -581,7 +581,7 @@ static gpointer backup_thread (gpointer data)
         CANCEL_CHECK;
     }
 
-    if (getenv ("WAYFIRE_CONFIG_FILE"))
+    if (getenv ("WAYLAND_DISPLAY"))
         sys_printf ("wfpanelctl ejecter %s", dst_dev);
     else
         sys_printf ("lxpanelctl command ejecter %s", dst_dev);
