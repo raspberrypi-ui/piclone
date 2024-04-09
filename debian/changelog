@@ -1,3 +1,9 @@
+piclone (0.29) bookworm; urgency=medium
+
+  * Use allocated rather than fixed buffer in sys_printf
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 09 Apr 2024 09:26:44 +0100
+
 piclone (0.28) bookworm; urgency=medium
 
   * Fix hiding of titlebars under Wayland

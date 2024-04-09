@@ -135,15 +135,18 @@ static int get_string (char *cmd, char *name)
 
 static int sys_printf (const char * format, ...)
 {
-    char buffer[256];
+    char *buffer;
     va_list args;
     FILE *fp;
+    int res;
 
     va_start (args, format);
-    vsprintf (buffer, format, args);
-    fp = popen (buffer, "r");
+    g_vasprintf (&buffer, format, args);
     va_end (args);
-    return pclose (fp);
+    fp = popen (buffer, "r");
+    res = pclose (fp);
+    g_free (buffer);
+    return res;
 }
 
 
