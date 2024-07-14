@@ -1,0 +1,246 @@
+# Simplified Chinese translations for piclone package.
+# Copyright (C) 2017 Raspberry Pi
+# This file is distributed under the same license as the piclone package.
+# ykla <yklaxds@gmail>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: piclone 0.5\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-06-15 18:37+0100\n"
+"PO-Revision-Date: 2024-07-14 13:55+0800\n"
+"Last-Translator: ykla <yklaxds@gmail.com>\n"
+"Language-Team: ykla <yklaxds@gmail.com>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 3.4.4\n"
+
+#: ../src/piclone.c:89 ../src/piclone.c:793
+msgid "Drives changed - copy aborted"
+msgstr "设备发生变更——复制中断"
+
+#: ../src/piclone.c:163 ../src/piclone.c:794
+msgid "OK"
+msgstr "成功"
+
+#: ../src/piclone.c:216
+msgid "Unable to read source."
+msgstr "无法读取来源设备。"
+
+#: ../src/piclone.c:222
+msgid "Non-MSDOS partition table on source."
+msgstr "来源设备非 MBR 分区表。"
+
+#: ../src/piclone.c:229
+msgid "Preparing target..."
+msgstr "正在准备目标设备……"
+
+#: ../src/piclone.c:242
+msgid "Could not write to destination."
+msgstr "目标无法写入。"
+
+#: ../src/piclone.c:256
+msgid "Could not create FAT."
+msgstr "无法创建 FAT。"
+
+#: ../src/piclone.c:262
+msgid "Reading partitions..."
+msgstr "正在读取分区……"
+
+#: ../src/piclone.c:277
+msgid "Too many partitions on source."
+msgstr "来源设备分区太多了。"
+
+#: ../src/piclone.c:289
+msgid "Preparing partitions..."
+msgstr "正在准备分区……"
+
+#: ../src/piclone.c:300 ../src/piclone.c:311 ../src/piclone.c:320
+msgid "Could not create partition."
+msgstr "无法创建分区。"
+
+#: ../src/piclone.c:385 ../src/piclone.c:391 ../src/piclone.c:413
+#: ../src/piclone.c:419
+msgid "Could not create file system."
+msgstr "无法创建文件系统。"
+
+#: ../src/piclone.c:443
+#, c-format
+msgid "Copying partition %d of %d..."
+msgstr "正在复制分区 %d 于 %d..."
+
+#: ../src/piclone.c:453 ../src/piclone.c:459
+msgid "Could not mount partition."
+msgstr "无法挂载分区。"
+
+#: ../src/piclone.c:477
+msgid "Insufficient space. Backup aborted."
+msgstr "空间不足。备份中断。"
+
+#: ../src/piclone.c:518 ../src/piclone.c:524
+msgid "Could not unmount partition."
+msgstr "无法卸载分区。"
+
+#: ../src/piclone.c:535 ../src/piclone.c:543
+msgid "Could not set flags."
+msgstr "无法设置标志位。"
+
+#: ../src/piclone.c:550
+msgid "Copy complete."
+msgstr "复制完成。"
+
+#: ../src/piclone.c:593
+msgid "Cancelling..."
+msgstr "正在取消……"
+
+#. add message
+#: ../src/piclone.c:641
+msgid "Checking source..."
+msgstr "正在检查来源设备……"
+
+#. add cancel button
+#: ../src/piclone.c:651
+msgid "Cancel"
+msgstr "取消"
+
+#: ../src/piclone.c:726
+#, c-format
+msgid "This will erase all content on the device '%s'. Are you sure?"
+msgstr "将清除 '%s' 上的所有内容，您确定吗？"
+
+#. add buttons
+#: ../src/piclone.c:734
+msgid "No"
+msgstr "否"
+
+#: ../src/piclone.c:738
+msgid "Yes"
+msgstr "确定"
+
+#: ../src/piclone.c:776 ../src/piclone.c:850
+msgid "No devices available"
+msgstr "无设备可用"
+
+#: ../src/piclone.c:803
+msgid "Drives changed - cancelling..."
+msgstr "驱动发生变更——正在取消……"
+
+#: ../src/piclone.c:900
+msgid "Select the device to copy from"
+msgstr "选择复制的来源设备"
+
+#: ../src/piclone.c:908
+msgid "Select the device to copy to"
+msgstr "选择复制的目标设备"
+
+#. End of file
+#. ===========================================================================
+#: ../data/piclone.ui.h:1 ../data/piclone.desktop.in.h:1
+msgid "SD Card Copier"
+msgstr "SD 卡复制工具"
+
+#: ../data/piclone.ui.h:2
+msgid "Help"
+msgstr "帮助"
+
+#: ../data/piclone.ui.h:3
+msgid "Start"
+msgstr "开始"
+
+#: ../data/piclone.ui.h:4
+msgid "Copy From Device:"
+msgstr "复制的来源设备："
+
+#: ../data/piclone.ui.h:5
+msgid "Select the device from which to copy"
+msgstr "选择复制的来源设备"
+
+#: ../data/piclone.ui.h:6
+msgid "Copy To Device:"
+msgstr "复制到目标设备："
+
+#: ../data/piclone.ui.h:7
+msgid "Select the device to which to copy"
+msgstr "选择复制的目标设备"
+
+#: ../data/piclone.ui.h:8
+msgid "New Partition UUIDs"
+msgstr "生成新的分区 UUID"
+
+#: ../data/piclone.ui.h:9
+msgid "Check this box to create new partition UUIDs on the copy"
+msgstr "选中此框可在目标设备上创建新的分区 UUID"
+
+#: ../data/piclone.ui.h:10
+msgid ""
+"SD Card Copier v1.0\n"
+"\n"
+"This is an application to copy and back up SD cards. To use it, you will "
+"need a USB SD card writer.\n"
+"\n"
+"To back up your Raspberry Pi's internal SD card, insert a blank SD card into "
+"a USB card writer and connect it to your Pi. Then start the application, "
+"choose your card writer from the “Copy To Device” drop-down box and press "
+"“Start”. The copy process will take 10-15 minutes depending on the size of "
+"your card.\n"
+"\n"
+"The resulting card should be a bootable copy of your existing card; to "
+"restore, simply place the backup card into the onboard SD card slot, put the "
+"card to restore onto into the USB writer and repeat the copy process above.\n"
+"\n"
+"You can also back up to a standard USB stick, and then restore from the USB "
+"stick to an SD card by setting the “Copy From Device” drop-down to the USB "
+"stick and the “Copy To Device” to a USB card writer containing the card to "
+"restore onto.\n"
+"\n"
+"Note that you cannot copy onto the SD card from which your Pi is currently "
+"booted, which is why it does not appear in the “Copy To Device” dropdown.\n"
+"\n"
+"Note also that the destination card doesn’t need to be the same size as the "
+"source card, but it must have enough space to hold all the data that is on "
+"it. The application will warn you if there is insufficient space on the "
+"destination.\n"
+"\n"
+"Under Raspbian Stretch and later versions, you cannot mount two partitions "
+"with the same UUID, so you will not be able to mount a cloned SD card when "
+"booted from the disk from which it was cloned. If you need to do this, check "
+"the \"New Partition UUIDs\" box before copying.\n"
+msgstr ""
+"SD 卡复制工具 v1.0\n"
+"\n"
+"这是一款用于复制和备份 SD 卡的工具。该工具需使用 USB SD 卡读卡器才能运行。\n"
+"\n"
+"要备份你的树莓派所使用的 SD 卡，请将一张空白的 SD 卡插入 USB 读卡器，并将其接"
+"入至你的树莓派。然后启动应用程序，从下拉框“复制到目标设备”中选择你的读卡器并"
+"按“开始”。复制过程取决于卡的大小，可能需要 10-15 分钟。\n"
+"\n"
+"生成的卡是现有卡的可启动备份；要恢复，只需将备份卡插入板载 SD 卡槽，将要恢复"
+"的卡放入 USB 读卡器中，然后重复上述复制过程。\n"
+"\n"
+"你也可以备份到普通 U 盘，然后把下拉框“复制的来源设备”设置为 U 盘，将“复制到目"
+"标设备”设置为包含要恢复到的卡的 USB 读卡器，从 U 盘恢复至 SD 卡。\n"
+"\n"
+"请注意，你无法把树莓派当前正在的使用 SD 卡作为要复制的目标设备，因此它不会出"
+"现在下拉框“复制到目标设备”中。\n"
+"\n"
+"还请注意，目标设备不需要与来源设备大小一致，但必须有足够的空间容纳所有数据。"
+"如果目标设备空间不足，应用程序会产生警告。\n"
+"\n"
+"在 Raspbian Stretch 及更高版本中，你无法挂载两个相同 UUID 的分区，因此当从被"
+"克隆的磁盘启动时，你将无法挂载来源设备的 SD 卡。如果要这样做，请在复制前勾"
+"选“生成新的分区 UUID”框。\n"
+
+#: ../data/piclone.ui.h:26
+msgid "SD Card Copier Help"
+msgstr "SD 卡复制工具帮助"
+
+#: ../data/piclone.desktop.in.h:2
+msgid "Make a copy of the Raspbian SD card"
+msgstr "制作 Raspbian SD 卡备份"
+
+#: ../data/pwdpic.sh:6
+msgid "Password Required"
+msgstr "需要密码"
