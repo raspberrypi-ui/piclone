@@ -1,3 +1,9 @@
+piclone (0.30) bookworm; urgency=medium
+
+  * Translation update
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 16 Jul 2024 07:47:57 +0100
+
 piclone (0.29) bookworm; urgency=medium
 
   * Use allocated rather than fixed buffer in sys_printf
