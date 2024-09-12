@@ -1,3 +1,9 @@
+piclone (0.31) bookworm; urgency=medium
+
+  * Fix shadows on undecorated windows
+
+ -- Simon Long <simon@raspberrypi.com>  Thu, 12 Sep 2024 13:47:44 +0100
+
 piclone (0.30) bookworm; urgency=medium
 
   * Translation update
