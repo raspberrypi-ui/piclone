@@ -1,0 +1,2 @@
+#!/bin/sh
+ls -1 *.po | cut -d . -f 1 > LINGUAS

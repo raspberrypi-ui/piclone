@@ -1,13 +1,14 @@
 Source: piclone
 Section: utils
 Priority: optional
-Maintainer: Simon Long <simon@raspberrypi.org>
-Build-Depends: debhelper (>= 9), dh-autoreconf, libglib2.0-dev, libgtk-3-dev (>= 3.24), intltool
-Standards-Version: 3.9.5
+Maintainer: Simon Long <simon@raspberrypi.com>
+Build-Depends: debhelper-compat (= 13), meson, libgtk-3-dev (>= 3.24), intltool (>= 0.40.0)
+Standards-Version: 4.5.1
+Homepage: http://raspberrypi.com/
 
 Package: piclone
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, parted, dosfstools, e2fsprogs, coreutils, mount, uuid, zenity, dbus-x11, libgtk-3-0 (>= 3.24)
+Depends: ${shlibs:Depends}, ${misc:Depends}, parted, dosfstools, e2fsprogs, coreutils, mount, uuid, sudopwd, dbus-x11, libgtk-3-0 (>= 3.24)
 Description: SD Card backup program for Raspberry Pi
  This is a GTK application to copy the contents of SD cards and other USB
  drives. It mirrors the partition layout of the source device onto the

@@ -1,8 +1,8 @@
 [Desktop Entry]
 Type=Application
-_Name=SD Card Copier
-_GenericName=SD Card Copier
-_Comment=Make a copy of the Raspbian SD card
+Name=SD Card Copier
+GenericName=SD Card Copier
+Comment=Make a copy of the Raspbian SD card
 Icon=media-removable
 Exec=piclone
 StartupNotify=true

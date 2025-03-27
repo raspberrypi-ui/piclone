@@ -1,3 +1,9 @@
+piclone (0.32) bookworm; urgency=medium
+
+  * Convert to meson build system
+
+ -- Simon Long <simon@raspberrypi.com>  Thu, 27 Mar 2025 13:22:37 +0000
+
 piclone (0.31) bookworm; urgency=medium
 
   * Fix shadows on undecorated windows

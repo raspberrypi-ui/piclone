@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include <ctype.h>
 #include <dirent.h>
+#include <locale.h>
 
 #include <glib.h>
 #include <glib/gi18n.h>
@@ -44,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* Variable and macro definitions */
 /*---------------------------------------------------------------------------*/
 
-#define SUDO_PREFIX "SUDO_ASKPASS=/usr/lib/piclone/pwdpic.sh sudo -A "
+#define SUDO_PREFIX "SUDO_ASKPASS=/usr/bin/sudopwd sudo -A "
 
 /* struct to store partition data */
 
@@ -885,12 +886,10 @@ int main (int argc, char *argv[])
 {
     GtkBuilder *builder;
 
-#ifdef ENABLE_NLS
     setlocale (LC_ALL, "");
     bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
     bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
     textdomain (GETTEXT_PACKAGE);
-#endif
 
     // GTK setup
     gtk_init (&argc, &argv);
