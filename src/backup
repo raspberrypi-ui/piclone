@@ -2,13 +2,11 @@
 
 # unmount any partitions on the target device
 
-a=9
-while [ $a -gt 0 ]
-do
-    sudo umount $1$a
-    a=`expr $a - 1`
-done
+sudo umount $1*
 
+partprefix=$1
+[[ $partprefix =~ ^/dev/(loop|mmcblk) ]] && partprefix=${partprefix}p
+echo partprefix=$partprefix
 # wipe the FAT on the target
 
 sudo dd if=/dev/zero of=$1 bs=512 count=1
@@ -49,16 +47,16 @@ sudo parted /dev/mmcblk0 unit s print | tail -n +8 | head -n -1 | while read lin
 		# create file systems
 
 		if [ "$fstype" == "fat32" ] || [ "$fstype" == "fat16" ]; then
-			sudo mkfs.fat $1$pnum
+			sudo mkfs.fat $partprefix$pnum
 		fi
 		if [ "$fstype" == "ext4" ]; then
-			sudo mkfs.ext4 -F $1$pnum
+			sudo mkfs.ext4 -F $partprefix$pnum
 		fi
 
 		# mount and copy
 
-		sudo mount $1$pnum $dst
-		sudo mount /dev/mmcblk0p$pnum $src
+		sudo mount $partprefix$pnum $dst
+		sudo mount  /dev/mmcblk0p$pnum $src
 		sudo cp -axv $src/. $dst/.
 		sudo umount $dst
 		sudo umount $src
