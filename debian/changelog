@@ -1,3 +1,9 @@
+piclone (1.3) trixie; urgency=medium
+
+  * Add activation
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 19 May 2026 13:56:59 +0100
+
 piclone (1.2) trixie; urgency=medium
 
   * Fix dependencies

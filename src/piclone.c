@@ -41,6 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <glib/gstdio.h>
 #include <gtk/gtk.h>
 
+#include "activate.h"
+
 /*---------------------------------------------------------------------------*/
 /* Variable and macro definitions */
 /*---------------------------------------------------------------------------*/
@@ -878,6 +880,8 @@ int main (int argc, char *argv[])
 {
     GtkBuilder *builder;
 
+    init_dbus ("piclone");
+
     setlocale (LC_ALL, "");
     bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
     bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
@@ -936,9 +940,14 @@ int main (int argc, char *argv[])
     g_object_unref (builder);
 
     gtk_widget_show (main_dlg);
+
+    setup_activate (main_dlg);
+
     gtk_main ();
 
     gtk_widget_destroy (main_dlg);
+
+    close_dbus ();
 
     return 0;
 }
