@@ -1,0 +1,245 @@
+# Polish translations for piclone package.
+# Copyright (C) 2026 THE piclone'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the piclone package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: piclone\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-19 20:49+0200\n"
+"PO-Revision-Date: 2026-05-20 23:50+0200\n"
+"Last-Translator: Skotniczny <skotniczny@outlook.com>\n"
+"Language-Team: Polish\n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2);\n"
+
+#: src/piclone.c:92 src/piclone.c:808
+msgid "Drives changed - copy aborted"
+msgstr "Wykryto zmianę napędów – kopiowanie przerwane"
+
+#: src/piclone.c:172 src/piclone.c:809
+msgid "OK"
+msgstr "OK"
+
+#: src/piclone.c:254
+msgid "Unable to read source."
+msgstr "Nie można odczytać źródła."
+
+#: src/piclone.c:260
+msgid "Non-MSDOS partition table on source."
+msgstr "Tablica partycji na urządzeniu źródłowym nie jest tablicą MSDOS."
+
+#: src/piclone.c:267
+msgid "Preparing target..."
+msgstr "Przygotowywanie urządzenia docelowego…"
+
+#: src/piclone.c:280
+msgid "Could not write to destination."
+msgstr "Nie można zapisać na urządzeniu docelowym."
+
+#: src/piclone.c:294
+msgid "Could not create FAT."
+msgstr "Nie można utworzyć systemu plików FAT."
+
+#: src/piclone.c:300
+msgid "Reading partitions..."
+msgstr "Odczytywanie partycji…"
+
+#: src/piclone.c:315
+msgid "Too many partitions on source."
+msgstr "Zbyt wiele partycji na urządzeniu źródłowym."
+
+#: src/piclone.c:327
+msgid "Preparing partitions..."
+msgstr "Przygotowywanie partycji…"
+
+#: src/piclone.c:338 src/piclone.c:349 src/piclone.c:358
+msgid "Could not create partition."
+msgstr "Nie można utworzyć partycji."
+
+#: src/piclone.c:423 src/piclone.c:429 src/piclone.c:451 src/piclone.c:457
+msgid "Could not create file system."
+msgstr "Nie można utworzyć systemu plików."
+
+#: src/piclone.c:481
+#, c-format
+msgid "Copying partition %d of %d..."
+msgstr "Kopiowanie partycji %d z %d…"
+
+#: src/piclone.c:491 src/piclone.c:497
+msgid "Could not mount partition."
+msgstr "Nie można zamontować partycji."
+
+#: src/piclone.c:515
+msgid "Insufficient space. Backup aborted."
+msgstr "Niewystarczająca ilość miejsca. Kopiowanie przerwane."
+
+#: src/piclone.c:556 src/piclone.c:562
+msgid "Could not unmount partition."
+msgstr "Nie można odmontować partycji."
+
+#: src/piclone.c:573
+msgid "Could not set flags."
+msgstr "Nie można ustawić flag."
+
+#: src/piclone.c:584
+msgid "Copy complete."
+msgstr "Kopiowanie zakończone."
+
+#: src/piclone.c:622
+msgid "Cancelling..."
+msgstr "Anulowanie…"
+
+#: src/piclone.c:665
+msgid "Checking source..."
+msgstr "Sprawdzanie źródła…"
+
+#: src/piclone.c:732
+#, c-format
+msgid "This will erase all content on the device '%s'. Are you sure?"
+msgstr "Spowoduje to usunięcie całej zawartości urządzenia „%s”. Czy na pewno kontynuować?"
+
+#: src/piclone.c:741
+msgid "_No"
+msgstr "_Nie"
+
+#: src/piclone.c:745
+msgid "_Yes"
+msgstr "_Tak"
+
+#: src/piclone.c:792 src/piclone.c:865
+msgid "No devices available"
+msgstr "Brak dostępnych urządzeń"
+
+#: src/piclone.c:818
+msgid "Drives changed - cancelling..."
+msgstr "Zmiana napędów – anulowanie…"
+
+#: data/piclone.ui:8 data/piclone.desktop.in:3 data/piclone.desktop.in:4
+msgid "SD Card Copier"
+msgstr "SD Card Copier"
+
+#: data/piclone.ui:32
+msgid "Select the device from which to copy"
+msgstr "Wybierz urządzenie, z którego chcesz kopiować"
+
+#: data/piclone.ui:33
+msgid "Copy From Device:"
+msgstr "Kopiuj z urządzenia:"
+
+#: data/piclone.ui:46
+msgid "Select the device to copy from"
+msgstr "Wybierz urządzenie źródłowe"
+
+#: data/piclone.ui:70
+msgid "Select the device to which to copy"
+msgstr "Wybierz urządzenie, na które chcesz skopiować"
+
+#: data/piclone.ui:71
+msgid "Copy To Device:"
+msgstr "Kopiuj na urządzenie:"
+
+#: data/piclone.ui:84
+msgid "Select the device to copy to"
+msgstr "Wybierz urządzenie docelowe"
+
+#: data/piclone.ui:105
+msgid "New Partition UUIDs"
+msgstr "Nowe UUID partycji" 
+
+#: data/piclone.ui:109
+msgid "Check this box to create new partition UUIDs on the copy"
+msgstr "Zaznacz to pole, aby utworzyć nowe UUID partycji na kopii"
+
+#: data/piclone.ui:173
+msgid "Start"
+msgstr "Start"
+
+#: data/piclone.ui:236
+msgid "label"
+msgstr ""
+
+#: data/piclone.ui:263
+msgid "_Cancel"
+msgstr "_Anuluj"
+
+#: data/piclone.ui:278
+msgid "_OK"
+msgstr "_OK"
+
+#: data/piclone.ui:311
+msgid ""
+"SD Card Copier v1.0\n"
+"\n"
+"This is an application to copy and back up SD cards. To use it, you will "
+"need a USB SD card writer.\n"
+"\n"
+"To back up your Raspberry Pi's internal SD card, insert a blank SD card into "
+"a USB card writer and connect it to your Pi. Then start the application, "
+"choose your card writer from the “Copy To Device” drop-down box and press "
+"“Start”. The copy process will take 10-15 minutes depending on the size of "
+"your card.\n"
+"\n"
+"The resulting card should be a bootable copy of your existing card; to "
+"restore, simply place the backup card into the onboard SD card slot, put the "
+"card to restore onto into the USB writer and repeat the copy process above.\n"
+"\n"
+"You can also back up to a standard USB stick, and then restore from the USB "
+"stick to an SD card by setting the “Copy From Device” drop-down to the USB "
+"stick and the “Copy To Device” to a USB card writer containing the card to "
+"restore onto.\n"
+"\n"
+"Note that you cannot copy onto the SD card from which your Pi is currently "
+"booted, which is why it does not appear in the “Copy To Device” dropdown.\n"
+"\n"
+"Note also that the destination card doesn’t need to be the same size as the "
+"source card, but it must have enough space to hold all the data that is on "
+"it. The application will warn you if there is insufficient space on the "
+"destination.\n"
+"\n"
+"Under Raspbian Stretch and later versions, you cannot mount two partitions "
+"with the same UUID, so you will not be able to mount a cloned SD card when "
+"booted from the disk from which it was cloned. If you need to do this, check "
+"the \"New Partition UUIDs\" box before copying.\n"
+msgstr ""
+"SD Card Copier v1.0\n"
+"\n"
+"Aplikacja do kopiowania i tworzenia kopii zapasowych kart SD. Do jej użycia potrzebny "
+"jest czytnik kart SD podłączany przez USB.\n"
+"\n"
+"Aby wykonać kopię zapasową karty SD używanej przez Raspberry Pi, włóż pustą kartę SD do "
+"czytnika USB i podłącz go do Raspberry Pi. Następnie uruchom aplikację, wybierz czytnik "
+"kart z listy „Kopiuj na urządzenie” i naciśnij „Start”. Proces kopiowania zajmie 10–15 "
+"minut, w zależności od rozmiaru karty.\n"
+"\n"
+"Utworzona karta będzie bootowalną kopią dotychczasowej karty; aby przywrócić dane, "
+"włóż kartę z kopią zapasową do wbudowanego gniazda kart SD, umieść kartę, "
+"na którą chcesz przywrócić dane, w czytniku USB i powtórz powyższy proces.\n"
+"\n"
+"Możesz także wykonać kopię zapasową na zwykłym pendrivie, a następnie przywrócić dane na "
+"kartę SD, ustawiając listę „Kopiuj z urządzenia” na pendrive i „Kopiuj na urządzenie” na "
+"czytnik USB z kartą docelową.\n"
+"\n"
+"Nie można kopiować na kartę SD, z której Raspberry Pi jest aktualnie uruchomione – dlatego "
+"nie pojawia się ona na liście „Kopiuj na urządzenie”.\n"
+"\n"
+"Karta docelowa nie musi być tego samego rozmiaru co źródłowa, ale musi mieć "
+"wystarczająco dużo miejsca na wszystkie dane. Aplikacja ostrzeże, jeśli na karcie "
+"docelowej zabraknie miejsca.\n"
+"\n"
+"W systemie Raspbian Stretch i nowszych nie można montować dwóch partycji o tym samym "
+"UUID, więc nie będzie można zamontować sklonowanej karty SD podczas uruchamiania z "
+"dysku, z którego została sklonowana. Jeśli jest to konieczne, zaznacz pole „Nowe UUID "
+"partycji” przed kopiowaniem.\n"
+
+#: data/piclone.ui:333
+msgid "SD Card Copier Help"
+msgstr "Pomoc programu SD Card Copier"
+
+#: data/piclone.desktop.in:5
+msgid "Make a copy of the Raspbian SD card"
+msgstr "Utwórz kopię karty SD z systemem Raspberry Pi OS"
