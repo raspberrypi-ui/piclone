@@ -1,3 +1,9 @@
+piclone (1.5) trixie; urgency=medium
+
+  * Connect delete handler
+
+ -- Simon Long <simon@raspberrypi.com>  Thu, 28 May 2026 09:47:43 +0100
+
 piclone (1.4) trixie; urgency=medium
 
   * Add Polish translation
