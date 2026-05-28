@@ -894,6 +894,7 @@ int main (int argc, char *argv[])
     // build the UI
     builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/piclone.ui");
     main_dlg = (GtkWidget *) gtk_builder_get_object (builder, "main_window");
+    g_signal_connect (main_dlg, "delete_event", G_CALLBACK (on_quit), NULL);
 
     // set up the start button
     start_btn = (GtkWidget *) gtk_builder_get_object (builder, "btn_start");
@@ -944,8 +945,6 @@ int main (int argc, char *argv[])
     setup_activate (main_dlg);
 
     gtk_main ();
-
-    gtk_widget_destroy (main_dlg);
 
     close_dbus ();
 
