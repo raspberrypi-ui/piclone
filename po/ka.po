@@ -1,0 +1,249 @@
+# Georgian translation for piclone.
+# Copyright (C) 2026 piclone's authors.
+# This file is distributed under the same license as the piclone package.
+# Ekaterine Papava <papava.e@gtu.ge>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: piclone\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-28 10:47+0200\n"
+"PO-Revision-Date: 2026-08-20 09:07+0200\n"
+"Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
+"Language-Team: Georgian <(nothing)>\n"
+"Language: ka\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.9\n"
+
+#: src/piclone.c:94 src/piclone.c:810
+msgid "Drives changed - copy aborted"
+msgstr "დისკები შეიცვალა - კოპირება შეწყდა"
+
+#: src/piclone.c:174 src/piclone.c:811
+msgid "OK"
+msgstr "დიახ"
+
+#: src/piclone.c:256
+msgid "Unable to read source."
+msgstr "წყაროს წაკითხვა შეუძლებელია."
+
+#: src/piclone.c:262
+msgid "Non-MSDOS partition table on source."
+msgstr "არა-MSDOS-ის დანაყოფების ცხრილი წყაროზე."
+
+#: src/piclone.c:269
+msgid "Preparing target..."
+msgstr "სამიზნის მომზადება..."
+
+#: src/piclone.c:282
+msgid "Could not write to destination."
+msgstr "სამიზნეზე ჩაწერა შეუძლებელია."
+
+#: src/piclone.c:296
+msgid "Could not create FAT."
+msgstr "FAT-ის შექმნა შეუძლებელია."
+
+#: src/piclone.c:302
+msgid "Reading partitions..."
+msgstr "მიმდინარეობს დანაყოფების წაკითხვა..."
+
+#: src/piclone.c:317
+msgid "Too many partitions on source."
+msgstr "წყაროზე მეტისმეტად ბევრი დანაყოფია."
+
+#: src/piclone.c:329
+msgid "Preparing partitions..."
+msgstr "დანაყოფების მომზადება..."
+
+#: src/piclone.c:340 src/piclone.c:351 src/piclone.c:360
+msgid "Could not create partition."
+msgstr "დანაყოფის შექმნა შეუძლებელია."
+
+#: src/piclone.c:425 src/piclone.c:431 src/piclone.c:453 src/piclone.c:459
+msgid "Could not create file system."
+msgstr "ფაილური სისტემის შექმნა შეუძლებელია."
+
+#: src/piclone.c:483
+#, c-format
+msgid "Copying partition %d of %d..."
+msgstr "დანაყოფის %d / %d კოპირება..."
+
+#: src/piclone.c:493 src/piclone.c:499
+msgid "Could not mount partition."
+msgstr "დანაყოფის მიმაგრება შეუძლებელია."
+
+#: src/piclone.c:517
+msgid "Insufficient space. Backup aborted."
+msgstr "არასაკმარისი ადგილი. მარქაფი შეწყდა."
+
+#: src/piclone.c:558 src/piclone.c:564
+msgid "Could not unmount partition."
+msgstr "დანაყოფის მოხსნა შეუძლებელია."
+
+#: src/piclone.c:575
+msgid "Could not set flags."
+msgstr "ალმების დაყენება შეუძლებელია."
+
+#: src/piclone.c:586
+msgid "Copy complete."
+msgstr "კოპირება დასრულდა."
+
+#: src/piclone.c:624
+msgid "Cancelling..."
+msgstr "გაუქმება…"
+
+#: src/piclone.c:667
+msgid "Checking source..."
+msgstr "წყაროს შემოწმება..."
+
+#: src/piclone.c:734
+#, c-format
+msgid "This will erase all content on the device '%s'. Are you sure?"
+msgstr "ეს წაშლის ყველაფერს მოწყობილობაზე '%s'. დარწმუნებული ბრძანდებით?"
+
+#: src/piclone.c:743
+msgid "_No"
+msgstr "_არა"
+
+#: src/piclone.c:747
+msgid "_Yes"
+msgstr "_დიახ"
+
+#: src/piclone.c:794 src/piclone.c:867
+msgid "No devices available"
+msgstr "მოწყობილობები მიუწვდომელია"
+
+#: src/piclone.c:820
+msgid "Drives changed - cancelling..."
+msgstr "დისკები შეიცვალა - შეწყვეტა..."
+
+#: data/piclone.ui:8 data/piclone.desktop.in:3 data/piclone.desktop.in:4
+msgid "SD Card Copier"
+msgstr "SD-ბარათის კოპირების პროგრამა"
+
+#: data/piclone.ui:32
+msgid "Select the device from which to copy"
+msgstr "აირჩიეთ მოწყობილობა, საიდანაც კოპირება მოხდება"
+
+#: data/piclone.ui:33
+msgid "Copy From Device:"
+msgstr "კოპირება მოწყობილობიდან:"
+
+#: data/piclone.ui:46
+msgid "Select the device to copy from"
+msgstr "აირჩიეთ მოწყობილობა, საიდანაც გნებავთ კოპირება"
+
+#: data/piclone.ui:70
+msgid "Select the device to which to copy"
+msgstr "აირჩიეთ მოწყობილობა, სადაც კოპირება მოხდება"
+
+#: data/piclone.ui:71
+msgid "Copy To Device:"
+msgstr "კოპირება მოწყობილობაზე:"
+
+#: data/piclone.ui:84
+msgid "Select the device to copy to"
+msgstr "აირჩიეთ მოწყობილობა, სადაც გნებავთ კოპირება"
+
+#: data/piclone.ui:105
+msgid "New Partition UUIDs"
+msgstr "ახალი დანაყოფის UUID-ები"
+
+#: data/piclone.ui:109
+msgid "Check this box to create new partition UUIDs on the copy"
+msgstr "დასვით ეს თოლია კოპირებისას ახალი UUID-ების შესაქმნელად"
+
+#: data/piclone.ui:173
+msgid "Start"
+msgstr "დაწყება"
+
+#: data/piclone.ui:236
+msgid "label"
+msgstr "ჭდე"
+
+#: data/piclone.ui:263
+msgid "_Cancel"
+msgstr "გაუ_ქმება"
+
+#: data/piclone.ui:278
+msgid "_OK"
+msgstr "_დიახ"
+
+#: data/piclone.ui:311
+msgid ""
+"SD Card Copier v1.0\n"
+"\n"
+"This is an application to copy and back up SD cards. To use it, you will "
+"need a USB SD card writer.\n"
+"\n"
+"To back up your Raspberry Pi's internal SD card, insert a blank SD card into "
+"a USB card writer and connect it to your Pi. Then start the application, "
+"choose your card writer from the “Copy To Device” drop-down box and press "
+"“Start”. The copy process will take 10-15 minutes depending on the size of "
+"your card.\n"
+"\n"
+"The resulting card should be a bootable copy of your existing card; to "
+"restore, simply place the backup card into the onboard SD card slot, put the "
+"card to restore onto into the USB writer and repeat the copy process above.\n"
+"\n"
+"You can also back up to a standard USB stick, and then restore from the USB "
+"stick to an SD card by setting the “Copy From Device” drop-down to the USB "
+"stick and the “Copy To Device” to a USB card writer containing the card to "
+"restore onto.\n"
+"\n"
+"Note that you cannot copy onto the SD card from which your Pi is currently "
+"booted, which is why it does not appear in the “Copy To Device” dropdown.\n"
+"\n"
+"Note also that the destination card doesn’t need to be the same size as the "
+"source card, but it must have enough space to hold all the data that is on "
+"it. The application will warn you if there is insufficient space on the "
+"destination.\n"
+"\n"
+"Under Raspbian Stretch and later versions, you cannot mount two partitions "
+"with the same UUID, so you will not be able to mount a cloned SD card when "
+"booted from the disk from which it was cloned. If you need to do this, check "
+"the \"New Partition UUIDs\" box before copying.\n"
+msgstr ""
+"SD ბარათის კოპირების პროგრამა v1.0\n"
+"\n"
+"ეს SD ბარათების კოპირების და მარქაფის პროგრამაა. მის გამოსაყენებლად USB SD "
+"ბარათის ჩამწერის დაგჭირდებატ.\n"
+"\n"
+"თქვენი Raspberry Pi-ის შიდა SD ბარათის დასამარქაფებლად ჩადეთ ცარიელი SD "
+"ბარათის ჩამწერში და მიეაერთეთ თქვენს Pi-ზე. შემდეგ გაუშვით ეს აპლიკაცია, "
+"აირჩიეთ თქვენი ბარათის ჩამწერი ჩამოსაშლელ მენიუში \"კოპირება მოწყობილობაზე\" "
+"და დააჭირეთ ღილაკს \"დაწყება\". კოპირების პროცესს, თქვენი ბარათის ზომაზე "
+"დამოკიდებულებით, 10-15 წუთი დასჭირდება.\n"
+"\n"
+"შედეგად მიღებული ბარათი უნდა იყოს თქვენი არსებული ბარათის ჩატვირთვადი ასლი. "
+"აღსადგენად უბრალოდ მოათავსეთ მარქაფი ბარათი თქვენს დაფაზე არსებულ SD ბარათის "
+"სლოტში, ჩადეთ აღსადგენი ბარათი USB ჩამწერში და გაიმეორეთ კოპირების ზედა "
+"ოპერაცია.\n"
+"\n"
+"ასევე შეგიძლიათ სტანდარტული USB დისკის მარქაფიც და შემდეგ USB დისკის აღდგენა "
+"SD ბარათზე ჩამოსაშლელ მენიუში \"მოწყობილობა, საიდანაც კოპირება გნებავთ\" USB "
+"დისკის არჩევით და მენიუში \"სადაც კოპირება გსურთ\" USB ბარათის ჩამწერის, "
+"რომელშიც დევს ბარათი, რაზეც აღდგენა გნებავთ, არჩევით.\n"
+"\n"
+"დაიმახსოვრეთ, რომ თქვენ არ შეგიძლიათ კოპირება SD ბარათზე, საიდანაც თქვენი Pi "
+"ამჟამადაა ჩატვირთული. ეს მიზეზია, რატომაც ის არ ჩანს ჩამოსაშლელ მენიუში "
+"\"კოპირება მოწყობილობაზე\".\n"
+"\n"
+"დაიმახსოვრეთ, რომ არაა საჭირო, სამიზნე ბარათი წყარო ბარათის ზომის იყოს, "
+"მაგრამ მასზე საკმარისი ადგილი უნდა იყოს.აპლიკაცია გაგაფრთხილებთ, თუ სამიზნე "
+"ბარათზე ადგილი საკმარისი არაა.\n"
+"\n"
+"Raspbian Strech-ში და უფრო ახალ ვერსიებში იგივე UUID-ის მქონე ორ დანაყოფს "
+"ვერ მიამაგრებთ, ასე რომ, თქვენ არ შეგეძლებათ დაკლონილი SD ბარათის მიმაგრება, "
+"როცა ჩატვირთული იქნებით ბარათიდან, საიდანაც ის დაკლონეთ. თუ ამისი გაკეთება "
+"გჭირდებათ, კოპირებამდე დასვით თოლია \"ახალი დანაყოფის UUID-ები\".\n"
+
+#: data/piclone.ui:333
+msgid "SD Card Copier Help"
+msgstr "SD-ბარათის კოპირების პროგრამის დახმარება"
+
+#: data/piclone.desktop.in:5
+msgid "Make a copy of the Raspbian SD card"
+msgstr "Raspbian-ის SD ბარათის ასლის შექმნა"
