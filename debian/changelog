@@ -1,3 +1,9 @@
+piclone (1.6) trixie; urgency=medium
+
+  * Add Georgian translation
+
+ -- Simon Long <simon@raspberrypi.com>  Wed, 02 Sep 2026 07:34:56 +0100
+
 piclone (1.5) trixie; urgency=medium
 
   * Connect delete handler
